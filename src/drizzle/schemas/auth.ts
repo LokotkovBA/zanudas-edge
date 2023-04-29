@@ -63,7 +63,7 @@ export const users = sqliteTable(
     "users",
     {
         id: text("id").primaryKey().notNull(),
-        role: text("role").notNull().default("CHATTER"),
+        privileges: integer("privileges").notNull().default(0),
         name: text("name"),
         email: text("email").notNull(),
         emailVerified: integer("emailVerified", { mode: "timestamp" }),
