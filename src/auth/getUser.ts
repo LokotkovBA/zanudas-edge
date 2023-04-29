@@ -7,11 +7,10 @@ import { sessions, users } from "~/drizzle/schemas/auth";
 export interface User {
     id: string;
     email: string;
-    role: UserRole;
+    privileges: number;
     name: string | undefined;
 }
 
-export type UserRole = "CHATTER" | "MOD" | "ADMIN";
 
 export type GetUser = () => Promise<User | null>;
 
@@ -33,7 +32,7 @@ export function createGetUser(
             .select({
                 user_id: users.id,
                 user_name: users.name,
-                user_role: users.role,
+                user_privileges: users.privileges,
                 user_email: users.email,
             })
             .from(sessions)
@@ -42,19 +41,14 @@ export function createGetUser(
             .all();
         const session = rows[0];
         if (!session) return null;
-        if (!isUserRole(session.user_role)) throw Error("Invalid user role in db");
 
         const user: User = {
             id: session.user_id,
             name: session.user_name ?? undefined,
-            role: session.user_role,
+            privileges: session.user_privileges,
             email: session.user_email,
         };
         return user;
     };
 }
 
-
-function isUserRole(input: string): input is UserRole {
-    return ["CHATTER", "MOD", "ADMIN"].includes(input);
-}
