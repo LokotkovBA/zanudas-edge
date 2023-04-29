@@ -9,8 +9,12 @@
 /coverage
 
 # next.js
+.env
 /.next/
 /out/
+
+# db
+migrations/
 
 # production
 /build
