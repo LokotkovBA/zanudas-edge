@@ -8,6 +8,7 @@ export const authConfig: SolidAuthConfig = {
     // Configure one or more authentication providers
     adapter: createDrizzleAdapter(drizzleClient),
     providers: [
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore growing pains
         TwitchProvider({
             clientId: env.TWITCH_CLIENT_ID,
