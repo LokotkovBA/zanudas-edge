@@ -6,12 +6,10 @@ import { sessions, users } from "~/drizzle/schemas/auth";
 
 export interface User {
     id: string;
-    email: string;
     privileges: number;
     name: string;
     image: string;
 }
-
 
 export type GetUser = () => Promise<User | null>;
 
@@ -35,7 +33,6 @@ export function createGetUser(
                 user_name: users.name,
                 user_privileges: users.privileges,
                 user_image: users.image,
-                user_email: users.email,
             })
             .from(sessions)
             .innerJoin(users, eq(users.id, sessions.userId))
@@ -49,9 +46,7 @@ export function createGetUser(
             name: session.user_name ?? "",
             image: session.user_image ?? "",
             privileges: session.user_privileges,
-            email: session.user_email,
         };
         return user;
     };
 }
-
