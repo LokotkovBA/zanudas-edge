@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import { Menu } from "~/components/server/Menu";
 import { api } from "~/server/api";
 
@@ -19,8 +20,10 @@ export default async function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.className} bg-slate-900 text-slate-50`}>
-                <header className="flex px-40 py-3 items-center">
-                    <h1 className="text-3xl text-amber-400">{`>3`}</h1>
+                <header className="flex items-center px-40 py-3">
+                    <h1 className="text-3xl text-amber-400">
+                        <Link href="/">{`>3`}</Link>
+                    </h1>
                     {/* @ts-expect-error Async Server Component */}
                     <Menu />
                 </header>
