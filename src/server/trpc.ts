@@ -50,7 +50,7 @@ export const publicProcedure = t.procedure.use((opts) => {
                     id: opts.ctx.user.id,
                     name: opts.ctx.user.name,
                     email: opts.ctx.user.email,
-                    image: (opts.ctx.user as { image?: string }).image,
+                    image: opts.ctx.user.image,
                 }
                 : undefined,
         },

@@ -8,7 +8,8 @@ export interface User {
     id: string;
     email: string;
     privileges: number;
-    name: string | undefined;
+    name: string;
+    image: string;
 }
 
 
@@ -33,6 +34,7 @@ export function createGetUser(
                 user_id: users.id,
                 user_name: users.name,
                 user_privileges: users.privileges,
+                user_image: users.image,
                 user_email: users.email,
             })
             .from(sessions)
@@ -44,7 +46,8 @@ export function createGetUser(
 
         const user: User = {
             id: session.user_id,
-            name: session.user_name ?? undefined,
+            name: session.user_name ?? "",
+            image: session.user_image ?? "",
             privileges: session.user_privileges,
             email: session.user_email,
         };
