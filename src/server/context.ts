@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { inferAsyncReturnType } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
-import { GetUser, User } from "~/auth/getUser";
+import type { GetUser, User } from "~/auth/getUser";
 import { drizzleClient } from "~/drizzle/db";
 
 /**
