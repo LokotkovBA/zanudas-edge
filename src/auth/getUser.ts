@@ -27,7 +27,7 @@ export function createGetUser(
             newCookies["__Secure-next-auth.session-token"];
         if (!sessionToken) return null;
 
-        const rows = await drizzleClient
+        const session = await drizzleClient
             .select({
                 user_id: users.id,
                 user_name: users.name,
@@ -36,9 +36,8 @@ export function createGetUser(
             })
             .from(sessions)
             .innerJoin(users, eq(users.id, sessions.userId))
-            .limit(1)
-            .all();
-        const session = rows[0];
+            .where(eq(sessions.sessionToken, sessionToken))
+            .get();
         if (!session) return null;
 
         const user: User = {
