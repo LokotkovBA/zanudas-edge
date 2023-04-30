@@ -1,5 +1,13 @@
-import type { BuiltInProviderType, RedirectableProviderType } from "@auth/core/providers";
-import type { LiteralUnion, SignInAuthorizationParams, SignInOptions, SignOutParams } from "next-auth/react";
+import type {
+    BuiltInProviderType,
+    RedirectableProviderType,
+} from "@auth/core/providers";
+import type {
+    LiteralUnion,
+    SignInAuthorizationParams,
+    SignInOptions,
+    SignOutParams,
+} from "next-auth/react";
 
 /**
  * Client-side method to initiate a signin flow
@@ -8,12 +16,19 @@ import type { LiteralUnion, SignInAuthorizationParams, SignInOptions, SignOutPar
  *
  * [Documentation](https://next-auth.js.org/getting-started/client#signin)
  */
-export async function signIn<P extends RedirectableProviderType | undefined = undefined>(
-    providerId?: LiteralUnion<P extends RedirectableProviderType ? P | BuiltInProviderType : BuiltInProviderType>,
+export async function signIn<
+    P extends RedirectableProviderType | undefined = undefined,
+>(
+    providerId?: LiteralUnion<
+        P extends RedirectableProviderType
+            ? P | BuiltInProviderType
+            : BuiltInProviderType
+    >,
     options?: SignInOptions,
     authorizationParams?: SignInAuthorizationParams,
 ) {
-    const { callbackUrl = window.location.href, redirect = true } = options ?? {};
+    const { callbackUrl = window.location.href, redirect = true } =
+        options ?? {};
 
     // TODO: Support custom providers
     const isCredentials = providerId === "credentials";
@@ -21,9 +36,13 @@ export async function signIn<P extends RedirectableProviderType | undefined = un
     const isSupportingReturn = isCredentials || isEmail;
 
     // TODO: Handle custom base path
-    const signInUrl = `/api/auth/${isCredentials ? "callback" : "signin"}/${providerId}`;
+    const signInUrl = `/api/auth/${
+        isCredentials ? "callback" : "signin"
+    }/${providerId}`;
 
-    const _signInUrl = `${signInUrl}?${new URLSearchParams(authorizationParams)}`;
+    const _signInUrl = `${signInUrl}?${new URLSearchParams(
+        authorizationParams,
+    )}`;
 
     // TODO: Handle custom base path
     const csrfTokenResponse = await fetch("/api/auth/csrf");

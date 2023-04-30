@@ -9,4 +9,3 @@ const client = createClient({
 });
 
 export const drizzleClient = drizzle(client);
-

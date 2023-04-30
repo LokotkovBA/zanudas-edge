@@ -24,12 +24,17 @@ interface CreateTRPCNextLayoutOptions<TRouter extends AnyRouter> {
 /**
  * @internal
  */
-export type DecorateProcedure<TProcedure extends AnyProcedure> = TProcedure extends AnyQueryProcedure
-    ? {
-        fetch(input: inferProcedureInput<TProcedure>): Promise<inferProcedureOutput<TProcedure>>;
-        fetchInfinite(input: inferProcedureInput<TProcedure>): Promise<inferProcedureOutput<TProcedure>>;
-    }
-    : never;
+export type DecorateProcedure<TProcedure extends AnyProcedure> =
+    TProcedure extends AnyQueryProcedure
+        ? {
+              fetch(
+                  input: inferProcedureInput<TProcedure>,
+              ): Promise<inferProcedureOutput<TProcedure>>;
+              fetchInfinite(
+                  input: inferProcedureInput<TProcedure>,
+              ): Promise<inferProcedureOutput<TProcedure>>;
+          }
+        : never;
 
 type OmitNever<TType> = Pick<
     TType,
@@ -40,28 +45,40 @@ type OmitNever<TType> = Pick<
 /**
  * @internal
  */
-export type DecoratedProcedureRecord<TProcedures extends ProcedureRouterRecord, TPath extends string = ""> = OmitNever<{
+export type DecoratedProcedureRecord<
+    TProcedures extends ProcedureRouterRecord,
+    TPath extends string = "",
+> = OmitNever<{
     [TKey in keyof TProcedures]: TProcedures[TKey] extends AnyRouter
-    ? DecoratedProcedureRecord<TProcedures[TKey]["_def"]["record"], `${TPath}${TKey & string}.`>
-    : TProcedures[TKey] extends AnyQueryProcedure
-    ? DecorateProcedure<TProcedures[TKey]>
-    : never;
+        ? DecoratedProcedureRecord<
+              TProcedures[TKey]["_def"]["record"],
+              `${TPath}${TKey & string}.`
+          >
+        : TProcedures[TKey] extends AnyQueryProcedure
+        ? DecorateProcedure<TProcedures[TKey]>
+        : never;
 }>;
 
-type CreateTRPCNextLayout<TRouter extends AnyRouter> = DecoratedProcedureRecord<TRouter["_def"]["record"]> & {
+type CreateTRPCNextLayout<TRouter extends AnyRouter> = DecoratedProcedureRecord<
+    TRouter["_def"]["record"]
+> & {
     dehydrate(): Promise<DehydratedState>;
 };
 
-function getQueryKey(path: string[], input: unknown, isFetchInfinite?: boolean) {
+function getQueryKey(
+    path: string[],
+    input: unknown,
+    isFetchInfinite?: boolean,
+) {
     return input === undefined
         ? [path, { type: isFetchInfinite ? "infinite" : "query" }]
         : [
-            path,
-            {
-                input: { ...input },
-                type: isFetchInfinite ? "infinite" : "query",
-            },
-        ];
+              path,
+              {
+                  input: { ...input },
+                  type: isFetchInfinite ? "infinite" : "query",
+              },
+          ];
 }
 
 export function createTRPCNextLayout<TRouter extends AnyRouter>(
@@ -105,12 +122,14 @@ export function createTRPCNextLayout<TRouter extends AnyRouter>(
         if (lastPart === "dehydrate" && path.length === 0) {
             if (queryClient.isFetching()) {
                 await new Promise<void>((resolve) => {
-                    const unsub = queryClient.getQueryCache().subscribe((event) => {
-                        if (event?.query.getObserversCount() === 0) {
-                            resolve();
-                            unsub();
-                        }
-                    });
+                    const unsub = queryClient
+                        .getQueryCache()
+                        .subscribe((event) => {
+                            if (event?.query.getObserversCount() === 0) {
+                                resolve();
+                                unsub();
+                            }
+                        });
                 });
             }
             const dehydratedState = dehydrate(queryClient);
@@ -125,9 +144,13 @@ export function createTRPCNextLayout<TRouter extends AnyRouter>(
         const queryKey = getQueryKey(path, input, lastPart === "fetchInfinite");
 
         if (lastPart === "fetchInfinite") {
-            return queryClient.fetchInfiniteQuery(queryKey, () => caller.query(pathStr, input));
+            return queryClient.fetchInfiniteQuery(queryKey, () =>
+                caller.query(pathStr, input),
+            );
         }
 
-        return queryClient.fetchQuery(queryKey, () => caller.query(pathStr, input));
+        return queryClient.fetchQuery(queryKey, () =>
+            caller.query(pathStr, input),
+        );
     }) as CreateTRPCNextLayout<TRouter>;
 }

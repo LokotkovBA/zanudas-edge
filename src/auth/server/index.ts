@@ -3,7 +3,11 @@
 import { Auth } from "@auth/core";
 import type { AuthAction, AuthConfig } from "@auth/core/types";
 import { serialize, type CookieSerializeOptions } from "cookie";
-import { parseString, splitCookiesString, type Cookie } from "set-cookie-parser";
+import {
+    parseString,
+    splitCookiesString,
+    type Cookie,
+} from "set-cookie-parser";
 
 export interface SolidAuthConfig extends AuthConfig {
     /**
@@ -44,9 +48,15 @@ const getSetCookieCallback = (cook?: string | null): Cookie | undefined => {
     return parseString(splitCookie?.[0] ?? ""); // just return the first cookie if no session token is found
 };
 
-export async function SolidAuthHandler(request: Request, prefix: string, authOptions: SolidAuthConfig) {
+export async function SolidAuthHandler(
+    request: Request,
+    prefix: string,
+    authOptions: SolidAuthConfig,
+) {
     const url = new URL(request.url);
-    const action = url.pathname.slice(prefix.length + 1).split("/")[0] as AuthAction;
+    const action = url.pathname
+        .slice(prefix.length + 1)
+        .split("/")[0] as AuthAction;
 
     if (!actions.includes(action) || !url.pathname.startsWith(prefix + "/")) {
         return;
@@ -54,11 +64,17 @@ export async function SolidAuthHandler(request: Request, prefix: string, authOpt
 
     const res = await Auth(request, authOptions);
     if (["callback", "signin", "signout"].includes(action)) {
-        const parsedCookie = getSetCookieCallback(res.clone().headers.get("Set-Cookie"));
+        const parsedCookie = getSetCookieCallback(
+            res.clone().headers.get("Set-Cookie"),
+        );
         if (parsedCookie) {
             res.headers.set(
                 "Set-Cookie",
-                serialize(parsedCookie.name, parsedCookie.value, parsedCookie as CookieSerializeOptions),
+                serialize(
+                    parsedCookie.name,
+                    parsedCookie.value,
+                    parsedCookie as CookieSerializeOptions,
+                ),
             );
         }
     }

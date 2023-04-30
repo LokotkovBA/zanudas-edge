@@ -26,7 +26,10 @@ const t = initTRPC.context<Context>().create({
             ...shape,
             data: {
                 ...shape.data,
-                zod: error.cause instanceof ZodError ? error.cause.flatten().fieldErrors : null,
+                zod:
+                    error.cause instanceof ZodError
+                        ? error.cause.flatten().fieldErrors
+                        : null,
             },
         };
     },
@@ -47,11 +50,11 @@ export const publicProcedure = t.procedure.use((opts) => {
         ctx: {
             user: opts.ctx.user
                 ? {
-                    id: opts.ctx.user.id,
-                    name: opts.ctx.user.name,
-                    email: opts.ctx.user.email,
-                    image: opts.ctx.user.image,
-                }
+                      id: opts.ctx.user.id,
+                      name: opts.ctx.user.name,
+                      privileges: opts.ctx.user.privileges,
+                      image: opts.ctx.user.image,
+                  }
                 : undefined,
         },
     });

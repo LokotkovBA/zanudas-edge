@@ -30,7 +30,10 @@ function getBaseUrl() {
     if (process.env.RENDER_INTERNAL_HOSTNAME) {
         // reference for render.com
         const port = process.env.PORT;
-        if (!port) throw new Error("PORT is not set but RENDER_INTERNAL_HOSTNAME is set");
+        if (!port)
+            throw new Error(
+                "PORT is not set but RENDER_INTERNAL_HOSTNAME is set",
+            );
         return `http://${process.env.RENDER_INTERNAL_HOSTNAME}:${port}`;
     }
     // assume localhost

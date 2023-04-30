@@ -19,7 +19,9 @@ function throwError(msg: string) {
 export function getRequestStorage<T>(): T {
     if ("getStore" in asyncStorage) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        return asyncStorage.getStore() ?? throwError("Couldn't get async storage");
+        return (
+            asyncStorage.getStore() ?? throwError("Couldn't get async storage")
+        );
     }
 
     return asyncStorage as T;

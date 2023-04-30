@@ -22,9 +22,9 @@ export async function createContext(
     // HACKs because we can't import `next/cookies` in `/api`-routes
     opts:
         | {
-            type: "rsc";
-            getUser: GetUser;
-        }
+              type: "rsc";
+              getUser: GetUser;
+          }
         | (FetchCreateContextFnOptions & { type: "api"; getUser: GetUser }),
 ) {
     // for API-response caching see https://trpc.io/docs/caching
