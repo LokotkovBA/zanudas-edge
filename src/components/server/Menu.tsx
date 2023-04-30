@@ -7,6 +7,7 @@ import { isAdmin } from "~/utils/privileges";
 import { linkStyles } from "../styles/link";
 import PublicLinks from "../client/PublicLinks";
 import AdminLinks from "../client/AdminLinks";
+import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 
 export async function Menu() {
     const user = await api.whoami.fetch();
@@ -23,9 +24,10 @@ export async function Menu() {
                 <li className="ml-auto">
                     <Link
                         target="_blank"
-                        className={linkStyles}
+                        className={`${linkStyles} flex items-center gap-1 fill-slate-50`}
                         href="https://www.donationalerts.com/r/zanuda"
                     >
+                        <DonationAlertsIcon size={"1.2em"} />
                         Request
                     </Link>
                 </li>
@@ -35,8 +37,8 @@ export async function Menu() {
                     </li>
                 )}
                 <li>
-                    {!user && <SignInButton className={linkStyles} />}
-                    {user && <SignOutButton className={linkStyles} />}
+                    {!user && <SignInButton />}
+                    {user && <SignOutButton />}
                 </li>
             </menu>
         </nav>

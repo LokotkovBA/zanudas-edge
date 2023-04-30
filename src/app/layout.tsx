@@ -24,7 +24,7 @@ export default async function RootLayout({
     return (
         <html lang="en">
             <body className={`${inter.className} bg-slate-900 text-slate-50`}>
-                <header className="border-b border-b-slate-500 bg-slate-950 px-2 py-4 lg:px-40">
+                <header className="border-b border-b-slate-500 bg-slate-950 px-2 py-4 xl:px-40">
                     {/* @ts-expect-error Async Server Component */}
                     <Menu />
                 </header>
