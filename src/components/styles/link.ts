@@ -1,3 +1,3 @@
-const className = "";
+const className = "hover:bg-slate-900 px-4 py-3 rounded-md";
 
-export default className;
+export { className as linkStyles };

@@ -1,3 +1,3 @@
-const className = ""
+const className = "";
 
-export default className;
+export { className as buttonStyles };

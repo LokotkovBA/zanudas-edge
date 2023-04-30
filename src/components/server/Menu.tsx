@@ -1,25 +1,25 @@
 import Link from "next/link";
 import { api } from "~/server/api";
 import SignInButton from "../client/SignInButton";
-import linkStyles from "../styles/link";
 import Image from "next/image";
 import SignOutButton from "../client/SignOutButton";
+import { isAdmin } from "~/utils/privileges";
+import { linkStyles } from "../styles/link";
+import PublicLinks from "../client/PublicLinks";
+import AdminLinks from "../client/AdminLinks";
 
 export async function Menu() {
     const user = await api.whoami.fetch();
     return (
         <nav className="w-full">
-            <menu className="flex gap-8 items-center">
-                <li className="ml-auto">
-                    <Link className={linkStyles} href="/queue">
-                        Queue
-                    </Link>
-                </li>
+            <menu className="flex items-center gap-6 text-lg">
                 <li>
-                    <Link className={linkStyles} href="/songlist">
-                        Song list
-                    </Link>
+                    <h1 className="text-3xl text-amber-400">
+                        <Link href="/">{`>3`}</Link>
+                    </h1>
                 </li>
+                <PublicLinks />
+                {isAdmin(user?.privileges) && <AdminLinks />}
                 <li className="ml-auto">
                     <Link
                         target="_blank"
@@ -29,11 +29,14 @@ export async function Menu() {
                         Request
                     </Link>
                 </li>
-                <li className="flex gap-1 items-center">
-                    {!user && <SignInButton className={linkStyles} />}
-                    {!!user && (
+                {user && (
+                    <li>
                         <ProfileBlock image={user.image} name={user.name} />
-                    )}
+                    </li>
+                )}
+                <li>
+                    {!user && <SignInButton className={linkStyles} />}
+                    {user && <SignOutButton className={linkStyles} />}
                 </li>
             </menu>
         </nav>
@@ -42,16 +45,16 @@ export async function Menu() {
 
 function ProfileBlock({ image, name }: { image: string; name: string }) {
     return (
-        <>
+        <div className="flex items-center gap-4">
             <Image
-                className="rounded-full border-slate-700 border-2"
+                priority={true}
+                className="rounded-full"
                 alt={`${name}'s profile picture`}
                 width={45}
                 height={45}
                 src={image}
             />
             <span className="text-amber-400">{name}</span>
-            <SignOutButton />
-        </>
+        </div>
     );
 }

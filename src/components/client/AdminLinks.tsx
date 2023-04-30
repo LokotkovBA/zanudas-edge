@@ -1,0 +1,24 @@
+"use client";
+
+import Link from "next/link";
+import { linkStyles } from "../styles/link";
+import { usePathname } from "next/navigation";
+import clsx from "clsx";
+
+export default function AdminLinks() {
+    const pathname = usePathname();
+    return (
+        <>
+            <li>
+                <Link
+                    className={clsx(linkStyles, {
+                        "text-sky-400": pathname === "/users",
+                    })}
+                    href="/users"
+                >
+                    Users
+                </Link>
+            </li>
+        </>
+    );
+}
