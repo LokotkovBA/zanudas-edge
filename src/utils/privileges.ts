@@ -1,9 +1,13 @@
+export function isMaster(privileges?: number): boolean {
+    return privileges ? (privileges & 1024) !== 0 : false;
+}
+
 export function isAdmin(privileges?: number): boolean {
-    return privileges ? (privileges & 512) !== 0 : false;
+    return privileges ? (privileges & 1536) !== 0 : false;
 }
 
 export function isMod(privileges?: number): boolean {
-    return privileges ? (privileges & 256) !== 0 : false;
+    return privileges ? (privileges & 1792) !== 0 : false;
 }
 
 export function excludeStuff(privileges?: number): number {
