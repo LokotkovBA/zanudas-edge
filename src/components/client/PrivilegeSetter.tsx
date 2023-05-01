@@ -25,10 +25,11 @@ const PrivilegeSetter: React.FC<PrivilegeSetterProps> = ({
 
     function onSetClick() {
         const privileges = parseInt(currentPrivileges.join(""), 2);
-        updatePrivileges({ user_id, privileges })
+        updatePrivileges({ user_id, privileges });
     }
 
-    const { mutate: updatePrivileges } = clientAPI.users.updatePrivileges.useMutation()
+    const { mutate: updatePrivileges } =
+        clientAPI.users.updatePrivileges.useMutation();
 
     return (
         <>

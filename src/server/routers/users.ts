@@ -9,7 +9,9 @@ export const usersRouter = createTRPCRouter({
     updatePrivileges: privateProcedure
         .input(z.object({ user_id: z.string(), privileges: z.number() }))
         .mutation(({ ctx, input: { user_id, privileges } }) => {
-            if (!isMaster(ctx.user.privileges)) throw new TRPCError({ code: "FORBIDDEN" });
+            if (!isMaster(ctx.user.privileges)) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
             return ctx.drizzle
                 .update(users)
                 .set({ privileges })
