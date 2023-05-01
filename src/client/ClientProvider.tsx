@@ -5,9 +5,9 @@ import { httpBatchLink, loggerLink } from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { useState } from "react";
 import superjson from "superjson";
-import type { AppRouter } from "~/server/routers/_app";
+import type { AppRouter } from "~/server/routers/root";
 
-export const api = createTRPCReact<AppRouter>({
+export const clientAPI = createTRPCReact<AppRouter>({
     unstable_overrides: {
         useMutation: {
             async onSuccess(opts) {
@@ -39,7 +39,7 @@ function getBaseUrl() {
     // assume localhost
     return `http://localhost:${process.env.PORT ?? 3000}`;
 }
-//doesn't work on the edge
+
 export function ClientProvider(props: { children: React.ReactNode }) {
     const [queryClient] = useState(
         () =>
@@ -54,7 +54,7 @@ export function ClientProvider(props: { children: React.ReactNode }) {
             }),
     );
     const [trpcClient] = useState(() =>
-        api.createClient({
+        clientAPI.createClient({
             links: [
                 loggerLink({
                     enabled: () => true,
@@ -67,10 +67,10 @@ export function ClientProvider(props: { children: React.ReactNode }) {
         }),
     );
     return (
-        <api.Provider client={trpcClient} queryClient={queryClient}>
+        <clientAPI.Provider client={trpcClient} queryClient={queryClient}>
             <QueryClientProvider client={queryClient}>
                 {props.children}
             </QueryClientProvider>
-        </api.Provider>
+        </clientAPI.Provider>
     );
 }

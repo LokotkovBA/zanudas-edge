@@ -1,0 +1,15 @@
+diff --git a/node_modules/@tanstack/react-query/build/lib/reactBatchedUpdates.mjs b/node_modules/@tanstack/react-query/build/lib/reactBatchedUpdates.mjs
+index 784cddc..b3c912d 100644
+--- a/node_modules/@tanstack/react-query/build/lib/reactBatchedUpdates.mjs
++++ b/node_modules/@tanstack/react-query/build/lib/reactBatchedUpdates.mjs
+@@ -1,7 +1,8 @@
+ 'use client';
+-import * as ReactDOM from 'react-dom';
+ 
+-const unstable_batchedUpdates = ReactDOM.unstable_batchedUpdates;
++const unstable_batchedUpdates = (callback) => {
++    callback()
++};
+ 
+ export { unstable_batchedUpdates };
+ //# sourceMappingURL=reactBatchedUpdates.mjs.map

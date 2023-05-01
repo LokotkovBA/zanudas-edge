@@ -2,10 +2,10 @@ import { cookies } from "next/headers";
 import superjson from "superjson";
 import { createGetUser } from "~/auth/getUser";
 import { createContext } from "~/server/context";
-import { appRouter } from "~/server/routers/_app";
 import { createTRPCNextLayout } from "./createTRPCNextLayout";
+import { appRouter } from "./routers/root";
 
-export const api = createTRPCNextLayout({
+export const serverAPI = createTRPCNextLayout({
     router: appRouter,
     transformer: superjson,
     createContext() {

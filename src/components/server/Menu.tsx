@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { api } from "~/server/api";
+import { serverAPI } from "~/server/api";
 import SignInButton from "../client/SignInButton";
 import Image from "next/image";
 import SignOutButton from "../client/SignOutButton";
@@ -10,7 +10,7 @@ import AdminLinks from "../client/AdminLinks";
 import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 
 export async function Menu() {
-    const user = await api.whoami.fetch();
+    const user = await serverAPI.getAuth.fetch();
     return (
         <nav className="w-full">
             <menu className="flex items-center gap-6 text-lg">

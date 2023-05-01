@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import type { NextRequest } from "next/server";
 import { createGetUser } from "~/auth/getUser";
 import { createContext } from "~/server/context";
-import { appRouter } from "~/server/routers/_app";
+import { appRouter } from "~/server/routers/root";
 
 export const runtime = "edge";
 

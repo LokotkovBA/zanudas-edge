@@ -39,7 +39,7 @@ const t = initTRPC.context<Context>().create({
  * Create a router
  * @see https://trpc.io/docs/v10/router
  */
-export const router = t.router;
+export const createTRPCRouter = t.router;
 
 /**
  * Create an unprotected procedure
@@ -50,11 +50,11 @@ export const publicProcedure = t.procedure.use((opts) => {
         ctx: {
             user: opts.ctx.user
                 ? {
-                      id: opts.ctx.user.id,
-                      name: opts.ctx.user.name,
-                      privileges: opts.ctx.user.privileges,
-                      image: opts.ctx.user.image,
-                  }
+                    id: opts.ctx.user.id,
+                    name: opts.ctx.user.name,
+                    privileges: opts.ctx.user.privileges,
+                    image: opts.ctx.user.image,
+                }
                 : undefined,
         },
     });
