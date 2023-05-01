@@ -16,20 +16,21 @@ export function SearchableUsersList() {
     return (
         <>
             <input
-                className="border border-slate-500 bg-slate-950"
+                className="rounded border border-slate-500 bg-slate-950 p-2"
+                placeholder="Search"
                 onChange={(event) =>
                     setFilterString(event.target.value.toLowerCase())
                 }
                 value={filterString}
                 type="text"
             />
-            <article className="flex items-center gap-2 px-20 py-2">
+            <ul className="flex items-center gap-2 px-20 py-2">
                 {usersData
                     ?.filter(({ name }) =>
                         name?.toLowerCase().includes(filterString),
                     )
                     .map(({ id, name, image, privileges }) => (
-                        <section
+                        <li
                             className="flex flex-col items-center gap-2"
                             key={id}
                         >
@@ -47,9 +48,9 @@ export function SearchableUsersList() {
                                 user_id={id}
                                 privileges={privileges}
                             />
-                        </section>
+                        </li>
                     ))}
-            </article>
+            </ul>
         </>
     );
 }
