@@ -8,13 +8,11 @@ import clsx from "clsx";
 type PrivilegeSetterProps = {
     user_id: string;
     privileges: number;
-    roles: string[];
 };
 
 const PrivilegeSetter: React.FC<PrivilegeSetterProps> = ({
     user_id,
     privileges,
-    roles,
 }) => {
     const [currentPrivileges, setCurrentPrivileges] = useState(
         parsePrivileges(privileges),
@@ -64,6 +62,21 @@ const PrivilegeSetter: React.FC<PrivilegeSetterProps> = ({
         </>
     );
 };
+export default PrivilegeSetter;
+
+const roles = [
+    "Master",
+    "Admin",
+    "Mod",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+];
 
 function parsePrivileges(privileges: number) {
     return leadingZero(privileges.toString(2), 11).split("");
@@ -72,5 +85,3 @@ function parsePrivileges(privileges: number) {
 function leadingZero(value: string, desiredLength: number) {
     return "0".repeat(desiredLength - value.length) + value;
 }
-
-export default PrivilegeSetter;
