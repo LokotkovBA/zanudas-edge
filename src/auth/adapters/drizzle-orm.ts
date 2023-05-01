@@ -25,27 +25,25 @@ export function createDrizzleAdapter(db: LibSQLDatabase): Adapter {
             return row;
         },
         async getUser(id) {
-            const rows = await db
+            const row = await db
                 .select()
                 .from(users)
                 .where(eq(users.id, id))
                 .limit(1)
-                .all();
-            const row = rows[0];
+                .get();
             return row ?? null;
         },
         async getUserByEmail(email) {
-            const rows = await db
+            const row = await db
                 .select()
                 .from(users)
                 .where(eq(users.email, email))
                 .limit(1)
-                .all();
-            const row = rows[0];
+                .get();
             return row ?? null;
         },
         async getUserByAccount({ providerAccountId, provider }) {
-            const rows = await db
+            const row = await db
                 .select()
                 .from(users)
                 .innerJoin(accounts, eq(users.id, accounts.userId))
@@ -56,8 +54,7 @@ export function createDrizzleAdapter(db: LibSQLDatabase): Adapter {
                     ),
                 )
                 .limit(1)
-                .all();
-            const row = rows[0];
+                .get();
             return row?.users ?? null;
         },
         async updateUser({ id, ...userData }) {
@@ -128,7 +125,7 @@ export function createDrizzleAdapter(db: LibSQLDatabase): Adapter {
             };
         },
         async getSessionAndUser(sessionToken) {
-            const rows = await db
+            const row = await db
                 .select({
                     user: users,
                     session: {
@@ -142,8 +139,7 @@ export function createDrizzleAdapter(db: LibSQLDatabase): Adapter {
                 .innerJoin(users, eq(users.id, sessions.userId))
                 .where(eq(sessions.sessionToken, sessionToken))
                 .limit(1)
-                .all();
-            const row = rows[0];
+                .get();
             if (!row) return null;
             const { user, session } = row;
             return {
@@ -194,14 +190,13 @@ export function createDrizzleAdapter(db: LibSQLDatabase): Adapter {
             };
         },
         async useVerificationToken({ identifier, token }) {
-            // First get the token while it still exists. TODO: need to add identifier to where clause?
-            const rows = await db
+            // First get the token while it still exists
+            const row = await db
                 .select()
                 .from(verificationTokens)
                 .where(eq(verificationTokens.token, token))
                 .limit(1)
-                .all();
-            const row = rows[0];
+                .get();
             if (!row) return null;
             // Then delete it.
             await db
