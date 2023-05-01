@@ -1,5 +1,6 @@
 import Image from "next/image";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+// import { redirect } from "next/navigation";
 import PrivilegeSetter from "~/components/client/PrivilegeSetter";
 import { drizzleClient } from "~/drizzle/db";
 import { users } from "~/drizzle/schemas/auth";
@@ -11,7 +12,8 @@ export const runtime = "edge";
 export default async function Users() {
     const user = await serverAPI.getAuth.fetch();
     if (!isAdmin(user?.privileges)) {
-        redirect("/");
+        notFound();
+        // redirect("/"); internal server error on edge
     }
 
     const usersData = await drizzleClient
@@ -25,21 +27,40 @@ export default async function Users() {
         .all();
 
     return (
-        <main>
+        <main className="flex items-center gap-2 px-20 py-2">
             {usersData.map(({ id, name, image, privileges }) => (
-                <section key={id}>
-                    <h2>{name}</h2>
+                <section className="flex flex-col items-center gap-2" key={id}>
+                    <h2 className="text-amber-400">{name}</h2>
                     {image && (
                         <Image
+                            className="rounded-full"
                             width={45}
                             height={45}
                             alt={`${name}'s profile picture`}
                             src={image}
                         />
                     )}
-                    <PrivilegeSetter user_id={id} privileges={privileges} />
+                    <PrivilegeSetter
+                        user_id={id}
+                        privileges={privileges}
+                        roles={roles}
+                    />
                 </section>
             ))}
         </main>
     );
 }
+
+const roles = [
+    "Master",
+    "Admin",
+    "Mod",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+    "Reserved",
+];
