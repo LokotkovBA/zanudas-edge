@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
 // import { redirect } from "next/navigation";
 import { SearchableUsersList } from "~/components/client/SearchableUsersList";
+import { Spinner } from "~/components/utils/Spinner";
 import { serverAPI } from "~/server/api";
 import { isAdmin } from "~/utils/privileges";
 
@@ -22,11 +23,6 @@ export default async function Users() {
                 <UsersList />
             </Suspense>
         </main>
-    );
-}
-function Spinner() {
-    return (
-        <div className="h-20 w-20 animate-spin rounded-[50%] border-8 border-slate-950 border-t-sky-400" />
     );
 }
 
