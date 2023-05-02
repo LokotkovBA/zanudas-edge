@@ -17,7 +17,7 @@ export const queue = sqliteTable("queue", {
     currency: text("currency").notNull().default("RUB"),
     tag: text("tag").notNull().default(""),
     queueNumber: integer("queue_number").notNull(),
-    likeCount: integer("queue_number").notNull().default(0),
+    likeCount: integer("like_count").notNull().default(0),
     played: integer("played").notNull().default(0),
     willAdd: integer("will_add").notNull().default(0),
     visible: integer("visible").notNull().default(0),
