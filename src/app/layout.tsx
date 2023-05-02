@@ -24,18 +24,16 @@ export default async function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <ClientProvider>
-            <html lang="en">
-                <body
-                    className={`${inter.variable} bg-slate-900 font-sans text-slate-50`}
-                >
-                    <header className="border-b border-b-slate-500 bg-slate-950 px-2 py-4 xl:px-40">
-                        {/* @ts-expect-error Async Server Component */}
-                        <Menu />
-                    </header>
-                    {children}
-                </body>
-            </html>
-        </ClientProvider>
+        <html lang="en">
+            <body
+                className={`${inter.variable} bg-slate-900 font-sans text-slate-50`}
+            >
+                <header className="border-b border-b-slate-500 bg-slate-950 px-2 py-4 xl:px-40">
+                    {/* @ts-expect-error Async Server Component */}
+                    <Menu />
+                </header>
+                <ClientProvider>{children}</ClientProvider>
+            </body>
+        </html>
     );
 }
