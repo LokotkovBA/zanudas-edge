@@ -34,7 +34,12 @@ export default async function RootLayout({
                     <Menu />
                 </header>
                 <ClientProvider>{children}</ClientProvider>
-                <Toaster />
+                <Toaster
+                    toastOptions={{
+                        className:
+                            "bg-slate-950 text-slate-50 border border-slate-500",
+                    }}
+                />
             </body>
         </html>
     );
