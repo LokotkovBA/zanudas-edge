@@ -16,20 +16,24 @@ function filterStyles(isSelected: boolean) {
     });
 }
 
-const filterValues = ["Foreign", "Russian", "OST", "Original"];
-
 export function SearchableSongList() {
     const queryClient = useQueryClient();
     dehydrate(queryClient);
-    const { data: songlistData } = clientAPI.songlist.getAll.useQuery();
+
+    const { data: songListData } = clientAPI.songlist.getAll.useQuery();
 
     const [searchValue, setSearchValue] = useState("");
+    const [filterState, setFilterState] = useState(-1);
+
+    if (!songListData) {
+        return <></>;
+    }
+
+    const { songList, filterCount, filterValues } = songListData;
 
     function onSearchChange(event: ChangeEvent<HTMLInputElement>) {
         setSearchValue(event.target.value);
     }
-
-    const [filterState, setFilterState] = useState(-1);
 
     return (
         <>
@@ -53,6 +57,9 @@ export function SearchableSongList() {
                             key={value}
                         >
                             {value}
+                            <span className="ml-2 box-content inline-block w-[3ch] rounded-md bg-sky-600 px-1 text-slate-50">
+                                {filterCount[index]}
+                            </span>
                         </button>
                     ))}
                 </div>
@@ -61,7 +68,7 @@ export function SearchableSongList() {
                 {splitByAuthor(
                     searchSonglist(
                         searchValue,
-                        filterSonglist(filterState, filterValues, songlistData),
+                        filterSonglist(filterState, filterValues, songList),
                     ),
                 ).map((authorBlock) => {
                     return (

@@ -15,11 +15,28 @@ export const songsRouter = createTRPCRouter({
 
             return ctx.drizzle.insert(songs).values(input).returning().get();
         }),
-    getAll: publicProcedure.query(({ ctx }) => {
-        return ctx.drizzle
+    getAll: publicProcedure.query(async ({ ctx }) => {
+        const songList = await ctx.drizzle
             .select()
             .from(songs)
             .orderBy(asc(songs.artist), asc(songs.songName))
             .all();
+
+        const filterValues = ["Foreign", "Russian", "OST", "Original"];
+        const filterCount: number[] = [];
+        for (const { tag } of songList) {
+            let index = 0;
+            for (const filter of filterValues) {
+                const lowerFilter = filter.toLowerCase();
+                if (tag.includes(lowerFilter)) {
+                    filterCount[index] =
+                        filterCount[index] === undefined
+                            ? 1
+                            : filterCount[index] + 1;
+                }
+                index++;
+            }
+        }
+        return { songList, filterValues, filterCount };
     }),
 });
