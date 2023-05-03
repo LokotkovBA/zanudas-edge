@@ -1,4 +1,8 @@
+import { Suspense } from "react";
+import { HydrateClient } from "~/client/HydrateClient";
 import { FileUploader } from "~/components/client/FileUploader";
+import { SearchableSongList } from "~/components/client/songlist/SearchableSongList";
+import { Spinner } from "~/components/utils/Spinner";
 import { serverAPI } from "~/server/api";
 import { isAdmin } from "~/utils/privileges";
 
@@ -6,9 +10,25 @@ export const runtime = "edge";
 
 export default async function SongList() {
     const userData = await serverAPI.getAuth.fetch();
+
     return (
-        <main className="flex flex-col items-center gap-2 pt-2">
+        <main className="flex flex-col items-center gap-2 px-20">
             {isAdmin(userData?.privileges) && <FileUploader />}
+            <Suspense fallback={<Spinner />}>
+                {/* @ts-expect-error Async Server Component */}
+                <List />
+            </Suspense>
         </main>
+    );
+}
+
+async function List() {
+    await serverAPI.songlist.getAll.fetch();
+    const dehydratatedState = await serverAPI.dehydrate();
+
+    return (
+        <HydrateClient state={dehydratatedState}>
+            <SearchableSongList />
+        </HydrateClient>
     );
 }

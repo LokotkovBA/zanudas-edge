@@ -8,6 +8,7 @@ import { insertSongsSchema } from "~/drizzle/schemas/songlist";
 import { buttonStyles } from "../styles/button";
 import toast from "react-hot-toast";
 import { Spinner } from "../utils/Spinner";
+import { type SonglistEntry } from "~/drizzle/types";
 
 export function FileUploader() {
     const onDrop: <T extends File>(acceptedFiles: T[]) => void = useCallback(
@@ -100,8 +101,6 @@ export function FileUploader() {
         </>
     );
 }
-
-type SonglistEntry = z.infer<typeof insertSongsSchema>;
 
 function deleteId(list: SonglistEntry[]) {
     for (const song of list) {

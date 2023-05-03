@@ -5,6 +5,7 @@ import Image from "next/image";
 import { clientAPI } from "~/client/ClientProvider";
 import PrivilegeSetter from "./PrivilegeSetter";
 import { useState } from "react";
+import { searchBarStyles } from "../styles/searchBar";
 
 export function SearchableUsersList() {
     const queryClient = useQueryClient();
@@ -16,7 +17,7 @@ export function SearchableUsersList() {
     return (
         <>
             <input
-                className="rounded border border-slate-500 bg-slate-950 p-2"
+                className={searchBarStyles}
                 placeholder="Search"
                 onChange={(event) =>
                     setFilterString(event.target.value.toLowerCase())
