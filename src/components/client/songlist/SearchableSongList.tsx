@@ -23,13 +23,13 @@ export function SearchableSongList() {
     const { data: songListData } = clientAPI.songlist.getAll.useQuery();
 
     const [searchValue, setSearchValue] = useState("");
-    const [filterState, setFilterState] = useState(-1);
+    const [selectedCategory, setSelectedCategory] = useState(-1);
 
     if (!songListData) {
         return <></>;
     }
 
-    const { songList, filterCount, filterValues } = songListData;
+    const { songList, categories, categoriesCounts } = songListData;
 
     function onSearchChange(event: ChangeEvent<HTMLInputElement>) {
         setSearchValue(event.target.value);
@@ -46,19 +46,19 @@ export function SearchableSongList() {
                     type="text"
                 />
                 <div className="grid grid-cols-4">
-                    {filterValues.map((value, index) => (
+                    {categories.map((value, index) => (
                         <button
-                            className={filterStyles(filterState === index)}
+                            className={filterStyles(selectedCategory === index)}
                             onClick={() =>
-                                setFilterState((prevState) =>
-                                    prevState === index ? -1 : index,
+                                setSelectedCategory((prevCategory) =>
+                                    prevCategory === index ? -1 : index,
                                 )
                             }
                             key={value}
                         >
                             {value}
                             <span className="ml-2 box-content inline-block w-[3ch] rounded-md bg-sky-600 px-1 text-slate-50">
-                                {filterCount[index]}
+                                {categoriesCounts[index]}
                             </span>
                         </button>
                     ))}
@@ -66,9 +66,13 @@ export function SearchableSongList() {
             </header>
             <ul className="w-full sm:w-2/3 xl:w-1/3">
                 {splitByAuthor(
-                    searchSonglist(
+                    filterBySearch(
                         searchValue,
-                        filterSonglist(filterState, filterValues, songList),
+                        filterByCategorySonglist(
+                            selectedCategory,
+                            categories,
+                            songList,
+                        ),
                     ),
                 ).map((authorBlock) => {
                     return (
@@ -126,19 +130,19 @@ function splitByAuthor(list?: SonglistEntry[]): SonglistEntry[][] {
     return result;
 }
 
-function filterSonglist(
-    filterState: number,
-    filterValues: string[],
-    songlist?: SonglistEntry[],
+function filterByCategorySonglist(
+    selectedCategory: number,
+    categories: string[],
+    songList?: SonglistEntry[],
 ) {
-    return songlist?.filter(({ tag }) => {
-        return filterState === -1
+    return songList?.filter(({ tag }) => {
+        return selectedCategory === -1
             ? true
-            : tag?.includes(filterValues[filterState].toLowerCase());
+            : tag?.includes(categories[selectedCategory].toLowerCase());
     });
 }
 
-function searchSonglist(search: string | null, songlist?: SonglistEntry[]) {
+function filterBySearch(search: string | null, songlist?: SonglistEntry[]) {
     return songlist?.filter(({ artist, songName, tag }) => {
         if (!search) return true;
         const lowerSearch = search.toLowerCase();

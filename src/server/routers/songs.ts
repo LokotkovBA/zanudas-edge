@@ -22,21 +22,24 @@ export const songsRouter = createTRPCRouter({
             .orderBy(asc(songs.artist), asc(songs.songName))
             .all();
 
-        const filterValues = ["Foreign", "Russian", "OST", "Original"];
-        const filterCount: number[] = [];
+        const categories = ["Foreign", "Russian", "OST", "Original"];
+        const categoriesCounts: number[] = [];
         for (const { tag } of songList) {
             let index = 0;
-            for (const filter of filterValues) {
-                const lowerFilter = filter.toLowerCase();
-                if (tag.includes(lowerFilter)) {
-                    filterCount[index] =
-                        filterCount[index] === undefined
+            for (const category of categories) {
+                if (tag.includes(category.toLowerCase())) {
+                    categoriesCounts[index] =
+                        categoriesCounts[index] === undefined
                             ? 1
-                            : filterCount[index] + 1;
+                            : categoriesCounts[index] + 1;
                 }
                 index++;
             }
         }
-        return { songList, filterValues, filterCount };
+        return {
+            songList,
+            categories,
+            categoriesCounts,
+        };
     }),
 });
