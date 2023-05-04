@@ -84,12 +84,12 @@ export function SearchableSongList() {
                     >
                         {showMobileFirstLetters ? "Hide" : "Letters"}
                     </button>
-                    <button
-                        className="h-full border border-sky-700 bg-sky-700 px-1 hover:border-slate-50"
-                        onClick={() => scrollToTop()}
+                    <Link
+                        className="flex h-full items-center justify-center border border-sky-700 bg-sky-700 px-1 hover:border-slate-50"
+                        href="/songlist#top"
                     >
                         Top
-                    </button>
+                    </Link>
                 </aside>
                 {showMobileFirstLetters && (
                     <LetterButtons
@@ -141,7 +141,7 @@ export function SearchableSongList() {
                                             }
                                             className="flex cursor-pointer items-end justify-between hover:text-sky-500"
                                         >
-                                            <p className="pt-2 leading-none">
+                                            <p className="pt-2 leading-5">
                                                 {songName}
                                             </p>
                                             <section className="flex items-end gap-1 leading-none">
@@ -207,12 +207,6 @@ function LetterButtons({
             })}
         </menu>
     );
-}
-
-function scrollToTop() {
-    if (typeof window === "undefined") return;
-
-    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function copyToClipboard(text: string) {

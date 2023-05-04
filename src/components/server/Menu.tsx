@@ -13,7 +13,7 @@ export async function Menu() {
     const user = await serverAPI.getAuth.fetch();
     return (
         <nav className="w-full">
-            <menu className="grid grid-cols-2 grid-rows-2 items-center justify-items-center text-lg md:flex md:gap-6">
+            <menu className="grid grid-cols-2 grid-rows-2 items-center justify-items-center gap-4 text-lg md:flex md:gap-6">
                 <li className="">
                     <h1 className="font-bold text-amber-400 md:text-3xl">
                         <Link href="/">{`>3`}</Link>
