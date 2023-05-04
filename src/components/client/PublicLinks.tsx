@@ -9,7 +9,7 @@ export default function PublicLinks() {
     const pathname = usePathname();
     return (
         <>
-            <li className="ml-auto">
+            <li className="md:ml-auto">
                 <Link
                     className={clsx(linkStyles, {
                         "text-sky-400": pathname === "/queue",

@@ -11,7 +11,8 @@ import Link from "next/link";
 import { ThumbsUp } from "~/svg/ThumbsUp";
 
 function categoryStyles(isSelected: boolean) {
-    const className = "border-b-2 px-5 py-1 grid grid-cols-1 md:grid-cols-2";
+    const className =
+        "border-b-2 px-5 py-1 grid grid-cols-1 justify-items-center md:grid-cols-2";
     return clsx(className, {
         "border-b-slate-700": !isSelected,
         "text-sky-400 border-b-sky-400": isSelected,
@@ -66,7 +67,7 @@ export function SearchableSongList() {
                             key={value}
                         >
                             {value}
-                            <span className="ml-2 box-content inline-block w-[3ch] rounded-md bg-sky-700 px-1 text-slate-50">
+                            <span className="box-content inline-block w-[3ch] rounded-md bg-sky-700 px-1 text-slate-50 md:ml-2">
                                 {categoriesCounts[index]}
                             </span>
                         </button>

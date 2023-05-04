@@ -13,15 +13,15 @@ export async function Menu() {
     const user = await serverAPI.getAuth.fetch();
     return (
         <nav className="w-full">
-            <menu className="flex items-center gap-6 text-lg">
-                <li>
-                    <h1 className="text-3xl text-amber-400">
+            <menu className="grid grid-cols-2 grid-rows-2 items-center justify-items-center text-lg md:flex md:gap-6">
+                <li className="">
+                    <h1 className="font-bold text-amber-400 md:text-3xl">
                         <Link href="/">{`>3`}</Link>
                     </h1>
                 </li>
                 <PublicLinks />
                 {isAdmin(user?.privileges) && <AdminLinks />}
-                <li className="ml-auto">
+                <li className="md:ml-auto">
                     <Link
                         target="_blank"
                         className={`${linkStyles} flex items-center gap-1 fill-slate-50`}
