@@ -2,13 +2,15 @@
 
 import { clientAPI } from "~/client/ClientProvider";
 import { type SonglistEntry } from "~/drizzle/types";
-import { type ChangeEvent, useState, useRef } from "react";
+import React, { type ChangeEvent, useState, useRef, useEffect } from "react";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import { dehydrate, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
 import Link from "next/link";
 import { ThumbsUp } from "~/svg/ThumbsUp";
+import { isAdmin, isMod } from "~/utils/privileges";
+import { buttonStyles } from "~/components/styles/button";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -19,7 +21,7 @@ function categoryStyles(isSelected: boolean) {
     });
 }
 
-export function SearchableSongList() {
+export function SearchableSongList({ privileges }: { privileges: number }) {
     const queryClient = useQueryClient();
     dehydrate(queryClient);
 
@@ -30,6 +32,9 @@ export function SearchableSongList() {
     const artistFirstLetters = useRef<string[]>(
         songListData?.artistFirstLetters ?? [],
     );
+
+    const modalRef = useRef<HTMLDialogElement>(null);
+    const [modalData, setModalData] = useState<SonglistEntry | null>(null);
 
     const [showMobileFirstLetters, setShowMobileFirstLetters] = useState(false);
 
@@ -124,39 +129,35 @@ export function SearchableSongList() {
                                 {authorBlock[0].artist}
                             </h2>
                             <div className="flex flex-col gap-2 py-2">
-                                {authorBlock.map(
-                                    ({
-                                        id,
-                                        artist,
-                                        songName,
-                                        likeCount,
-                                        playCount,
-                                    }) => (
+                                {authorBlock.map((song) => (
+                                    <div
+                                        className="flex flex-wrap items-start gap-2 sm:flex-nowrap"
+                                        key={song.id}
+                                    >
                                         <div
-                                            key={id}
                                             onClick={() =>
                                                 copyToClipboard(
-                                                    `${artist} - ${songName}`,
+                                                    `${song.artist} - ${song.songName}`,
                                                 )
                                             }
-                                            className="flex cursor-pointer items-end justify-between hover:text-sky-500"
+                                            className="flex w-full cursor-pointer items-end justify-between hover:text-sky-500"
                                         >
                                             <p className="pt-2 leading-5">
-                                                {songName}
+                                                {song.songName}
                                             </p>
                                             <section className="flex items-end gap-1 leading-none">
-                                                {!!likeCount && (
+                                                {!!song.likeCount && (
                                                     <>
                                                         <span className="text-end">
-                                                            {likeCount}
+                                                            {song.likeCount}
                                                         </span>
-                                                        {likeCount > 0 && (
+                                                        {song.likeCount > 0 && (
                                                             <ThumbsUp
                                                                 size={"1.5rem"}
                                                                 className="fill-green-400"
                                                             />
                                                         )}
-                                                        {likeCount < 0 && (
+                                                        {song.likeCount < 0 && (
                                                             <ThumbsUp
                                                                 size={"1.5rem"}
                                                                 className="fill-red-400"
@@ -164,22 +165,127 @@ export function SearchableSongList() {
                                                         )}
                                                     </>
                                                 )}
-                                                {!!playCount &&
-                                                    playCount > 1 && (
+                                                {!!song.playCount &&
+                                                    song.playCount > 1 && (
                                                         <p className="ml-1 whitespace-nowrap">
-                                                            x{playCount}🎹
+                                                            x{song.playCount}🎹
                                                         </p>
                                                     )}
                                             </section>
                                         </div>
-                                    ),
-                                )}
+                                        {isAdmin(privileges) && (
+                                            <button
+                                                className={buttonStyles}
+                                                onClick={() => {
+                                                    setModalData(song);
+                                                    modalRef.current?.showModal();
+                                                }}
+                                            >
+                                                Change
+                                            </button>
+                                        )}
+                                        {isMod(privileges) && (
+                                            <button className={buttonStyles}>
+                                                Add
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </li>
                     );
                 })}
             </ul>
+            {isAdmin(privileges) && (
+                <ModalEdit modalRef={modalRef} song={modalData} />
+            )}
         </>
+    );
+}
+
+function ModalEdit({
+    song,
+    modalRef,
+}: {
+    song: SonglistEntry | null;
+    modalRef: React.RefObject<HTMLDialogElement>;
+}) {
+    const [artistValue, setArtistValue] = useState("");
+    const [songNameValue, setSongNameValue] = useState("");
+    const [tagValue, setTagValue] = useState("");
+    useEffect(() => {
+        setArtistValue(song?.artist ?? "");
+        setSongNameValue(song?.songName ?? "");
+        setTagValue(song?.tag ?? "");
+    }, [song?.songName, song?.tag, song?.artist]);
+
+    const { mutate: changeSong } = clientAPI.songlist.changeSong.useMutation({
+        onSuccess() {
+            toast.dismiss();
+            toast.success("Changed");
+            modalRef.current?.close();
+        },
+        onMutate() {
+            toast.loading("Changing");
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Change failed, ${error.message}`);
+        },
+    });
+    return (
+        <dialog
+            className="border border-slate-500 bg-slate-900 text-slate-50"
+            onSubmit={(event) => {
+                event.preventDefault();
+                if (!song) {
+                    return;
+                }
+                changeSong({
+                    id: song.id ?? -1,
+                    artist: artistValue,
+                    songName: songNameValue,
+                    tag: tagValue,
+                });
+            }}
+            ref={modalRef}
+        >
+            <button
+                onClick={() => modalRef.current?.close()}
+                className={`${buttonStyles} mb-1`}
+            >
+                Close
+            </button>
+            <form className="grid grid-cols-songEdit items-center gap-2">
+                <label htmlFor="artist">Artist</label>
+                <input
+                    onChange={(event) => setArtistValue(event.target.value)}
+                    value={artistValue}
+                    id="artist"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <label htmlFor="songName">Song name</label>
+                <input
+                    onChange={(event) => setSongNameValue(event.target.value)}
+                    value={songNameValue}
+                    id="songName"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <label htmlFor="tag">Tag</label>
+                <input
+                    onChange={(event) => setTagValue(event.target.value)}
+                    value={tagValue}
+                    id="tag"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <button type="submit" className={`${buttonStyles} col-span-2`}>
+                    Change
+                </button>
+            </form>
+        </dialog>
     );
 }
 
@@ -209,9 +315,12 @@ function LetterButtons({
     );
 }
 
-function copyToClipboard(text: string) {
-    toast.success("Copied");
-    navigator.clipboard.writeText(text);
+async function copyToClipboard(text: string) {
+    toast.promise(navigator.clipboard.writeText(text), {
+        loading: "Copying",
+        success: "Copied",
+        error: "Error",
+    });
 }
 
 function splitByAuthor(

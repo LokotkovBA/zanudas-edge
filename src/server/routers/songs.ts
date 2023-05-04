@@ -3,7 +3,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { insertSongsSchema, songs } from "~/drizzle/schemas/songlist";
 import { TRPCError } from "@trpc/server";
 import { isAdmin } from "~/utils/privileges";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 
 export const songsRouter = createTRPCRouter({
     uploadMany: privateProcedure
@@ -14,6 +14,33 @@ export const songsRouter = createTRPCRouter({
             }
 
             return ctx.drizzle.insert(songs).values(input).returning().get();
+        }),
+    changeSong: privateProcedure
+        .input(
+            z.object({
+                id: z.number(),
+                artist: z.string(),
+                songName: z.string(),
+                tag: z.string(),
+            }),
+        )
+        .mutation(({ ctx, input }) => {
+            if (!isAdmin(ctx.user.privileges)) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+            if (input.id < 0) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Incorrect id",
+                });
+            }
+
+            return ctx.drizzle
+                .update(songs)
+                .set(input)
+                .where(eq(songs.id, input.id))
+                .returning()
+                .get();
         }),
     getAll: publicProcedure.query(async ({ ctx }) => {
         const songList = await ctx.drizzle

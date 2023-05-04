@@ -11,6 +11,9 @@ module.exports = {
             fontFamily: {
                 sans: ["var(--font-inter)"],
             },
+            gridTemplateColumns: {
+                songEdit: ".5fr 1fr",
+            },
         },
     },
     plugins: [],

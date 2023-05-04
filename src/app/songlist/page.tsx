@@ -16,19 +16,19 @@ export default async function SongList() {
             {isAdmin(userData?.privileges) && <FileUploader />}
             <Suspense fallback={<Spinner />}>
                 {/* @ts-expect-error Async Server Component */}
-                <List />
+                <List privileges={userData?.privileges} />
             </Suspense>
         </main>
     );
 }
 
-async function List() {
+async function List({ privileges = 0 }: { privileges?: number }) {
     await serverAPI.songlist.getAll.fetch();
     const dehydratatedState = await serverAPI.dehydrate();
 
     return (
         <HydrateClient state={dehydratatedState}>
-            <SearchableSongList />
+            <SearchableSongList privileges={privileges} />
         </HydrateClient>
     );
 }
