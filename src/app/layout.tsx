@@ -25,7 +25,7 @@ export default async function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en">
+        <html lang="en" className="scroll-smooth">
             <body
                 className={`${inter.variable} bg-slate-900 font-sans text-slate-50`}
             >

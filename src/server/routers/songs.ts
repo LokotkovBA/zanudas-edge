@@ -24,7 +24,14 @@ export const songsRouter = createTRPCRouter({
 
         const categories = ["Foreign", "Russian", "OST", "Original"];
         const categoriesCounts: number[] = [];
-        for (const { tag } of songList) {
+        const artistFirstLetters: string[] = [songList[0].artist[0]];
+        let lettersIndex = 0;
+        for (const { tag, artist } of songList) {
+            if (artist[0] !== artistFirstLetters[lettersIndex]) {
+                artistFirstLetters.push(artist[0]);
+                lettersIndex++;
+            }
+
             let index = 0;
             for (const category of categories) {
                 if (tag.includes(category.toLowerCase())) {
@@ -40,6 +47,7 @@ export const songsRouter = createTRPCRouter({
             songList,
             categories,
             categoriesCounts,
+            artistFirstLetters,
         };
     }),
 });
