@@ -11,6 +11,7 @@ import Link from "next/link";
 import { ThumbsUp } from "~/svg/ThumbsUp";
 import { isAdmin, isMod } from "~/utils/privileges";
 import { buttonStyles } from "~/components/styles/button";
+import { ThumbsDown } from "~/svg/ThumbsDown";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -158,9 +159,9 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                                                             />
                                                         )}
                                                         {song.likeCount < 0 && (
-                                                            <ThumbsUp
+                                                            <ThumbsDown
                                                                 size={"1.5rem"}
-                                                                className="fill-red-400"
+                                                                className="translate-y-2 fill-red-400"
                                                             />
                                                         )}
                                                     </>
@@ -315,7 +316,7 @@ function LetterButtons({
     );
 }
 
-async function copyToClipboard(text: string) {
+function copyToClipboard(text: string) {
     toast.promise(navigator.clipboard.writeText(text), {
         loading: "Copying",
         success: "Copied",
