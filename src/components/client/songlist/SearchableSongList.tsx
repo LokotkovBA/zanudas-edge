@@ -2,9 +2,15 @@
 
 import { clientAPI } from "~/client/ClientProvider";
 import { type SonglistEntry } from "~/drizzle/types";
-import React, { type ChangeEvent, useState, useRef, useEffect } from "react";
+import React, {
+    type ChangeEvent,
+    useState,
+    useRef,
+    useEffect,
+    useDeferredValue,
+    memo,
+} from "react";
 import { searchBarStyles } from "~/components/styles/searchBar";
-import { dehydrate, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
 import Link from "next/link";
@@ -23,31 +29,21 @@ function categoryStyles(isSelected: boolean) {
 }
 
 export function SearchableSongList({ privileges }: { privileges: number }) {
-    const queryClient = useQueryClient();
-    dehydrate(queryClient);
-
     const { data: songListData } = clientAPI.songlist.getAll.useQuery();
 
+    const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
+
     const [searchValue, setSearchValue] = useState("");
-    const [selectedCategory, setSelectedCategory] = useState(-1);
-    const artistFirstLetters = useRef<string[]>(
-        songListData?.artistFirstLetters ?? [],
-    );
-
-    const modalRef = useRef<HTMLDialogElement>(null);
-    const [modalData, setModalData] = useState<SonglistEntry | null>(null);
-
-    const [showMobileFirstLetters, setShowMobileFirstLetters] = useState(false);
-
-    if (!songListData) {
-        return <></>;
-    }
-
-    const { songList, categories, categoriesCounts } = songListData;
-
+    const defferedSearchValue = useDeferredValue(searchValue);
     function onSearchChange(event: ChangeEvent<HTMLInputElement>) {
         setSearchValue(event.target.value);
     }
+
+    if (!songListData) {
+        return <>The list is empty</>;
+    }
+
+    const { categories, categoriesCounts } = songListData;
 
     return (
         <>
@@ -63,10 +59,10 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                     {categories.map((value, index) => (
                         <button
                             className={categoryStyles(
-                                selectedCategory === index,
+                                selectedCategoryIndex === index,
                             )}
                             onClick={() =>
-                                setSelectedCategory((prevCategory) =>
+                                setSelectedCategoryIndex((prevCategory) =>
                                     prevCategory === index ? -1 : index,
                                 )
                             }
@@ -80,6 +76,43 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                     ))}
                 </div>
             </header>
+            <FilteredList
+                defferedSearchValue={defferedSearchValue}
+                selectedCategoryIndex={selectedCategoryIndex}
+                privileges={privileges}
+            />
+        </>
+    );
+}
+
+type FilteredListProps = {
+    privileges: number;
+    defferedSearchValue: string;
+    selectedCategoryIndex: number;
+};
+
+const FilteredList = memo(function FilteredList({
+    defferedSearchValue,
+    selectedCategoryIndex,
+    privileges,
+}: FilteredListProps) {
+    const { data: songListData } = clientAPI.songlist.getAll.useQuery();
+
+    const modalRef = useRef<HTMLDialogElement>(null);
+    const [modalData, setModalData] = useState<SonglistEntry | null>(null);
+    const artistFirstLettersRef = useRef<string[]>(
+        songListData?.artistFirstLetters ?? [],
+    );
+    const [showMobileFirstLetters, setShowMobileFirstLetters] = useState(false);
+
+    if (!songListData) {
+        return <>The list is empty</>;
+    }
+
+    const { categories, songList } = songListData;
+
+    return (
+        <>
             <nav className="sticky top-0 z-10 flex w-full px-3 sm:w-2/3 xl:w-1/3">
                 <aside className="flex flex-col">
                     <button
@@ -100,21 +133,21 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                 {showMobileFirstLetters && (
                     <LetterButtons
                         className="flex sm:hidden"
-                        letters={artistFirstLetters.current}
+                        letters={artistFirstLettersRef.current}
                     />
                 )}
                 <LetterButtons
                     className="hidden sm:flex"
-                    letters={artistFirstLetters.current}
+                    letters={artistFirstLettersRef.current}
                 />
             </nav>
             <ul className="w-full sm:w-2/3 xl:w-1/3">
                 {splitByAuthor(
-                    artistFirstLetters.current,
+                    artistFirstLettersRef.current,
                     filterBySearch(
-                        searchValue,
+                        defferedSearchValue,
                         filterByCategorySonglist(
-                            selectedCategory,
+                            selectedCategoryIndex,
                             categories,
                             songList,
                         ),
@@ -202,7 +235,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
             )}
         </>
     );
-}
+});
 
 function ModalEdit({
     song,
