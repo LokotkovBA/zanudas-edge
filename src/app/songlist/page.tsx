@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
-import { FileUploader } from "~/components/client/FileUploader";
+import { FileUploader } from "~/components/client/songlist/FileUploader";
 import { SearchableSongList } from "~/components/client/songlist/SearchableSongList";
 import { Spinner } from "~/components/utils/Spinner";
 import { serverAPI } from "~/server/api";

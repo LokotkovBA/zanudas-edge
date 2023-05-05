@@ -4,7 +4,7 @@ import Image from "next/image";
 import { clientAPI } from "~/client/ClientProvider";
 import PrivilegeSetter from "./PrivilegeSetter";
 import { useState } from "react";
-import { searchBarStyles } from "../styles/searchBar";
+import { searchBarStyles } from "~/components/styles/searchBar";
 
 export function SearchableUsersList() {
     const { data: usersData } = clientAPI.users.getAll.useQuery();

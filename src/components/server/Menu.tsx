@@ -5,9 +5,9 @@ import Image from "next/image";
 import SignOutButton from "../client/SignOutButton";
 import { isAdmin } from "~/utils/privileges";
 import { linkStyles } from "../styles/link";
-import PublicLinks from "../client/PublicLinks";
-import AdminLinks from "../client/AdminLinks";
 import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
+import PublicLinks from "../client/menu/PublicLinks";
+import AdminLinks from "../client/menu/AdminLinks";
 
 export async function Menu() {
     const user = await serverAPI.getAuth.fetch();

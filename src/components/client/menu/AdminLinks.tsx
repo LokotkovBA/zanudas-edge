@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { linkStyles } from "../styles/link";
+import { linkStyles } from "~/components/styles/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 

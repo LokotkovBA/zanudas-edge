@@ -1,10 +1,10 @@
 import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
 import { redirect } from "next/navigation";
-import { SearchableUsersList } from "~/components/client/SearchableUsersList";
 import { Spinner } from "~/components/utils/Spinner";
 import { serverAPI } from "~/server/api";
 import { isAdmin } from "~/utils/privileges";
+import { SearchableUsersList } from "~/components/client/users/SearchableUsersList";
 
 export const runtime = "edge";
 

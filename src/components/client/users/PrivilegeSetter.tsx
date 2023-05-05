@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
-import { buttonStyles } from "../styles/button";
+import { buttonStyles } from "~/components/styles/button";
 import clsx from "clsx";
 
 type PrivilegeSetterProps = {

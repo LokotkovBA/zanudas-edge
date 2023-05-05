@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { linkStyles } from "../styles/link";
+import { linkStyles } from "~/components/styles/link";
 import clsx from "clsx";
 
 export default function PublicLinks() {

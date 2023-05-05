@@ -5,9 +5,9 @@ import { useDropzone } from "react-dropzone";
 import { z } from "zod";
 import { clientAPI } from "~/client/ClientProvider";
 import { insertSongsSchema } from "~/drizzle/schemas/songlist";
-import { buttonStyles } from "../styles/button";
+import { buttonStyles } from "~/components/styles/button";
 import toast from "react-hot-toast";
-import { Spinner } from "../utils/Spinner";
+import { Spinner } from "~/components/utils/Spinner";
 import { type SonglistEntry } from "~/drizzle/types";
 
 export function FileUploader() {
