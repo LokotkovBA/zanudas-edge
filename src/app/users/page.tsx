@@ -1,7 +1,6 @@
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
-// import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { SearchableUsersList } from "~/components/client/SearchableUsersList";
 import { Spinner } from "~/components/utils/Spinner";
 import { serverAPI } from "~/server/api";
@@ -12,8 +11,7 @@ export const runtime = "edge";
 export default async function Users() {
     const user = await serverAPI.getAuth.fetch();
     if (!isAdmin(user?.privileges)) {
-        notFound();
-        // redirect("/"); internal server error on edge
+        redirect("/");
     }
 
     return (
