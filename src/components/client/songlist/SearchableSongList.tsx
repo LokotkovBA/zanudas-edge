@@ -123,11 +123,11 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                     return (
                         <li
                             className="z-0 mb-2 rounded border border-slate-500 bg-slate-950 p-3 transition-transform duration-200 ease-in-out hover:scale-105 hover:shadow hover:shadow-black"
-                            key={authorBlock[0].id}
-                            id={authorBlock[0].artist[0]}
+                            key={authorBlock[0]?.id}
+                            id={authorBlock[0]?.artist[0]}
                         >
                             <h2 className="border-b border-b-sky-400 text-lg font-bold text-sky-400">
-                                {authorBlock[0].artist}
+                                {authorBlock[0]?.artist ?? "Empty list"}
                             </h2>
                             <div className="flex flex-col gap-2 py-2">
                                 {authorBlock.map((song) => (
@@ -332,7 +332,7 @@ function splitByAuthor(
     const result: SonglistEntry[][] = [];
     if (list === undefined || list.length === 0) return result;
 
-    let curArtist = list[0].artist;
+    let curArtist = list[0]?.artist;
     let curArtistArray: SonglistEntry[] = [];
     for (const song of list) {
         if (song.artist !== curArtist) {
@@ -344,12 +344,25 @@ function splitByAuthor(
     }
     result.push(curArtistArray);
 
-    artistFirstLetters.push(result[0][0].artist[0]);
+    const firstBlock = result[0];
+    if (!firstBlock) {
+        return result;
+    }
+
+    const firstArtistFirstLetter = firstBlock[0]?.artist[0];
+    if (!firstArtistFirstLetter) {
+        return result;
+    }
+
+    artistFirstLetters.push(firstArtistFirstLetter);
     let letterIndex = 0;
     for (const block of result) {
-        const curArtistFirstLetter = block[0].artist[0];
-        if (artistFirstLetters[letterIndex] !== curArtistFirstLetter) {
-            artistFirstLetters?.push(curArtistFirstLetter);
+        const curArtistFirstLetter = block[0]?.artist[0];
+        if (
+            curArtistFirstLetter &&
+            artistFirstLetters[letterIndex] !== curArtistFirstLetter
+        ) {
+            artistFirstLetters.push(curArtistFirstLetter);
             letterIndex++;
         }
     }
@@ -358,15 +371,18 @@ function splitByAuthor(
 }
 
 function filterByCategorySonglist(
-    selectedCategory: number,
+    selectedCategoryIndex: number,
     categories: string[],
     songList?: SonglistEntry[],
 ) {
-    return songList?.filter(({ tag }) => {
-        return selectedCategory === -1
-            ? true
-            : tag?.includes(categories[selectedCategory].toLowerCase());
-    });
+    const selectedCategory = categories[selectedCategoryIndex];
+    return selectedCategory === undefined
+        ? songList
+        : songList?.filter(({ tag }) => {
+              return selectedCategoryIndex === -1
+                  ? true
+                  : tag?.includes(selectedCategory.toLowerCase());
+          });
 }
 
 function filterBySearch(search: string | null, songlist?: SonglistEntry[]) {

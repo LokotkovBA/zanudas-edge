@@ -49,12 +49,20 @@ export const songsRouter = createTRPCRouter({
             .orderBy(asc(songs.artist), asc(songs.songName))
             .all();
 
+        const firstArtistFirstLetter = songList[0]?.artist[0];
+        if (!firstArtistFirstLetter) {
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "First artist first letter doesn't exist",
+            });
+        }
+
         const categories = ["Foreign", "Russian", "OST", "Original"];
         const categoriesCounts: number[] = [];
-        const artistFirstLetters: string[] = [songList[0].artist[0]];
+        const artistFirstLetters: string[] = [firstArtistFirstLetter];
         let lettersIndex = 0;
         for (const { tag, artist } of songList) {
-            if (artist[0] !== artistFirstLetters[lettersIndex]) {
+            if (artist[0] && artist[0] !== artistFirstLetters[lettersIndex]) {
                 artistFirstLetters.push(artist[0]);
                 lettersIndex++;
             }
@@ -62,10 +70,9 @@ export const songsRouter = createTRPCRouter({
             let index = 0;
             for (const category of categories) {
                 if (tag.includes(category.toLowerCase())) {
+                    const currentCount = categoriesCounts[index];
                     categoriesCounts[index] =
-                        categoriesCounts[index] === undefined
-                            ? 1
-                            : categoriesCounts[index] + 1;
+                        currentCount === undefined ? 1 : currentCount + 1;
                 }
                 index++;
             }

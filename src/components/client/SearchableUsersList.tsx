@@ -1,6 +1,5 @@
 "use client";
 
-import { dehydrate, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
 import { clientAPI } from "~/client/ClientProvider";
 import PrivilegeSetter from "./PrivilegeSetter";
@@ -8,8 +7,6 @@ import { useState } from "react";
 import { searchBarStyles } from "../styles/searchBar";
 
 export function SearchableUsersList() {
-    const queryClient = useQueryClient();
-    dehydrate(queryClient);
     const { data: usersData } = clientAPI.users.getAll.useQuery();
 
     const [filterString, setFilterString] = useState("");
