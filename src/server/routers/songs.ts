@@ -64,6 +64,22 @@ export const songsRouter = createTRPCRouter({
                 .get();
         }),
 
+    addSong: privateProcedure
+        .input(
+            z.object({
+                artist: z.string(),
+                songName: z.string(),
+                tag: z.string(),
+            }),
+        )
+        .mutation(({ ctx, input }) => {
+            if (!isAdmin(ctx.user.privileges)) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            return ctx.drizzle.insert(songs).values(input).returning().get();
+        }),
+
     getAll: publicProcedure.query(async ({ ctx }) => {
         const songList = await ctx.drizzle
             .select()

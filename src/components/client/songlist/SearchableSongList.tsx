@@ -32,6 +32,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
     const { data: songListData } = clientAPI.songlist.getAll.useQuery();
 
     const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
+    const modalAddRef = useRef<HTMLDialogElement>(null);
 
     const [searchValue, setSearchValue] = useState("");
     const defferedSearchValue = useDeferredValue(searchValue);
@@ -55,6 +56,14 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                     placeholder="Search"
                     type="text"
                 />
+                {isAdmin(privileges) && (
+                    <button
+                        className={buttonStyles}
+                        onClick={() => modalAddRef.current?.showModal()}
+                    >
+                        Add song
+                    </button>
+                )}
                 <div className="grid grid-cols-4">
                     {categories.map((value, index) => (
                         <button
@@ -81,6 +90,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                 selectedCategoryIndex={selectedCategoryIndex}
                 privileges={privileges}
             />
+            {isAdmin(privileges) && <ModalAdd modalRef={modalAddRef} />}
         </>
     );
 }
@@ -257,6 +267,92 @@ const FilteredList = memo(function FilteredList({
     );
 });
 
+function ModalAdd({
+    modalRef,
+}: {
+    modalRef: React.RefObject<HTMLDialogElement>;
+}) {
+    const [artistValue, setArtistValue] = useState("");
+    const [songNameValue, setSongNameValue] = useState("");
+    const [tagValue, setTagValue] = useState("");
+
+    const { mutate: addSong } = clientAPI.songlist.addSong.useMutation({
+        onMutate() {
+            toast.loading("Adding");
+        },
+        onSuccess() {
+            setArtistValue("");
+            setSongNameValue("");
+            setTagValue("");
+            toast.dismiss();
+            toast.success("Added");
+            modalRef.current?.close();
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Error: ${error.message}`);
+        },
+    });
+
+    return (
+        <dialog
+            ref={modalRef}
+            className="border border-slate-500 bg-slate-900 text-slate-50"
+            onSubmit={(event) => {
+                event.preventDefault();
+                let artistCapitalFirst = artistValue[0]?.toUpperCase();
+                if (!artistCapitalFirst) {
+                    toast.error("Empty artist");
+                    return;
+                }
+
+                artistCapitalFirst += artistValue.slice(1);
+                addSong({
+                    artist: artistCapitalFirst,
+                    songName: songNameValue,
+                    tag: tagValue,
+                });
+            }}
+        >
+            <button
+                onClick={() => modalRef.current?.close()}
+                className={`${buttonStyles} mb-1`}
+            >
+                Close
+            </button>
+            <form className="grid grid-cols-songEdit items-center gap-2">
+                <label htmlFor="artist">Artist</label>
+                <input
+                    onChange={(event) => setArtistValue(event.target.value)}
+                    value={artistValue}
+                    id="artist"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <label htmlFor="songName">Song name</label>
+                <input
+                    onChange={(event) => setSongNameValue(event.target.value)}
+                    value={songNameValue}
+                    id="songName"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <label htmlFor="tag">Tag</label>
+                <input
+                    onChange={(event) => setTagValue(event.target.value)}
+                    value={tagValue}
+                    id="tag"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <button type="submit" className={`${buttonStyles} col-span-2`}>
+                    Add
+                </button>
+            </form>
+        </dialog>
+    );
+}
+
 function ModalDelete({
     id,
     modalRef,
@@ -270,7 +366,6 @@ function ModalDelete({
 }) {
     const { mutate: deleteSong } = clientAPI.songlist.deleteSong.useMutation({
         onMutate() {
-            console.log(id);
             toast.loading("Deleting");
         },
         onSuccess() {
