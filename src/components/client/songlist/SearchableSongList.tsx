@@ -98,8 +98,9 @@ const FilteredList = memo(function FilteredList({
 }: FilteredListProps) {
     const { data: songListData } = clientAPI.songlist.getAll.useQuery();
 
-    const modalRef = useRef<HTMLDialogElement>(null);
-    const [modalData, setModalData] = useState<SonglistEntry | null>(null);
+    const modalEditRef = useRef<HTMLDialogElement>(null);
+    const modalDeleteRef = useRef<HTMLDialogElement>(null);
+    const [modalEditData, setModalData] = useState<SonglistEntry | null>(null);
     const artistFirstLettersRef = useRef<string[]>(
         songListData?.artistFirstLetters ?? [],
     );
@@ -207,21 +208,32 @@ const FilteredList = memo(function FilteredList({
                                                     )}
                                             </section>
                                         </div>
-                                        {isAdmin(privileges) && (
-                                            <button
-                                                className={buttonStyles}
-                                                onClick={() => {
-                                                    setModalData(song);
-                                                    modalRef.current?.showModal();
-                                                }}
-                                            >
-                                                Change
-                                            </button>
-                                        )}
                                         {isMod(privileges) && (
                                             <button className={buttonStyles}>
                                                 Add
                                             </button>
+                                        )}
+                                        {isAdmin(privileges) && (
+                                            <>
+                                                <button
+                                                    className={buttonStyles}
+                                                    onClick={() => {
+                                                        setModalData(song);
+                                                        modalEditRef.current?.showModal();
+                                                    }}
+                                                >
+                                                    Change
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setModalData(song);
+                                                        modalDeleteRef.current?.showModal();
+                                                    }}
+                                                    className="rounded-full border-2 border-transparent bg-slate-600 p-1 hover:border-slate-300"
+                                                >
+                                                    ❌
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 ))}
@@ -231,11 +243,73 @@ const FilteredList = memo(function FilteredList({
                 })}
             </ul>
             {isAdmin(privileges) && (
-                <ModalEdit modalRef={modalRef} song={modalData} />
+                <>
+                    <ModalDelete
+                        modalRef={modalDeleteRef}
+                        id={modalEditData?.id}
+                        artist={modalEditData?.artist}
+                        songName={modalEditData?.songName}
+                    />
+                    <ModalEdit modalRef={modalEditRef} song={modalEditData} />
+                </>
             )}
         </>
     );
 });
+
+function ModalDelete({
+    id,
+    modalRef,
+    songName,
+    artist,
+}: {
+    id?: number;
+    songName?: string;
+    artist?: string;
+    modalRef: React.RefObject<HTMLDialogElement>;
+}) {
+    const { mutate: deleteSong } = clientAPI.songlist.deleteSong.useMutation({
+        onMutate() {
+            console.log(id);
+            toast.loading("Deleting");
+        },
+        onSuccess() {
+            toast.dismiss();
+            toast.success("Deleted");
+            modalRef.current?.close();
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Error: ${error.message}`);
+        },
+    });
+    return (
+        <dialog
+            ref={modalRef}
+            className="border border-slate-500 bg-slate-900 text-slate-50"
+        >
+            <section className="grid grid-cols-2 gap-1 ">
+                <h2 className="col-start-1 col-end-3">
+                    Are you sure you want to delete {artist} - {songName}?
+                </h2>
+                {id !== undefined && (
+                    <button
+                        className={buttonStyles}
+                        onClick={() => deleteSong({ id })}
+                    >
+                        Yes!
+                    </button>
+                )}
+                <button
+                    className="rounded border-2 border-transparent bg-slate-600 p-1 hover:border-slate-300"
+                    onClick={() => modalRef.current?.close()}
+                >
+                    No!✋
+                </button>
+            </section>
+        </dialog>
+    );
+}
 
 function ModalEdit({
     song,

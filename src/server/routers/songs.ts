@@ -15,6 +15,27 @@ export const songsRouter = createTRPCRouter({
 
             return ctx.drizzle.insert(songs).values(input).returning().get();
         }),
+
+    deleteSong: privateProcedure
+        .input(z.object({ id: z.number() }))
+        .mutation(({ ctx, input: { id } }) => {
+            if (!isAdmin(ctx.user.privileges)) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+            if (id < 0) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Incorrect id",
+                });
+            }
+
+            return ctx.drizzle
+                .delete(songs)
+                .where(eq(songs.id, id))
+                .returning()
+                .get();
+        }),
+
     changeSong: privateProcedure
         .input(
             z.object({
@@ -42,6 +63,7 @@ export const songsRouter = createTRPCRouter({
                 .returning()
                 .get();
         }),
+
     getAll: publicProcedure.query(async ({ ctx }) => {
         const songList = await ctx.drizzle
             .select()
