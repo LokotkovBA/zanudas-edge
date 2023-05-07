@@ -57,12 +57,20 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                     type="text"
                 />
                 {isAdmin(privileges) && (
-                    <button
-                        className={buttonStyles}
-                        onClick={() => modalAddRef.current?.showModal()}
-                    >
-                        Add song
-                    </button>
+                    <>
+                        <button
+                            className={buttonStyles}
+                            onClick={() => modalAddRef.current?.showModal()}
+                        >
+                            Add song
+                        </button>
+                        <button
+                            className={buttonStyles}
+                            onClick={() => exportJSON(songListData.songList)}
+                        >
+                            Export all
+                        </button>
+                    </>
                 )}
                 <div className="grid grid-cols-4">
                     {categories.map((value, index) => (
@@ -93,6 +101,17 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
             {isAdmin(privileges) && <ModalAdd modalRef={modalAddRef} />}
         </>
     );
+}
+
+function exportJSON(songListData: SonglistEntry[]) {
+    const jsonStringData = `data:text/json;chatset=utf8,${encodeURIComponent(
+        JSON.stringify(songListData),
+    )}`;
+    const link = document.createElement("a");
+    link.href = jsonStringData;
+    link.download = "songList.json";
+
+    link.click();
 }
 
 type FilteredListProps = {
