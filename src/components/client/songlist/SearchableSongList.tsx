@@ -18,6 +18,7 @@ import { ThumbsUp } from "~/svg/ThumbsUp";
 import { isAdmin, isMod } from "~/utils/privileges";
 import { buttonStyles } from "~/components/styles/button";
 import { ThumbsDown } from "~/svg/ThumbsDown";
+import { deleteButtonStyles } from "~/components/styles/deleteButton";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -258,7 +259,9 @@ const FilteredList = memo(function FilteredList({
                                                         setModalData(song);
                                                         modalDeleteRef.current?.showModal();
                                                     }}
-                                                    className="rounded-full border-2 border-transparent bg-slate-600 p-1 hover:border-slate-300"
+                                                    className={
+                                                        deleteButtonStyles
+                                                    }
                                                 >
                                                     ❌
                                                 </button>
