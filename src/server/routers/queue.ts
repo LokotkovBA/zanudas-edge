@@ -51,7 +51,13 @@ export const queueRouter = createTRPCRouter({
         }),
 
     add: privateProcedure
-        .input(z.object({ artist: z.string(), songName: z.string() }))
+        .input(
+            z.object({
+                artist: z.string(),
+                songName: z.string(),
+                tag: z.string().optional(),
+            }),
+        )
         .mutation(async ({ ctx, input }) => {
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });

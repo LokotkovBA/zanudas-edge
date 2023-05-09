@@ -135,6 +135,19 @@ const FilteredList = memo(function FilteredList({
         songListData?.artistFirstLetters ?? [],
     );
     const [showMobileFirstLetters, setShowMobileFirstLetters] = useState(false);
+    const { mutate: addToQueue } = clientAPI.queue.add.useMutation({
+        onMutate() {
+            toast.loading("Adding to queue");
+        },
+        onSuccess() {
+            toast.dismiss();
+            toast.success("Added");
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Error: ${error.message}`);
+        },
+    });
 
     if (!songListData) {
         return <>The list is empty</>;
@@ -239,7 +252,16 @@ const FilteredList = memo(function FilteredList({
                                             </section>
                                         </div>
                                         {isMod(privileges) && (
-                                            <button className={buttonStyles}>
+                                            <button
+                                                onClick={() => {
+                                                    addToQueue({
+                                                        artist: song.artist,
+                                                        songName: song.songName,
+                                                        tag: song.tag,
+                                                    });
+                                                }}
+                                                className={buttonStyles}
+                                            >
                                                 Add
                                             </button>
                                         )}
