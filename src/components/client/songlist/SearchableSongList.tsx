@@ -19,6 +19,7 @@ import { isAdmin, isMod } from "~/utils/privileges";
 import { buttonStyles } from "~/components/styles/button";
 import { ThumbsDown } from "~/svg/ThumbsDown";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
+import { inputStyles } from "~/components/styles/input";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -364,7 +365,7 @@ function ModalAdd({
             >
                 Close
             </button>
-            <form className="grid grid-cols-songEdit items-center gap-2">
+            <form className="grid-cols-songEdit grid items-center gap-2">
                 <label htmlFor="artist">Artist</label>
                 <input
                     onChange={(event) => setArtistValue(event.target.value)}
@@ -503,13 +504,13 @@ function ModalEdit({
             >
                 Close
             </button>
-            <form className="grid grid-cols-songEdit items-center gap-2">
+            <form className="grid grid-cols-mobileEdit items-center gap-2 sm:grid-cols-desktopEdit">
                 <label htmlFor="artist">Artist</label>
                 <input
                     onChange={(event) => setArtistValue(event.target.value)}
                     value={artistValue}
                     id="artist"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <label htmlFor="songName">Song name</label>
@@ -517,7 +518,7 @@ function ModalEdit({
                     onChange={(event) => setSongNameValue(event.target.value)}
                     value={songNameValue}
                     id="songName"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <label htmlFor="tag">Tag</label>
@@ -525,7 +526,7 @@ function ModalEdit({
                     onChange={(event) => setTagValue(event.target.value)}
                     value={tagValue}
                     id="tag"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <button type="submit" className={`${buttonStyles} col-span-2`}>

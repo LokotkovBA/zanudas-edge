@@ -12,7 +12,8 @@ module.exports = {
                 sans: ["var(--font-inter)"],
             },
             gridTemplateColumns: {
-                songEdit: ".5fr 1fr",
+                desktopEdit: ".5fr 1fr",
+                mobileEdit: ".2fr 1fr",
             },
         },
     },

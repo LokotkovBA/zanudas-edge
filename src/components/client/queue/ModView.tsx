@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
-import { searchBarStyles } from "~/components/styles/searchBar";
+import { inputStyles } from "~/components/styles/input";
 import { type QueueEntry } from "~/drizzle/types";
 
 export function ModView() {
@@ -265,54 +265,54 @@ function ModalEdit({
             >
                 Close
             </button>
-            <form className="grid grid-cols-songEdit items-center gap-2">
+            <form className="grid grid-cols-mobileEdit items-center gap-2 sm:grid-cols-desktopEdit">
                 <label htmlFor="artist">Artist</label>
                 <input
                     ref={artistRef}
                     id="artist"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <label htmlFor="songName">Song name</label>
                 <input
                     ref={songNameRef}
                     id="songName"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <label htmlFor="tag">Tag</label>
                 <input
                     ref={tagRef}
                     id="tag"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <label htmlFor="donorName">Donor name</label>
                 <input
                     ref={donorNameRef}
                     id="donorName"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
                 <label htmlFor="donateAmount">Donate amount</label>
                 <input
                     ref={donateAmountRef}
                     id="donateAmount"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="number"
                 />
                 <label htmlFor="currency">Currency</label>
                 <input
                     ref={currencyRef}
                     id="currency"
-                    className={searchBarStyles}
+                    className={inputStyles}
                     type="text"
                 />
-                <label htmlFor="donorText">donorText</label>
+                <label htmlFor="donorText">Donor message</label>
                 <textarea
                     ref={donorTextRef}
                     id="donorText"
-                    className={searchBarStyles}
+                    className={inputStyles}
                 />
                 <button type="submit" className={`${buttonStyles} col-span-2`}>
                     Change
