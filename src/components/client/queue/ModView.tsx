@@ -15,6 +15,8 @@ export function ModView() {
         onSuccess() {
             toast.dismiss();
             toast.success("Changed");
+            modalDeleteRef.current?.close();
+            modalEditRef.current?.close();
         },
         onError(error) {
             toast.dismiss();
@@ -187,14 +189,51 @@ function ModalEdit({
     modalRef: React.RefObject<HTMLDialogElement>;
     changeEntry: (entry: QueueEntry) => void;
 }) {
-    const [artistValue, setArtistValue] = useState("");
-    const [songNameValue, setSongNameValue] = useState("");
-    const [tagValue, setTagValue] = useState("");
+    const artistRef = useRef<HTMLInputElement>(null);
+    const songNameRef = useRef<HTMLInputElement>(null);
+    const tagRef = useRef<HTMLInputElement>(null);
+    const donorNameRef = useRef<HTMLInputElement>(null);
+    const donateAmountRef = useRef<HTMLInputElement>(null);
+    const donorTextRef = useRef<HTMLTextAreaElement>(null);
+    const currencyRef = useRef<HTMLInputElement>(null);
+
+    //oh well
     useLayoutEffect(() => {
-        setArtistValue(entry?.artist ?? "");
-        setSongNameValue(entry?.songName ?? "");
-        setTagValue(entry?.tag ?? "");
-    }, [entry?.songName, entry?.tag, entry?.artist]);
+        if (artistRef.current) {
+            artistRef.current.value = entry?.artist ?? "";
+        }
+    }, [entry?.artist]);
+    useLayoutEffect(() => {
+        if (songNameRef.current) {
+            songNameRef.current.value = entry?.songName ?? "";
+        }
+    }, [entry?.songName]);
+    useLayoutEffect(() => {
+        if (tagRef.current) {
+            tagRef.current.value = entry?.tag ?? "";
+        }
+    }, [entry?.tag]);
+    useLayoutEffect(() => {
+        if (donorNameRef.current) {
+            donorNameRef.current.value = entry?.donorName ?? "";
+        }
+    }, [entry?.donorName]);
+    useLayoutEffect(() => {
+        if (donateAmountRef.current) {
+            donateAmountRef.current.value =
+                entry?.donateAmount.toString() ?? "";
+        }
+    }, [entry?.donateAmount]);
+    useLayoutEffect(() => {
+        if (donorTextRef.current) {
+            donorTextRef.current.value = entry?.donorText ?? "";
+        }
+    }, [entry?.donorText]);
+    useLayoutEffect(() => {
+        if (currencyRef.current) {
+            currencyRef.current.value = entry?.currency ?? "";
+        }
+    }, [entry?.currency]);
 
     return (
         <dialog
@@ -207,9 +246,15 @@ function ModalEdit({
                 changeEntry({
                     ...entry,
                     id: entry.id ?? -1,
-                    artist: artistValue,
-                    songName: songNameValue,
-                    tag: tagValue,
+                    artist: artistRef.current?.value ?? "",
+                    songName: songNameRef.current?.value ?? "",
+                    tag: tagRef.current?.value ?? "",
+                    donorName: donorNameRef.current?.value ?? "",
+                    donateAmount: parseInt(
+                        donateAmountRef.current?.value ?? "0",
+                    ),
+                    donorText: donorTextRef.current?.value ?? "",
+                    currency: currencyRef.current?.value ?? "",
                 });
             }}
             ref={modalRef}
@@ -223,27 +268,51 @@ function ModalEdit({
             <form className="grid grid-cols-songEdit items-center gap-2">
                 <label htmlFor="artist">Artist</label>
                 <input
-                    onChange={(event) => setArtistValue(event.target.value)}
-                    value={artistValue}
+                    ref={artistRef}
                     id="artist"
                     className={searchBarStyles}
                     type="text"
                 />
                 <label htmlFor="songName">Song name</label>
                 <input
-                    onChange={(event) => setSongNameValue(event.target.value)}
-                    value={songNameValue}
+                    ref={songNameRef}
                     id="songName"
                     className={searchBarStyles}
                     type="text"
                 />
                 <label htmlFor="tag">Tag</label>
                 <input
-                    onChange={(event) => setTagValue(event.target.value)}
-                    value={tagValue}
+                    ref={tagRef}
                     id="tag"
                     className={searchBarStyles}
                     type="text"
+                />
+                <label htmlFor="donorName">Donor name</label>
+                <input
+                    ref={donorNameRef}
+                    id="donorName"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <label htmlFor="donateAmount">Donate amount</label>
+                <input
+                    ref={donateAmountRef}
+                    id="donateAmount"
+                    className={searchBarStyles}
+                    type="number"
+                />
+                <label htmlFor="currency">Currency</label>
+                <input
+                    ref={currencyRef}
+                    id="currency"
+                    className={searchBarStyles}
+                    type="text"
+                />
+                <label htmlFor="donorText">donorText</label>
+                <textarea
+                    ref={donorTextRef}
+                    id="donorText"
+                    className={searchBarStyles}
                 />
                 <button type="submit" className={`${buttonStyles} col-span-2`}>
                     Change

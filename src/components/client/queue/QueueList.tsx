@@ -11,7 +11,10 @@ export function QueueList({ privileges }: { privileges: number }) {
 
     const filteredQueueData = queueData?.filter((entry) => entry.visible);
 
-    if ((!isMod(privileges) && !filteredQueueData?.length) || !queueData) {
+    if (
+        (!isMod(privileges) && !filteredQueueData?.length) ||
+        !queueData?.length
+    ) {
         return (
             <h2 className="flex items-center gap-1">
                 Queue is empty.
