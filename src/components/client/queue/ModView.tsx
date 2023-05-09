@@ -85,12 +85,14 @@ export function ModView() {
                                 defaultChecked={entry.played === 1}
                                 type="checkbox"
                             />
-                            <label htmlFor={`${entry.id}-played`}>Played</label>
+                            <label htmlFor={`${entry.id}-current`}>
+                                Played
+                            </label>
                             <input
                                 onChange={changeHandler}
                                 id={`${entry.id}-current`}
-                                name="played"
-                                defaultChecked={entry.played === 1}
+                                name="current"
+                                defaultChecked={entry.current === 1}
                                 type="checkbox"
                             />
                             <label htmlFor={`${entry.id}-current`}>

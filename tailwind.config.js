@@ -14,6 +14,7 @@ module.exports = {
             gridTemplateColumns: {
                 desktopEdit: ".5fr 1fr",
                 mobileEdit: ".2fr 1fr",
+                queue: "1fr .5fr",
             },
         },
     },

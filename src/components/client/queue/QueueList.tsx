@@ -5,6 +5,7 @@ import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 import { isMod } from "~/utils/privileges";
 import { ModView } from "./ModView";
 import { type QueueEntry } from "~/drizzle/types";
+import clsx from "clsx";
 
 export function QueueList({ privileges }: { privileges: number }) {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
@@ -49,16 +50,44 @@ function PlebView({ filteredQueueData }: { filteredQueueData: QueueEntry[] }) {
         <>
             {filteredQueueData
                 .filter((entry) => entry.visible)
-                .map(({ artist, id, songName }) => (
-                    <li key={id} className="border-b border-b-sky-600">
-                        <h2 className="flex items-center gap-2">
-                            <span className="font-bold text-sky-400">
-                                {artist}
-                            </span>{" "}
-                            - {songName}
-                        </h2>
-                    </li>
-                ))}
+                .map(
+                    (
+                        { artist, id, songName, donorName, current, played },
+                        index,
+                    ) => (
+                        <li
+                            key={id}
+                            className="grid grid-rows-2 border-b border-b-sky-600 p-1 sm:grid-cols-2"
+                        >
+                            <h2 className="col-span-2 flex flex-wrap items-center gap-2">
+                                <span
+                                    className={clsx(
+                                        "rounded p-1 leading-none",
+                                        {
+                                            "bg-sky-700": !current && !played,
+                                            "bg-amber-400 text-black": current,
+                                            "bg-slate-700": played && !current,
+                                        },
+                                    )}
+                                >
+                                    {index + 1}
+                                </span>
+                                <span className="font-bold text-sky-400">
+                                    {artist}
+                                </span>{" "}
+                                - {songName}
+                            </h2>
+                            {donorName && (
+                                <p className="col-span-2 justify-self-end">
+                                    from{" "}
+                                    <span className="font-bold text-amber-400">
+                                        {donorName}
+                                    </span>
+                                </p>
+                            )}
+                        </li>
+                    ),
+                )}
         </>
     );
 }
