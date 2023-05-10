@@ -6,6 +6,7 @@ import { isMod } from "~/utils/privileges";
 import { ModView } from "./ModView";
 import { type QueueEntry } from "~/drizzle/types";
 import clsx from "clsx";
+import { LikeBlock } from "./LikeBlock";
 
 export function QueueList({ privileges }: { privileges: number }) {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
@@ -36,6 +37,7 @@ export function QueueList({ privileges }: { privileges: number }) {
             {isMod(privileges) && <ModView />}
             {!isMod(privileges) && (
                 <PlebView
+                    privileges={privileges}
                     filteredQueueData={queueData.filter(
                         (entry) => entry.visible,
                     )}
@@ -45,49 +47,67 @@ export function QueueList({ privileges }: { privileges: number }) {
     );
 }
 
-function PlebView({ filteredQueueData }: { filteredQueueData: QueueEntry[] }) {
+function PlebView({
+    privileges,
+    filteredQueueData,
+}: {
+    filteredQueueData: QueueEntry[];
+    privileges: number;
+}) {
     return (
         <>
-            {filteredQueueData
-                .filter((entry) => entry.visible)
-                .map(
-                    (
-                        { artist, id, songName, donorName, current, played },
-                        index,
-                    ) => (
-                        <li
-                            key={id}
-                            className="grid grid-rows-2 border-b border-b-sky-600 p-1 sm:grid-cols-2"
-                        >
-                            <h2 className="col-span-2 flex flex-wrap items-center gap-2">
-                                <span
-                                    className={clsx(
-                                        "rounded p-1 leading-none",
-                                        {
-                                            "bg-sky-700": !current && !played,
-                                            "bg-amber-400 text-black": current,
-                                            "bg-slate-700": played && !current,
-                                        },
-                                    )}
-                                >
-                                    {index + 1}
+            {filteredQueueData.map(
+                (
+                    {
+                        artist,
+                        id,
+                        songName,
+                        donorName,
+                        current,
+                        played,
+                        likeCount,
+                    },
+                    index,
+                ) => (
+                    <li
+                        key={id}
+                        className="grid gap-2 border-b border-b-sky-600 p-1 sm:grid-cols-2 sm:grid-rows-2"
+                    >
+                        <h2 className="col-span-2 grid items-center gap-2 sm:flex sm:flex-wrap">
+                            <span
+                                className={clsx(
+                                    "rounded p-1 text-center leading-none",
+                                    {
+                                        "bg-sky-700": !current && !played,
+                                        "bg-amber-400 text-black": current,
+                                        "bg-slate-700": played && !current,
+                                    },
+                                )}
+                            >
+                                {index + 1}
+                            </span>
+                            <span className="font-bold text-sky-400">
+                                {artist}
+                            </span>{" "}
+                            <span className="hidden sm:block">-</span>{" "}
+                            {songName}
+                        </h2>
+                        <LikeBlock
+                            className="sm:justify-self-end"
+                            count={likeCount}
+                            loggedIn={privileges !== -1}
+                        />
+                        {donorName && (
+                            <p className="justify-self-end sm:col-start-2 sm:col-end-3">
+                                from{" "}
+                                <span className="font-bold text-amber-400">
+                                    {donorName}
                                 </span>
-                                <span className="font-bold text-sky-400">
-                                    {artist}
-                                </span>{" "}
-                                - {songName}
-                            </h2>
-                            {donorName && (
-                                <p className="col-span-2 justify-self-end">
-                                    from{" "}
-                                    <span className="font-bold text-amber-400">
-                                        {donorName}
-                                    </span>
-                                </p>
-                            )}
-                        </li>
-                    ),
-                )}
+                            </p>
+                        )}
+                    </li>
+                ),
+            )}
         </>
     );
 }

@@ -16,7 +16,7 @@ export default async function Queue() {
             {isMod(userData?.privileges) && <AddButton />}
             <Suspense fallback={<Spinner />}>
                 {/* @ts-expect-error Async Server Component */}
-                <List privileges={userData?.privileges ?? 0} />
+                <List privileges={userData?.privileges ?? -1} />
             </Suspense>
         </main>
     );
