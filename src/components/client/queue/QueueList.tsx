@@ -33,7 +33,15 @@ export function QueueList({ privileges }: { privileges: number }) {
     }
 
     return (
-        <ul className="flex flex-col rounded border border-slate-400 bg-slate-950 px-5 py-1">
+        <ul
+            className={clsx(
+                "flex flex-col rounded border border-slate-400 bg-slate-950",
+                {
+                    "gap-3 p-5": isMod(privileges),
+                    "px-5 py-1": !isMod(privileges),
+                },
+            )}
+        >
             {isMod(privileges) && <ModView />}
             {!isMod(privileges) && (
                 <PlebView
