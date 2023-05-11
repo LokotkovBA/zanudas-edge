@@ -33,7 +33,7 @@ export function QueueList({ privileges }: { privileges: number }) {
     }
 
     return (
-        <ul className="flex flex-col gap-3 rounded border border-slate-400 bg-slate-950 p-5">
+        <ul className="flex flex-col rounded border border-slate-400 bg-slate-950 px-5 py-1">
             {isMod(privileges) && <ModView />}
             {!isMod(privileges) && (
                 <PlebView
@@ -71,7 +71,7 @@ function PlebView({
                 ) => (
                     <li
                         key={id}
-                        className="grid gap-2 border-b border-b-sky-600 p-1 sm:grid-cols-2 sm:grid-rows-2"
+                        className="grid gap-2 border-b border-b-sky-600 px-1 py-3 last:border-transparent sm:grid-cols-2 sm:grid-rows-2"
                     >
                         <h2 className="col-span-2 grid items-center gap-2 sm:flex sm:flex-wrap">
                             <span
