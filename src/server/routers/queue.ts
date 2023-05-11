@@ -1,18 +1,67 @@
-import { asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
-import { insertQueueSchema, queue } from "~/drizzle/schemas/queue";
+import { insertQueueSchema, likes, queue } from "~/drizzle/schemas/queue";
 import { isMod } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const queueRouter = createTRPCRouter({
-    getAll: publicProcedure.query(({ ctx }) => {
-        return ctx.drizzle
+    getAll: publicProcedure.query(async ({ ctx }) => {
+        if (ctx.user) {
+            const userLikes = ctx.drizzle
+                .select()
+                .from(likes)
+                .where(eq(likes.userId, ctx.user.id))
+                .as("userLikes");
+            return ctx.drizzle
+                .select()
+                .from(queue)
+                .orderBy(asc(queue.queueNumber))
+                .leftJoin(userLikes, eq(queue.id, userLikes.songId))
+                .all();
+        }
+
+        const data = await ctx.drizzle
             .select()
             .from(queue)
             .orderBy(asc(queue.queueNumber))
             .all();
+
+        return data.map((queue) => ({ queue, userLikes: null }));
     }),
+
+    like: privateProcedure
+        .input(z.object({ songId: z.number(), value: z.number() }))
+        .mutation(async ({ ctx, input: { songId, value } }) => {
+            if (
+                await ctx.drizzle
+                    .select()
+                    .from(likes)
+                    .where(
+                        and(
+                            eq(likes.userId, ctx.user.id),
+                            eq(likes.songId, songId),
+                        ),
+                    )
+                    .get()
+            ) {
+                return ctx.drizzle
+                    .update(likes)
+                    .set({ value })
+                    .where(
+                        and(
+                            eq(likes.userId, ctx.user.id),
+                            eq(likes.songId, songId),
+                        ),
+                    )
+                    .run();
+            }
+
+            return ctx.drizzle
+                .insert(likes)
+                .values({ songId, value, userId: ctx.user.id })
+                .run();
+        }),
 
     change: privateProcedure
         .input(insertQueueSchema)

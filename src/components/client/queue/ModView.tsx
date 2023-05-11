@@ -31,7 +31,7 @@ export function ModView() {
 
     return (
         <>
-            {queueData?.map((entry) => {
+            {queueData?.map(({ queue: entry, userLikes }) => {
                 function changeHandler(event: ChangeEvent<HTMLInputElement>) {
                     changeEntry({
                         ...entry,
@@ -60,9 +60,10 @@ export function ModView() {
                             ❌
                         </button>
                         <LikeBlock
+                            songId={entry.id}
                             count={entry.likeCount}
                             loggedIn={true}
-                            value={0}
+                            value={userLikes ? userLikes.value : 0}
                             className="justify-self-center"
                         />
                         <form className="grid grid-cols-2 items-center gap-x-1 gap-y-2">

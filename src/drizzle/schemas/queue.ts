@@ -27,8 +27,12 @@ export const likes = sqliteTable(
     {
         id: integer("id").primaryKey(),
         value: integer("value").notNull(),
-        songId: integer("song_id").references(() => queue.id),
-        userId: text("user_id").references(() => users.id),
+        songId: integer("song_id").references(() => queue.id, {
+            onDelete: "cascade",
+        }),
+        userId: text("user_id").references(() => users.id, {
+            onDelete: "cascade",
+        }),
     },
     (likes) => ({
         songIdx: index("songIdx").on(likes.songId),

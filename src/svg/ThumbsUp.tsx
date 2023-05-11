@@ -1,12 +1,15 @@
 export function ThumbsUp({
     className,
     size,
+    onClick,
 }: {
     size: string;
     className: string;
+    onClick?: () => void;
 }) {
     return (
         <svg
+            onClick={onClick}
             width={size}
             height={size}
             viewBox="0 0 24 24"

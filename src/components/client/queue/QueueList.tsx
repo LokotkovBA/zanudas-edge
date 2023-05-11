@@ -4,14 +4,14 @@ import { clientAPI } from "~/client/ClientProvider";
 import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 import { isMod } from "~/utils/privileges";
 import { ModView } from "./ModView";
-import { type QueueEntry } from "~/drizzle/types";
+import { type LikeEntry, type QueueEntry } from "~/drizzle/types";
 import clsx from "clsx";
 import { LikeBlock } from "./LikeBlock";
 
 export function QueueList({ privileges }: { privileges: number }) {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
 
-    const filteredQueueData = queueData?.filter((entry) => entry.visible);
+    const filteredQueueData = queueData?.filter((entry) => entry.queue.visible);
 
     if (
         (!isMod(privileges) && !filteredQueueData?.length) ||
@@ -47,7 +47,7 @@ export function QueueList({ privileges }: { privileges: number }) {
                 <PlebView
                     privileges={privileges}
                     filteredQueueData={queueData.filter(
-                        (entry) => entry.visible,
+                        (entry) => entry.queue.visible,
                     )}
                 />
             )}
@@ -55,11 +55,16 @@ export function QueueList({ privileges }: { privileges: number }) {
     );
 }
 
+type QueueData = {
+    queue: QueueEntry;
+    userLikes: LikeEntry | null;
+}[];
+
 function PlebView({
     privileges,
     filteredQueueData,
 }: {
-    filteredQueueData: QueueEntry[];
+    filteredQueueData: QueueData;
     privileges: number;
 }) {
     return (
@@ -67,13 +72,16 @@ function PlebView({
             {filteredQueueData.map(
                 (
                     {
-                        artist,
-                        id,
-                        songName,
-                        donorName,
-                        current,
-                        played,
-                        likeCount,
+                        queue: {
+                            artist,
+                            id,
+                            songName,
+                            donorName,
+                            current,
+                            played,
+                            likeCount,
+                        },
+                        userLikes,
                     },
                     index,
                 ) => (
@@ -101,10 +109,11 @@ function PlebView({
                             {songName}
                         </h2>
                         <LikeBlock
+                            songId={id}
                             className="sm:justify-self-end"
                             count={likeCount}
                             loggedIn={privileges !== -1}
-                            value={privileges !== -1 ? -1 : 0}
+                            value={userLikes ? userLikes.value : 0}
                         />
                         {donorName && (
                             <p className="justify-self-end sm:col-start-2 sm:col-end-3">
