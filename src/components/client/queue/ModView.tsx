@@ -25,6 +25,20 @@ export function ModView() {
         },
     });
 
+    const { mutate: setCurrent } = clientAPI.queue.setCurrent.useMutation({
+        onMutate() {
+            toast.loading("Changing");
+        },
+        onSuccess() {
+            toast.dismiss();
+            toast.success("Changed");
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Error: ${error.message}`);
+        },
+    });
+
     const [currentEntry, setCurrentEntry] = useState<QueueEntry | null>(null);
     const modalEditRef = useRef<HTMLDialogElement>(null);
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
@@ -126,7 +140,12 @@ export function ModView() {
                             <div className="justify-self-end">
                                 <input
                                     className="hidden"
-                                    onChange={changeHandler}
+                                    onChange={(event) => {
+                                        setCurrent({
+                                            id: entry.id,
+                                            value: event.target.checked,
+                                        });
+                                    }}
                                     id={`${entry.id}-current`}
                                     name="current"
                                     checked={entry.current === 1}
@@ -144,9 +163,9 @@ export function ModView() {
                                 className="justify-self-start"
                                 checked={entry.current === 1}
                                 onClick={(oldChecked) => {
-                                    changeEntry({
-                                        ...entry,
-                                        current: oldChecked ? 0 : 1,
+                                    setCurrent({
+                                        id: entry.id,
+                                        value: !oldChecked,
                                     });
                                 }}
                             />

@@ -83,6 +83,30 @@ export const queueRouter = createTRPCRouter({
                 .run();
         }),
 
+    setCurrent: privateProcedure
+        .input(z.object({ id: z.number(), value: z.boolean() }))
+        .mutation(async ({ ctx, input: { id, value } }) => {
+            if (!isMod(ctx.user.privileges)) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+            if (id < 0) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Incorrect id",
+                });
+            }
+
+            if (value) {
+                await ctx.drizzle.update(queue).set({ current: 0 }).run();
+            }
+
+            return ctx.drizzle
+                .update(queue)
+                .set({ current: value ? 1 : 0 })
+                .where(eq(queue.id, id))
+                .run();
+        }),
+
     delete: privateProcedure
         .input(z.object({ id: z.number() }))
         .mutation(({ ctx, input: { id } }) => {
