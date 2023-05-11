@@ -366,27 +366,27 @@ function ModalAdd({
                 Close
             </button>
             <form className="grid-cols-songEdit grid items-center gap-2">
-                <label htmlFor="artist">Artist</label>
+                <label htmlFor="artist-add">Artist</label>
                 <input
                     onChange={(event) => setArtistValue(event.target.value)}
                     value={artistValue}
-                    id="artist"
+                    id="artist-add"
                     className={searchBarStyles}
                     type="text"
                 />
-                <label htmlFor="songName">Song name</label>
+                <label htmlFor="songName-add">Song name</label>
                 <input
                     onChange={(event) => setSongNameValue(event.target.value)}
                     value={songNameValue}
-                    id="songName"
+                    id="songName-add"
                     className={searchBarStyles}
                     type="text"
                 />
-                <label htmlFor="tag">Tag</label>
+                <label htmlFor="tag-add">Tag</label>
                 <input
                     onChange={(event) => setTagValue(event.target.value)}
                     value={tagValue}
-                    id="tag"
+                    id="tag-add"
                     className={searchBarStyles}
                     type="text"
                 />
@@ -505,27 +505,27 @@ function ModalEdit({
                 Close
             </button>
             <form className="grid grid-cols-mobileEdit items-center gap-2 sm:grid-cols-desktopEdit">
-                <label htmlFor="artist">Artist</label>
+                <label htmlFor="artist-edit">Artist</label>
                 <input
                     onChange={(event) => setArtistValue(event.target.value)}
                     value={artistValue}
-                    id="artist"
+                    id="artist-edit"
                     className={inputStyles}
                     type="text"
                 />
-                <label htmlFor="songName">Song name</label>
+                <label htmlFor="songName-edit">Song name</label>
                 <input
                     onChange={(event) => setSongNameValue(event.target.value)}
                     value={songNameValue}
-                    id="songName"
+                    id="songName-edit"
                     className={inputStyles}
                     type="text"
                 />
-                <label htmlFor="tag">Tag</label>
+                <label htmlFor="tag-edit">Tag</label>
                 <input
                     onChange={(event) => setTagValue(event.target.value)}
                     value={tagValue}
-                    id="tag"
+                    id="tag-edit"
                     className={inputStyles}
                     type="text"
                 />
