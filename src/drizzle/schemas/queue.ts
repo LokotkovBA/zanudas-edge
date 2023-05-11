@@ -33,7 +33,7 @@ export const likes = sqliteTable(
         id: integer("id").primaryKey(),
         value: integer("value").notNull(),
         songId: integer("song_id").references(() => queue.id),
-        userId: integer("user_id").references(() => users.id),
+        userId: text("user_id").references(() => users.id),
     },
     (likes) => ({
         songIdx: uniqueIndex("songIdx").on(likes.songId),
