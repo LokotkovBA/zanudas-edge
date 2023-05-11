@@ -1,9 +1,10 @@
 type CrossProps = {
     size: string;
     className?: string;
+    id: string;
 };
 
-export function Cross({ className, size }: CrossProps) {
+export function Cross({ className, size, id }: CrossProps) {
     return (
         <svg
             className={className}
@@ -14,7 +15,7 @@ export function Cross({ className, size }: CrossProps) {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
-            <title id="cross">Cross</title>
+            <title id={`cross-${id}`}>Cross</title>
             <path
                 fillRule="evenodd"
                 clipRule="evenodd"

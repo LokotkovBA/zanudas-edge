@@ -1,9 +1,10 @@
 type CheckMarkProps = {
     size: string;
     className?: string;
+    id: string;
 };
 
-export function CheckMark({ size, className }: CheckMarkProps) {
+export function CheckMark({ size, className, id }: CheckMarkProps) {
     return (
         <svg
             className={className}
@@ -12,7 +13,7 @@ export function CheckMark({ size, className }: CheckMarkProps) {
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
-            <title id="check">Check mark</title>
+            <title id={`check-${id}`}>Check mark</title>
             <path
                 fillRule="evenodd"
                 clipRule="evenodd"

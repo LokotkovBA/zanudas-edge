@@ -41,15 +41,24 @@ export function ModView() {
 
                 return (
                     <li
-                        className="grid cursor-grab gap-2 rounded border border-sky-400 bg-sky-950 p-2 sm:grid-cols-2"
+                        className="grid cursor-grab grid-cols-1 gap-2 rounded border border-sky-400 bg-sky-950 p-2 sm:grid-cols-queue"
                         key={entry.id}
                     >
-                        <h2 className="flex gap-2 sm:col-start-1 sm:col-end-3">
+                        <h2 className="flex gap-2 sm:row-start-1">
                             <span className="font-bold text-sky-400">
                                 {entry.queueNumber}
                             </span>
                             {entry.artist} - {entry.songName}
                         </h2>
+                        <button
+                            onClick={() => {
+                                setCurrentEntry(entry);
+                                modalDeleteRef.current?.showModal();
+                            }}
+                            className="row-start-1 justify-self-end rounded-full border border-transparent bg-sky-800 p-2 hover:border-sky-400 sm:col-start-2"
+                        >
+                            ❌
+                        </button>
                         <LikeBlock
                             count={entry.likeCount}
                             loggedIn={true}
@@ -63,7 +72,7 @@ export function ModView() {
                                     onChange={changeHandler}
                                     id={`${entry.id}-visible`}
                                     name="visible"
-                                    defaultChecked={entry.visible === 1}
+                                    checked={entry.visible === 1}
                                     type="checkbox"
                                 />
                                 <label
@@ -74,6 +83,7 @@ export function ModView() {
                                 </label>
                             </div>
                             <CheckBox
+                                id={`visible-${entry.id}`}
                                 className="justify-self-start"
                                 checked={entry.visible === 1}
                                 onClick={(oldChecked) => {
@@ -90,7 +100,7 @@ export function ModView() {
                                     onChange={changeHandler}
                                     id={`${entry.id}-played`}
                                     name="played"
-                                    defaultChecked={entry.played === 1}
+                                    checked={entry.played === 1}
                                     type="checkbox"
                                 />
                                 <label
@@ -101,6 +111,7 @@ export function ModView() {
                                 </label>
                             </div>
                             <CheckBox
+                                id={`played-${entry.id}`}
                                 className="justify-self-start"
                                 checked={entry.played === 1}
                                 onClick={(oldChecked) => {
@@ -117,7 +128,7 @@ export function ModView() {
                                     onChange={changeHandler}
                                     id={`${entry.id}-current`}
                                     name="current"
-                                    defaultChecked={entry.current === 1}
+                                    checked={entry.current === 1}
                                     type="checkbox"
                                 />
                                 <label
@@ -128,6 +139,7 @@ export function ModView() {
                                 </label>
                             </div>
                             <CheckBox
+                                id={`current-${entry.id}`}
                                 className="justify-self-start"
                                 checked={entry.current === 1}
                                 onClick={(oldChecked) => {
@@ -144,7 +156,7 @@ export function ModView() {
                                     onChange={changeHandler}
                                     id={`${entry.id}-willAdd`}
                                     name="willAdd"
-                                    defaultChecked={entry.willAdd === 1}
+                                    checked={entry.willAdd === 1}
                                     type="checkbox"
                                 />
                                 <label
@@ -155,6 +167,7 @@ export function ModView() {
                                 </label>
                             </div>
                             <CheckBox
+                                id={`willAdd-${entry.id}`}
                                 className="justify-self-start"
                                 checked={entry.willAdd === 1}
                                 onClick={(oldChecked) => {
@@ -170,18 +183,9 @@ export function ModView() {
                                 setCurrentEntry(entry);
                                 modalEditRef.current?.showModal();
                             }}
-                            className="rounded bg-sky-800 p-2"
+                            className="rounded border border-transparent bg-sky-800 p-2 hover:border-sky-400 sm:col-span-2"
                         >
                             Open edit
-                        </button>
-                        <button
-                            onClick={() => {
-                                setCurrentEntry(entry);
-                                modalDeleteRef.current?.showModal();
-                            }}
-                            className="rounded-full bg-sky-800 p-2"
-                        >
-                            ❌
                         </button>
                     </li>
                 );
