@@ -1,9 +1,4 @@
-import {
-    integer,
-    sqliteTable,
-    text,
-    uniqueIndex,
-} from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { users } from "./auth";
 
@@ -36,7 +31,7 @@ export const likes = sqliteTable(
         userId: text("user_id").references(() => users.id),
     },
     (likes) => ({
-        songIdx: uniqueIndex("songIdx").on(likes.songId),
+        songIdx: index("songIdx").on(likes.songId),
     }),
 );
 
