@@ -2,9 +2,10 @@ import { type ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
-import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { inputStyles } from "~/components/styles/input";
 import { type QueueEntry } from "~/drizzle/types";
+import { LikeBlock } from "./LikeBlock";
+import { CheckBox } from "~/components/utils/CheckBox";
 
 export function ModView() {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
@@ -40,21 +41,136 @@ export function ModView() {
 
                 return (
                     <li
-                        className="grid grid-cols-2 gap-2 border-b border-sky-400 p-2"
+                        className="grid cursor-grab gap-2 rounded border border-sky-400 bg-sky-950 p-2 sm:grid-cols-2"
                         key={entry.id}
                     >
-                        <h2 className="col-start-1 col-end-3 flex gap-2">
+                        <h2 className="flex gap-2 sm:col-start-1 sm:col-end-3">
                             <span className="font-bold text-sky-400">
                                 {entry.queueNumber}
                             </span>
                             {entry.artist} - {entry.songName}
                         </h2>
+                        <LikeBlock
+                            count={entry.likeCount}
+                            loggedIn={true}
+                            value={0}
+                            className="justify-self-center"
+                        />
+                        <form className="grid grid-cols-2 items-center gap-x-1 gap-y-2">
+                            <div className="justify-self-end">
+                                <input
+                                    className="hidden"
+                                    onChange={changeHandler}
+                                    id={`${entry.id}-visible`}
+                                    name="visible"
+                                    defaultChecked={entry.visible === 1}
+                                    type="checkbox"
+                                />
+                                <label
+                                    className="cursor-pointer"
+                                    htmlFor={`${entry.id}-visible`}
+                                >
+                                    Visible
+                                </label>
+                            </div>
+                            <CheckBox
+                                className="justify-self-start"
+                                checked={entry.visible === 1}
+                                onClick={(oldChecked) => {
+                                    changeEntry({
+                                        ...entry,
+                                        visible: oldChecked ? 0 : 1,
+                                    });
+                                }}
+                            />
+
+                            <div className="justify-self-end">
+                                <input
+                                    className="hidden"
+                                    onChange={changeHandler}
+                                    id={`${entry.id}-played`}
+                                    name="played"
+                                    defaultChecked={entry.played === 1}
+                                    type="checkbox"
+                                />
+                                <label
+                                    className="cursor-pointer"
+                                    htmlFor={`${entry.id}-played`}
+                                >
+                                    Played
+                                </label>
+                            </div>
+                            <CheckBox
+                                className="justify-self-start"
+                                checked={entry.played === 1}
+                                onClick={(oldChecked) => {
+                                    changeEntry({
+                                        ...entry,
+                                        played: oldChecked ? 0 : 1,
+                                    });
+                                }}
+                            />
+
+                            <div className="justify-self-end">
+                                <input
+                                    className="hidden"
+                                    onChange={changeHandler}
+                                    id={`${entry.id}-current`}
+                                    name="current"
+                                    defaultChecked={entry.current === 1}
+                                    type="checkbox"
+                                />
+                                <label
+                                    className="cursor-pointer"
+                                    htmlFor={`${entry.id}-current`}
+                                >
+                                    Current
+                                </label>
+                            </div>
+                            <CheckBox
+                                className="justify-self-start"
+                                checked={entry.current === 1}
+                                onClick={(oldChecked) => {
+                                    changeEntry({
+                                        ...entry,
+                                        current: oldChecked ? 0 : 1,
+                                    });
+                                }}
+                            />
+
+                            <div className="justify-self-end">
+                                <input
+                                    className="hidden"
+                                    onChange={changeHandler}
+                                    id={`${entry.id}-willAdd`}
+                                    name="willAdd"
+                                    defaultChecked={entry.willAdd === 1}
+                                    type="checkbox"
+                                />
+                                <label
+                                    className="cursor-pointer"
+                                    htmlFor={`${entry.id}-willAdd`}
+                                >
+                                    Will add
+                                </label>
+                            </div>
+                            <CheckBox
+                                className="justify-self-start"
+                                checked={entry.willAdd === 1}
+                                onClick={(oldChecked) => {
+                                    changeEntry({
+                                        ...entry,
+                                        willAdd: oldChecked ? 0 : 1,
+                                    });
+                                }}
+                            />
+                        </form>
                         <button
                             onClick={() => {
                                 setCurrentEntry(entry);
                                 modalEditRef.current?.showModal();
                             }}
-                            className={buttonStyles}
+                            className="rounded bg-sky-800 p-2"
                         >
                             Open edit
                         </button>
@@ -63,52 +179,10 @@ export function ModView() {
                                 setCurrentEntry(entry);
                                 modalDeleteRef.current?.showModal();
                             }}
-                            className={deleteButtonStyles}
+                            className="rounded-full bg-sky-800 p-2"
                         >
                             ❌
                         </button>
-                        <form className="grid grid-cols-2">
-                            <input
-                                onChange={changeHandler}
-                                id={`${entry.id}-visible`}
-                                name="visible"
-                                defaultChecked={entry.visible === 1}
-                                type="checkbox"
-                            />
-                            <label htmlFor={`${entry.id}-visible`}>
-                                Visible
-                            </label>
-                            <input
-                                onChange={changeHandler}
-                                id={`${entry.id}-played`}
-                                name="played"
-                                defaultChecked={entry.played === 1}
-                                type="checkbox"
-                            />
-                            <label htmlFor={`${entry.id}-current`}>
-                                Played
-                            </label>
-                            <input
-                                onChange={changeHandler}
-                                id={`${entry.id}-current`}
-                                name="current"
-                                defaultChecked={entry.current === 1}
-                                type="checkbox"
-                            />
-                            <label htmlFor={`${entry.id}-current`}>
-                                Current
-                            </label>
-                            <input
-                                onChange={changeHandler}
-                                id={`${entry.id}-willAdd`}
-                                name="willAdd"
-                                defaultChecked={entry.willAdd === 1}
-                                type="checkbox"
-                            />
-                            <label htmlFor={`${entry.id}-willAdd`}>
-                                Will add
-                            </label>
-                        </form>
                     </li>
                 );
             })}

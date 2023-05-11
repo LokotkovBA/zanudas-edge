@@ -96,6 +96,7 @@ function PlebView({
                             className="sm:justify-self-end"
                             count={likeCount}
                             loggedIn={privileges !== -1}
+                            value={privileges !== -1 ? -1 : 0}
                         />
                         {donorName && (
                             <p className="justify-self-end sm:col-start-2 sm:col-end-3">
