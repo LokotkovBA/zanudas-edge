@@ -108,21 +108,21 @@ function PlebView({
                             <span className="hidden sm:block">-</span>{" "}
                             {songName}
                         </h2>
-                        <LikeBlock
-                            songId={id}
-                            className="sm:justify-self-end"
-                            count={likeCount}
-                            loggedIn={privileges !== -1}
-                            value={userLikes ? userLikes.value : 0}
-                        />
                         {donorName && (
-                            <p className="justify-self-end sm:col-start-2 sm:col-end-3">
+                            <p className="sm:justify-self-end">
                                 from{" "}
                                 <span className="font-bold text-amber-400">
                                     {donorName}
                                 </span>
                             </p>
                         )}
+                        <LikeBlock
+                            songId={id}
+                            className="col-start-2 justify-self-end"
+                            count={likeCount}
+                            loggedIn={privileges !== -1}
+                            value={userLikes ? userLikes.value : 0}
+                        />
                     </li>
                 ),
             )}
