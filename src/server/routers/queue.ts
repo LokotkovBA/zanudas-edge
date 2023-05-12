@@ -45,7 +45,7 @@ export const queueRouter = createTRPCRouter({
                     )
                     .get()
             ) {
-                return ctx.drizzle
+                await ctx.drizzle
                     .update(likes)
                     .set({ value })
                     .where(
@@ -55,12 +55,14 @@ export const queueRouter = createTRPCRouter({
                         ),
                     )
                     .run();
+                return value;
             }
 
-            return ctx.drizzle
+            await ctx.drizzle
                 .insert(likes)
                 .values({ songId, value, userId: ctx.user.id })
                 .run();
+            return value;
         }),
 
     change: privateProcedure

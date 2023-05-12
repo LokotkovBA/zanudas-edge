@@ -20,7 +20,6 @@ const server = z.object({
     ),
     TWITCH_CLIENT_ID: z.string(),
     TWITCH_CLIENT_SECRET: z.string(),
-    SOCKET_ADDRESS: z.url(),
     SOCKET_SECRET: z.string().min(1),
     SOCKET_KEY: z.string().min(1),
     // UPSTASH_REDIS_REST_URL: z.string().url(),
@@ -31,7 +30,9 @@ const server = z.object({
  * Specify your client-side environment variables schema here. This way you can ensure the app isn't
  * built with invalid env vars. To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
-const client = z.object({});
+const client = z.object({
+    NEXT_PUBLIC_SOCKET_ADDRESS: z.string().url(),
+});
 
 /**
  * You can't destruct `process.env` as a regular object in the Next.js edge runtimes (e.g.
@@ -46,6 +47,9 @@ const processEnv = {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     TWITCH_CLIENT_ID: process.env.TWITCH_CLIENT_ID,
     TWITCH_CLIENT_SECRET: process.env.TWITCH_CLIENT_SECRET,
+    SOCKET_SECRET: process.env.SOCKET_SECRET,
+    SOCKET_KEY: process.env.SOCKET_KEY,
+    NEXT_PUBLIC_SOCKET_ADDRESS: process.env.NEXT_PUBLIC_SOCKET_ADDRESS,
 };
 
 // Don't touch the part below

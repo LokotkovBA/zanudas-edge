@@ -16,19 +16,19 @@ export default async function Queue() {
             {isMod(userData?.privileges) && <AddButton />}
             <Suspense fallback={<Spinner />}>
                 {/* @ts-expect-error Async Server Component */}
-                <List privileges={userData?.privileges ?? -1} />
+                <List />
             </Suspense>
         </main>
     );
 }
 
-async function List({ privileges }: { privileges: number }) {
+async function List() {
     await serverAPI.queue.getAll.fetch();
     const state = await serverAPI.dehydrate();
 
     return (
         <HydrateClient state={state}>
-            <QueueList privileges={privileges} />
+            <QueueList />
         </HydrateClient>
     );
 }

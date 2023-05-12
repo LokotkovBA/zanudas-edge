@@ -7,14 +7,35 @@ import { ModView } from "./ModView";
 import { type LikeEntry, type QueueEntry } from "~/drizzle/types";
 import clsx from "clsx";
 import { LikeBlock } from "./LikeBlock";
+import { useEffect } from "react";
+import { socketClient } from "~/client/socketClient";
 
-export function QueueList({ privileges }: { privileges: number }) {
+export function QueueList() {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
 
     const filteredQueueData = queueData?.filter((entry) => entry.queue.visible);
 
+    const { data: userData } = clientAPI.getAuth.useQuery();
+
+    const ctx = clientAPI.useContext();
+
+    useEffect(() => {
+        if (userData) {
+            socketClient.emit("sub likes", userData.name);
+        }
+        socketClient.on("invalidate", () => {
+            ctx.queue.getAll.invalidate();
+        });
+        return () => {
+            if (userData) {
+                socketClient.emit("unsub likes", userData.name);
+            }
+            socketClient.off("invalidate");
+        };
+    }, [userData, ctx.queue.getAll]);
+
     if (
-        (!isMod(privileges) && !filteredQueueData?.length) ||
+        (!isMod(userData?.privileges) && !filteredQueueData?.length) ||
         !queueData?.length
     ) {
         return (
@@ -37,15 +58,14 @@ export function QueueList({ privileges }: { privileges: number }) {
             className={clsx(
                 "flex flex-col rounded border border-slate-400 bg-slate-950",
                 {
-                    "gap-3 p-5": isMod(privileges),
-                    "px-5 py-1": !isMod(privileges),
+                    "gap-3 p-5": isMod(userData?.privileges),
+                    "px-5 py-1": !isMod(userData?.privileges),
                 },
             )}
         >
-            {isMod(privileges) && <ModView />}
-            {!isMod(privileges) && (
+            {isMod(userData?.privileges) && <ModView />}
+            {!isMod(userData?.privileges) && (
                 <PlebView
-                    privileges={privileges}
                     filteredQueueData={queueData.filter(
                         (entry) => entry.queue.visible,
                     )}
@@ -60,13 +80,7 @@ type QueueData = {
     userLikes: LikeEntry | null;
 }[];
 
-function PlebView({
-    privileges,
-    filteredQueueData,
-}: {
-    filteredQueueData: QueueData;
-    privileges: number;
-}) {
+function PlebView({ filteredQueueData }: { filteredQueueData: QueueData }) {
     return (
         <>
             {filteredQueueData.map(
@@ -87,7 +101,7 @@ function PlebView({
                 ) => (
                     <li
                         key={id}
-                        className="grid gap-2 border-b border-b-sky-600 px-1 py-3 last:border-transparent sm:grid-cols-2 sm:grid-rows-2"
+                        className="grid items-center gap-2 border-b border-b-sky-600 px-1 py-3 last:border-transparent sm:grid-cols-2 sm:grid-rows-2"
                     >
                         <h2 className="col-span-2 grid items-center gap-2 sm:flex sm:flex-wrap">
                             <span
@@ -109,7 +123,7 @@ function PlebView({
                             {songName}
                         </h2>
                         {donorName && (
-                            <p className="sm:justify-self-end">
+                            <p>
                                 from{" "}
                                 <span className="font-bold text-amber-400">
                                     {donorName}
@@ -120,7 +134,6 @@ function PlebView({
                             songId={id}
                             className="col-start-2 justify-self-end"
                             count={likeCount}
-                            loggedIn={privileges !== -1}
                             value={userLikes ? userLikes.value : 0}
                         />
                     </li>

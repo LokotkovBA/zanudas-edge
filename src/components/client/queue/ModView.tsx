@@ -76,7 +76,6 @@ export function ModView() {
                         <LikeBlock
                             songId={entry.id}
                             count={entry.likeCount}
-                            loggedIn={true}
                             value={userLikes ? userLikes.value : 0}
                             className="justify-self-center"
                         />
