@@ -19,13 +19,23 @@ export function LikeBlock({
 }) {
     const { mutate: like } = clientAPI.queue.like.useMutation({
         onSuccess(value) {
-            socketClient.emit("like", {
-                username: userData?.encUser,
-                message: {
-                    entryId: songId,
-                    value,
-                },
-            });
+            if (value < 0) {
+                socketClient.emit("like", {
+                    username: userData?.encUser,
+                    message: {
+                        entryId: songId,
+                        value,
+                    },
+                });
+            } else {
+                socketClient.emit("hook like", {
+                    username: userData?.encUser,
+                    message: {
+                        entryId: songId,
+                        value,
+                    },
+                });
+            }
         },
     });
     const { data: userData } = clientAPI.getAuth.useQuery();
