@@ -7,6 +7,7 @@ import { isAdmin } from "~/utils/privileges";
 import { SearchableUsersList } from "~/components/client/users/SearchableUsersList";
 
 export const runtime = "edge";
+export const preferredRegion = "arn1";
 
 export default async function Users() {
     const user = await serverAPI.getAuth.fetch();

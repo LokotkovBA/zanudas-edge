@@ -6,6 +6,7 @@ import { createContext } from "~/server/context";
 import { appRouter } from "~/server/routers/root";
 
 export const runtime = "edge";
+export const preferredRegion = "arn1";
 
 const handler = (request: NextRequest) => {
     const req = new Request(request.url, {

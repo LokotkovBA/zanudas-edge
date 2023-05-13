@@ -7,6 +7,7 @@ import { serverAPI } from "~/server/api";
 import { isAdmin } from "~/utils/privileges";
 
 export const runtime = "edge";
+export const preferredRegion = "arn1";
 
 export default async function SongList() {
     const userData = await serverAPI.getAuth.fetch();
