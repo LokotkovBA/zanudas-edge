@@ -19,23 +19,14 @@ export function LikeBlock({
 }) {
     const { mutate: like } = clientAPI.queue.like.useMutation({
         onSuccess(value) {
-            if (value < 0) {
-                socketClient.emit("like", {
-                    username: userData?.encUser,
-                    message: {
-                        entryId: songId,
-                        value,
-                    },
-                });
-            } else {
-                socketClient.emit("hook like", {
-                    username: userData?.encUser,
-                    message: {
-                        entryId: songId,
-                        value,
-                    },
-                });
-            }
+            console.timeEnd("like");
+            socketClient.emit("like", {
+                username: userData?.encUser,
+                message: {
+                    entryId: songId,
+                    value,
+                },
+            });
         },
     });
     const { data: userData } = clientAPI.getAuth.useQuery();
@@ -47,6 +38,7 @@ export function LikeBlock({
                 <ThumbsUp
                     onClick={() => {
                         if (userData && userData.encUser) {
+                            console.time("like");
                             like({ songId, value: oldValue === 1 ? 0 : 1 });
                         }
                     }}
@@ -61,6 +53,7 @@ export function LikeBlock({
                 <ThumbsDown
                     onClick={() => {
                         if (userData && userData.encUser) {
+                            console.time("like");
                             like({ songId, value: oldValue === -1 ? 0 : -1 });
                         }
                     }}
