@@ -59,7 +59,7 @@ export function SearchableUsersList() {
                                     setNameToDelete(name ?? "");
                                     modalDeleteRef.current?.showModal();
                                 }}
-                                className={deleteButtonStyles}
+                                className={`${deleteButtonStyles} self-end`}
                             >
                                 ❌
                             </button>

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
 import clsx from "clsx";
+import { toast } from "react-hot-toast";
 
 type PrivilegeSetterProps = {
     user_id: string;
@@ -31,7 +32,19 @@ const PrivilegeSetter: React.FC<PrivilegeSetterProps> = ({
     }
 
     const { mutate: updatePrivileges } =
-        clientAPI.users.updatePrivileges.useMutation();
+        clientAPI.users.updatePrivileges.useMutation({
+            onMutate() {
+                toast.loading("Setting");
+            },
+            onSuccess() {
+                toast.dismiss();
+                toast.success("Set");
+            },
+            onError(error) {
+                toast.dismiss();
+                toast.error(`Error: ${error.message}`);
+            },
+        });
 
     return (
         <>
