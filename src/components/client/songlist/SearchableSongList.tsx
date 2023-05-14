@@ -20,6 +20,7 @@ import { buttonStyles } from "~/components/styles/button";
 import { ThumbsDown } from "~/svg/ThumbsDown";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { inputStyles } from "~/components/styles/input";
+import { socketClient } from "~/client/socketClient";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -136,6 +137,8 @@ const FilteredList = memo(function FilteredList({
         songListData?.artistFirstLetters ?? [],
     );
     const [showMobileFirstLetters, setShowMobileFirstLetters] = useState(false);
+
+    const { data: userData } = clientAPI.getAuth.useQuery();
     const { mutate: addToQueue } = clientAPI.queue.add.useMutation({
         onMutate() {
             toast.loading("Adding to queue");
@@ -143,6 +146,7 @@ const FilteredList = memo(function FilteredList({
         onSuccess() {
             toast.dismiss();
             toast.success("Added");
+            socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
             toast.dismiss();
