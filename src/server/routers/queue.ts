@@ -4,30 +4,52 @@ import { insertQueueSchema, likes, queue } from "~/drizzle/schemas/queue";
 import { isMod } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import type { QueueEntry, LikeEntry } from "~/drizzle/types";
 
 export const queueRouter = createTRPCRouter({
-    getAll: publicProcedure.query(async ({ ctx }) => {
+    getAll: privateProcedure.query(async ({ ctx }) => {
+        const userLikes = ctx.drizzle
+            .select()
+            .from(likes)
+            .where(eq(likes.userId, ctx.user.id))
+            .as("userLikes");
+
+        return ctx.drizzle
+            .select()
+            .from(queue)
+            .orderBy(asc(queue.queueNumber))
+            .leftJoin(userLikes, eq(queue.id, userLikes.songId))
+            .all();
+    }),
+
+    getFiltered: publicProcedure.query(async ({ ctx }) => {
+        let out: {
+            queue: QueueEntry;
+            userLikes: LikeEntry | null;
+        }[];
+
         if (ctx.user) {
             const userLikes = ctx.drizzle
                 .select()
                 .from(likes)
                 .where(eq(likes.userId, ctx.user.id))
                 .as("userLikes");
-            return ctx.drizzle
+            out = await ctx.drizzle
                 .select()
                 .from(queue)
                 .orderBy(asc(queue.queueNumber))
                 .leftJoin(userLikes, eq(queue.id, userLikes.songId))
                 .all();
+        } else {
+            const data = await ctx.drizzle
+                .select()
+                .from(queue)
+                .orderBy(asc(queue.queueNumber))
+                .all();
+            out = data.map((queue) => ({ queue, userLikes: null }));
         }
 
-        const data = await ctx.drizzle
-            .select()
-            .from(queue)
-            .orderBy(asc(queue.queueNumber))
-            .all();
-
-        return data.map((queue) => ({ queue, userLikes: null }));
+        return out.filter((entry) => entry.queue.visible);
     }),
 
     like: privateProcedure

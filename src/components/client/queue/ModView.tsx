@@ -1,3 +1,5 @@
+"use client";
+
 import { type ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";

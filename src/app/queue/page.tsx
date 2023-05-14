@@ -1,9 +1,13 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
 import { AddButton } from "~/components/client/queue/AddButton";
-import { QueueList } from "~/components/client/queue/QueueList";
+import { ModView } from "~/components/client/queue/ModView";
+import { PlebView } from "~/components/client/queue/PlebView";
+import { QueueSocketsSub } from "~/components/client/queue/QueueSocketsSub";
 import { Spinner } from "~/components/utils/Spinner";
 import { serverAPI } from "~/server/api";
+import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 import { isMod } from "~/utils/privileges";
 
 export const runtime = "edge";
@@ -14,22 +18,72 @@ export default async function Queue() {
 
     return (
         <main className="flex flex-col items-center gap-2 py-2">
-            {isMod(userData?.privileges) && <AddButton />}
-            <Suspense fallback={<Spinner />}>
-                {/* @ts-expect-error Async Server Component */}
-                <List />
-            </Suspense>
+            {isMod(userData?.privileges) && (
+                <>
+                    <AddButton />
+                    <Suspense fallback={<Spinner />}>
+                        {/* @ts-expect-error Async Server Component */}
+                        <ModPart />
+                    </Suspense>
+                </>
+            )}
+            {!isMod(userData?.privileges) && (
+                <Suspense fallback={<Spinner />}>
+                    {/* @ts-expect-error Async Server Component */}
+                    <PlebPart />
+                </Suspense>
+            )}
+            <QueueSocketsSub />
         </main>
     );
 }
 
-async function List() {
-    await serverAPI.queue.getAll.fetch();
-    const state = await serverAPI.dehydrate();
+async function ModPart() {
+    const queueData = await serverAPI.queue.getAll.fetch();
 
+    if (!queueData.length) {
+        return <EmptyQueue />;
+    }
+
+    const state = await serverAPI.dehydrate();
     return (
-        <HydrateClient state={state}>
-            <QueueList />
-        </HydrateClient>
+        <ul className="flex flex-col gap-3 rounded border border-slate-400 bg-slate-950 p-5">
+            <HydrateClient state={state}>
+                <ModView />
+            </HydrateClient>
+        </ul>
+    );
+}
+
+async function PlebPart() {
+    const filteredQueueData = await serverAPI.queue.getFiltered.fetch();
+
+    if (!filteredQueueData.length) {
+        return <EmptyQueue />;
+    }
+
+    const state = await serverAPI.dehydrate();
+    return (
+        <ul className="flex flex-col rounded border border-slate-400 bg-slate-950 px-5 py-1">
+            <HydrateClient state={state}>
+                <PlebView />
+            </HydrateClient>
+        </ul>
+    );
+}
+
+function EmptyQueue() {
+    return (
+        <h2 className="flex items-center gap-1">
+            Queue is empty.
+            <Link
+                target="_blank"
+                className="flex items-center justify-center gap-1 rounded fill-slate-50 px-1 py-2 hover:bg-slate-950"
+                href="https://www.donationalerts.com/r/zanuda"
+            >
+                <DonationAlertsIcon size={"1.2em"} />
+                Request
+            </Link>
+        </h2>
     );
 }

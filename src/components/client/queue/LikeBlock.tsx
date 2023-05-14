@@ -48,8 +48,7 @@ export function LikeBlock({
                     onClick={() => changeLike(songId, likeValue === 1 ? 0 : 1)}
                     size="1.3rem"
                     className={clsx({
-                        "cursor-pointer hover:fill-sky-500":
-                            userData !== undefined,
+                        "cursor-pointer hover:fill-sky-500": !!userData,
                         "fill-slate-50": likeValue === 0 || likeValue === -1,
                         "fill-green-500": likeValue === 1,
                     })}
@@ -60,8 +59,7 @@ export function LikeBlock({
                     }
                     size="1.3rem"
                     className={clsx({
-                        "cursor-pointer hover:fill-sky-500":
-                            userData !== undefined,
+                        "cursor-pointer hover:fill-sky-500": !!userData,
                         "fill-slate-50": likeValue === 0 || likeValue === 1,
                         "fill-red-500": likeValue === -1,
                     })}
