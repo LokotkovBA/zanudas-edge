@@ -88,7 +88,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                             key={value}
                         >
                             {value}
-                            <span className="box-content inline-block w-[3ch] rounded-md bg-sky-700 px-1 text-slate-50 md:ml-2">
+                            <span className="box-content inline-block w-[3ch] rounded-md bg-sky-800 px-1 text-slate-50 md:ml-2">
                                 {categoriesCounts[index]}
                             </span>
                         </button>
@@ -161,7 +161,7 @@ const FilteredList = memo(function FilteredList({
             <nav className="sticky top-0 z-10 flex w-full px-3 sm:w-2/3 xl:w-1/3">
                 <aside className="flex flex-col">
                     <button
-                        className="h-full border border-sky-700 bg-sky-700 px-2 hover:border-slate-50 sm:hidden"
+                        className="h-full border border-sky-800 bg-sky-800 px-2 hover:border-slate-50 sm:hidden"
                         onClick={() =>
                             setShowMobileFirstLetters((prev) => !prev)
                         }
@@ -169,7 +169,7 @@ const FilteredList = memo(function FilteredList({
                         {showMobileFirstLetters ? "Hide" : "Letters"}
                     </button>
                     <Link
-                        className="flex h-full items-center justify-center border border-sky-700 bg-sky-700 px-1 hover:border-slate-50"
+                        className="flex h-full items-center justify-center border border-sky-800 bg-sky-800 px-1 hover:border-slate-50"
                         href="/songlist#top"
                     >
                         Top
@@ -550,7 +550,7 @@ function LetterButtons({
                 return (
                     <li key={firstLetter}>
                         <Link
-                            className="flex w-6 justify-center border border-sky-700 bg-sky-700 px-1 hover:border-slate-50"
+                            className="flex w-6 justify-center border border-sky-800 bg-sky-800 px-1 hover:border-slate-50"
                             scroll={false}
                             href={`/songlist#${firstLetter}`}
                         >
