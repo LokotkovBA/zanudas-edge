@@ -123,7 +123,7 @@ function PlebView({ filteredQueueData }: { filteredQueueData: QueueData }) {
                             {songName}
                         </h2>
                         {donorName && (
-                            <p>
+                            <p className="justify-self-end">
                                 from{" "}
                                 <span className="font-bold text-amber-400">
                                     {donorName}
