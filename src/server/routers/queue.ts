@@ -1,10 +1,14 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
-import { insertQueueSchema, likes, queue } from "~/drizzle/schemas/queue";
+import { likes, queue } from "~/drizzle/schemas/queue";
 import { isMod } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import type { QueueEntry, LikeEntry } from "~/drizzle/types";
+import {
+    type QueueEntry,
+    type LikeEntry,
+    changedQueueEntrySchema,
+} from "~/drizzle/types";
 
 export const queueRouter = createTRPCRouter({
     getAll: privateProcedure.query(async ({ ctx }) => {
@@ -88,7 +92,7 @@ export const queueRouter = createTRPCRouter({
         }),
 
     change: privateProcedure
-        .input(insertQueueSchema)
+        .input(changedQueueEntrySchema)
         .mutation(({ ctx, input }) => {
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });

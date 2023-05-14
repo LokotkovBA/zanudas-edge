@@ -5,12 +5,15 @@ import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
 import { inputStyles } from "~/components/styles/input";
-import { type QueueEntry } from "~/drizzle/types";
+import { type ChangedQueueEntry, type QueueEntry } from "~/drizzle/types";
 import { LikeBlock } from "./LikeBlock";
 import { CheckBox } from "~/components/utils/CheckBox";
+import { socketClient } from "~/client/socketClient";
+import { EntryNumber } from "./EntryNumber";
 
 export function ModView() {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
+    const { data: userData } = clientAPI.getAuth.useQuery();
     const { mutate: changeEntry } = clientAPI.queue.change.useMutation({
         onMutate() {
             toast.loading("Changing");
@@ -20,6 +23,7 @@ export function ModView() {
             toast.success("Changed");
             modalDeleteRef.current?.close();
             modalEditRef.current?.close();
+            socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
             toast.dismiss();
@@ -34,6 +38,7 @@ export function ModView() {
         onSuccess() {
             toast.dismiss();
             toast.success("Changed");
+            socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
             toast.dismiss();
@@ -47,10 +52,10 @@ export function ModView() {
 
     return (
         <>
-            {queueData?.map(({ queue: entry, userLikes }) => {
+            {queueData?.map(({ queue: entry, userLikes }, index) => {
                 function changeHandler(event: ChangeEvent<HTMLInputElement>) {
                     changeEntry({
-                        ...entry,
+                        id: entry.id,
                         [event.target.name]: event.target.checked ? 1 : 0,
                     });
                 }
@@ -61,9 +66,12 @@ export function ModView() {
                         key={entry.id}
                     >
                         <h2 className="flex gap-2 sm:row-start-1">
-                            <span className="font-bold text-sky-400">
-                                {entry.queueNumber}
-                            </span>
+                            <EntryNumber
+                                number={index + 1}
+                                current={!!entry.current}
+                                visible={!!entry.visible}
+                                played={!!entry.played}
+                            />
                             {entry.artist} - {entry.songName}
                         </h2>
                         <button
@@ -79,7 +87,7 @@ export function ModView() {
                             songId={entry.id}
                             count={entry.likeCount}
                             value={userLikes ? userLikes.value : 0}
-                            className="justify-self-center"
+                            className="justify-self-center sm:justify-self-end"
                         />
                         <form className="grid grid-cols-2 items-center gap-x-1 gap-y-2">
                             <div className="justify-self-end">
@@ -104,7 +112,7 @@ export function ModView() {
                                 checked={entry.visible === 1}
                                 onClick={(oldChecked) => {
                                     changeEntry({
-                                        ...entry,
+                                        id: entry.id,
                                         visible: oldChecked ? 0 : 1,
                                     });
                                 }}
@@ -132,7 +140,7 @@ export function ModView() {
                                 checked={entry.played === 1}
                                 onClick={(oldChecked) => {
                                     changeEntry({
-                                        ...entry,
+                                        id: entry.id,
                                         played: oldChecked ? 0 : 1,
                                     });
                                 }}
@@ -193,7 +201,7 @@ export function ModView() {
                                 checked={entry.willAdd === 1}
                                 onClick={(oldChecked) => {
                                     changeEntry({
-                                        ...entry,
+                                        id: entry.id,
                                         willAdd: oldChecked ? 0 : 1,
                                     });
                                 }}
@@ -225,6 +233,7 @@ export function ModView() {
         </>
     );
 }
+
 function ModalDelete({
     artist,
     songName,
@@ -238,6 +247,7 @@ function ModalDelete({
     donorName?: string;
     modalRef: React.RefObject<HTMLDialogElement>;
 }) {
+    const { data: userData } = clientAPI.getAuth.useQuery();
     const { mutate: deleteEntry } = clientAPI.queue.delete.useMutation({
         onMutate() {
             toast.loading("Deleting");
@@ -246,12 +256,14 @@ function ModalDelete({
             toast.dismiss();
             toast.success("Deleted");
             modalRef.current?.close();
+            socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
             toast.dismiss();
             toast.error(`Error: ${error.message}`);
         },
     });
+
     return (
         <dialog
             ref={modalRef}
@@ -288,7 +300,7 @@ function ModalEdit({
 }: {
     entry: QueueEntry | null;
     modalRef: React.RefObject<HTMLDialogElement>;
-    changeEntry: (entry: QueueEntry) => void;
+    changeEntry: (entry: ChangedQueueEntry) => void;
 }) {
     const artistRef = useRef<HTMLInputElement>(null);
     const songNameRef = useRef<HTMLInputElement>(null);
@@ -345,7 +357,6 @@ function ModalEdit({
                     return;
                 }
                 changeEntry({
-                    ...entry,
                     id: entry.id ?? -1,
                     artist: artistRef.current?.value ?? "",
                     songName: songNameRef.current?.value ?? "",

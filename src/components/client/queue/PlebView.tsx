@@ -1,8 +1,8 @@
 "use client";
 
 import { clientAPI } from "~/client/ClientProvider";
-import clsx from "clsx";
 import { LikeBlock } from "./LikeBlock";
+import { EntryNumber } from "./EntryNumber";
 
 export function PlebView() {
     const { data: filteredQueueData } = clientAPI.queue.getFiltered.useQuery();
@@ -30,18 +30,12 @@ export function PlebView() {
                         className="grid items-center gap-2 border-b border-b-sky-600 px-1 py-3 last:border-transparent sm:grid-cols-2 sm:grid-rows-2"
                     >
                         <h2 className="col-span-2 grid items-center gap-2 sm:flex sm:flex-wrap">
-                            <span
-                                className={clsx(
-                                    "rounded p-1 text-center leading-none",
-                                    {
-                                        "bg-sky-700": !current && !played,
-                                        "bg-amber-400 text-black": current,
-                                        "bg-slate-700": played && !current,
-                                    },
-                                )}
-                            >
-                                {index + 1}
-                            </span>
+                            <EntryNumber
+                                number={index + 1}
+                                current={!!current}
+                                visible={true}
+                                played={!!played}
+                            />
                             <span className="font-bold text-sky-400">
                                 {artist}
                             </span>{" "}

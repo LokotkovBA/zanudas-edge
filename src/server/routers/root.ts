@@ -19,7 +19,9 @@ export const appRouter = createTRPCRouter({
         return {
             ...ctx.user,
             encUser: ctx.user
-                ? encrypt(`${ctx.user.name}//${Date.now()}`)
+                ? encrypt(
+                      `${ctx.user.name}//${Date.now()}//${ctx.user.privileges}`,
+                  )
                 : undefined,
         };
     }),
