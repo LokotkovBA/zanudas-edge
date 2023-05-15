@@ -75,6 +75,12 @@ export function ModView() {
     const [activeId, setActiveId] = useState<string | null>(null);
     const [order, setOrder] = useState(queueData?.order);
 
+    useLayoutEffect(() => {
+        if (queueData?.order) {
+            setOrder(queueData.order);
+        }
+    }, [queueData?.order]);
+
     const { mutate: changeOrder } = clientAPI.queue.changeOrder.useMutation({
         onMutate() {
             toast.loading("Setting order");
