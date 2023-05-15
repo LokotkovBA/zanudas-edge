@@ -15,6 +15,7 @@ module.exports = {
                 desktopEdit: ".5fr 1fr",
                 mobileEdit: ".2fr 1fr",
                 queue: "3fr 1fr",
+                mobileQueue: "1.5fr 1.5fr 1fr",
             },
         },
     },

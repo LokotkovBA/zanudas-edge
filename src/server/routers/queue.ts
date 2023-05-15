@@ -9,6 +9,9 @@ import {
     type LikeEntry,
     changedQueueEntrySchema,
 } from "~/drizzle/types";
+import { type RouterOutput } from "./root";
+
+export type QueueGetAllOutput = RouterOutput["queue"]["getAll"];
 
 export const queueRouter = createTRPCRouter({
     getAll: privateProcedure.query(async ({ ctx }) => {
@@ -18,13 +21,42 @@ export const queueRouter = createTRPCRouter({
             .where(eq(likes.userId, ctx.user.id))
             .as("userLikes");
 
-        return ctx.drizzle
+        const data = await ctx.drizzle
             .select()
             .from(queue)
             .orderBy(asc(queue.queueNumber))
             .leftJoin(userLikes, eq(queue.id, userLikes.songId))
             .all();
+
+        const map = new Map<
+            string,
+            { queue: QueueEntry; userLikes: LikeEntry | null }
+        >();
+        const order: string[] = new Array(data.length);
+
+        let index = 0;
+        for (const entry of data) {
+            const id = entry.queue.id.toString();
+            map.set(id, entry);
+            order[index] = id;
+            index++;
+        }
+
+        return {
+            map,
+            order,
+        };
     }),
+
+    changeOrder: privateProcedure
+        .input(z.array(z.string()))
+        .mutation(({ ctx, input: newOrder }) => {
+            if (!isMod(ctx.user.privileges)) {
+                throw new TRPCError({ code: "FORBIDDEN" });
+            }
+
+            // ctx.drizzle.update(queue).set()
+        }),
 
     getFiltered: publicProcedure.query(async ({ ctx }) => {
         let out: {

@@ -1,15 +1,30 @@
 "use client";
 
-import { type ChangeEvent, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
 import { inputStyles } from "~/components/styles/input";
 import { type ChangedQueueEntry, type QueueEntry } from "~/drizzle/types";
-import { LikeBlock } from "./LikeBlock";
-import { CheckBox } from "~/components/utils/CheckBox";
 import { socketClient } from "~/client/socketClient";
-import { EntryNumber } from "./EntryNumber";
+import { ModQueueEntry } from "./ModQueueEntry";
+import {
+    DndContext,
+    type DragEndEvent,
+    DragOverlay,
+    KeyboardSensor,
+    PointerSensor,
+    closestCorners,
+    useSensor,
+    useSensors,
+} from "@dnd-kit/core";
+import {
+    SortableContext,
+    arrayMove,
+    sortableKeyboardCoordinates,
+    verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { SortableModQueueEntry } from "./SortableModQueueEntry";
 
 export function ModView() {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
@@ -22,7 +37,7 @@ export function ModView() {
             toast.dismiss();
             toast.success("Changed");
             modalDeleteRef.current?.close();
-            modalEditRef.current?.close();
+            modalChangeRef.current?.close();
             socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
@@ -46,189 +61,76 @@ export function ModView() {
         },
     });
 
-    const [currentEntry, setCurrentEntry] = useState<QueueEntry | null>(null);
-    const modalEditRef = useRef<HTMLDialogElement>(null);
+    const [selectedEntry, setSelectedEntry] = useState<QueueEntry | null>(null);
+    const modalChangeRef = useRef<HTMLDialogElement>(null);
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
 
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        }),
+    );
+
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const [order, setOrder] = useState(queueData?.order);
+
+    function onDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+        if (!order || !over || active.id === over.id) {
+            return setActiveId(null);
+        }
+
+        const oldIndex = order.findIndex((id) => id === active.id);
+        const newIndex = order.findIndex((id) => id === over.id);
+        // const newOrder = arrayMove(queueData.order, oldIndex, newIndex);
+        setOrder((oldOrder) =>
+            oldOrder ? arrayMove(oldOrder, oldIndex, newIndex) : undefined,
+        );
+    }
     return (
         <>
-            {queueData?.map(({ queue: entry, userLikes }, index) => {
-                function changeHandler(event: ChangeEvent<HTMLInputElement>) {
-                    changeEntry({
-                        id: entry.id,
-                        [event.target.name]: event.target.checked ? 1 : 0,
-                    });
-                }
-
-                return (
-                    <li
-                        className="grid cursor-grab grid-cols-1 gap-2 rounded border border-sky-400 bg-sky-950 p-2 sm:grid-cols-queue"
-                        key={entry.id}
-                    >
-                        <h2 className="flex gap-2 sm:row-start-1">
-                            <EntryNumber
-                                number={index + 1}
-                                current={!!entry.current}
-                                visible={!!entry.visible}
-                                played={!!entry.played}
+            <DndContext
+                onDragStart={(event) => {
+                    const { active } = event;
+                    setActiveId(active.id.toString());
+                }}
+                onDragEnd={onDragEnd}
+                sensors={sensors}
+                collisionDetection={closestCorners}
+            >
+                <SortableContext
+                    strategy={verticalListSortingStrategy}
+                    items={order ?? []}
+                >
+                    {order?.map((id) => {
+                        return (
+                            <SortableModQueueEntry
+                                key={id}
+                                id={id}
+                                setCurrent={setCurrent}
+                                changeEntry={changeEntry}
+                                modalChangeRef={modalChangeRef}
+                                modalDeleteRef={modalDeleteRef}
+                                setSelectedEntry={setSelectedEntry}
                             />
-                            {entry.artist} - {entry.songName}
-                        </h2>
-                        <button
-                            onClick={() => {
-                                setCurrentEntry(entry);
-                                modalDeleteRef.current?.showModal();
-                            }}
-                            className="row-start-1 justify-self-end rounded-full border border-transparent bg-sky-800 p-2 hover:border-sky-400 sm:col-start-2"
-                        >
-                            ❌
-                        </button>
-                        <LikeBlock
-                            songId={entry.id}
-                            count={entry.likeCount}
-                            value={userLikes ? userLikes.value : 0}
-                            className="justify-self-center sm:justify-self-end"
-                        />
-                        <form className="grid grid-cols-2 items-center gap-x-1 gap-y-2">
-                            <div className="justify-self-end">
-                                <input
-                                    className="hidden"
-                                    onChange={changeHandler}
-                                    id={`${entry.id}-visible`}
-                                    name="visible"
-                                    checked={entry.visible === 1}
-                                    type="checkbox"
-                                />
-                                <label
-                                    className="cursor-pointer"
-                                    htmlFor={`${entry.id}-visible`}
-                                >
-                                    Visible
-                                </label>
-                            </div>
-                            <CheckBox
-                                id={`visible-${entry.id}`}
-                                className="justify-self-start"
-                                checked={entry.visible === 1}
-                                onClick={(oldChecked) => {
-                                    changeEntry({
-                                        id: entry.id,
-                                        visible: oldChecked ? 0 : 1,
-                                    });
-                                }}
-                            />
-
-                            <div className="justify-self-end">
-                                <input
-                                    className="hidden"
-                                    onChange={changeHandler}
-                                    id={`${entry.id}-played`}
-                                    name="played"
-                                    checked={entry.played === 1}
-                                    type="checkbox"
-                                />
-                                <label
-                                    className="cursor-pointer"
-                                    htmlFor={`${entry.id}-played`}
-                                >
-                                    Played
-                                </label>
-                            </div>
-                            <CheckBox
-                                id={`played-${entry.id}`}
-                                className="justify-self-start"
-                                checked={entry.played === 1}
-                                onClick={(oldChecked) => {
-                                    changeEntry({
-                                        id: entry.id,
-                                        played: oldChecked ? 0 : 1,
-                                    });
-                                }}
-                            />
-
-                            <div className="justify-self-end">
-                                <input
-                                    className="hidden"
-                                    onChange={(event) => {
-                                        setCurrent({
-                                            id: entry.id,
-                                            value: event.target.checked,
-                                        });
-                                    }}
-                                    id={`${entry.id}-current`}
-                                    name="current"
-                                    checked={entry.current === 1}
-                                    type="checkbox"
-                                />
-                                <label
-                                    className="cursor-pointer"
-                                    htmlFor={`${entry.id}-current`}
-                                >
-                                    Current
-                                </label>
-                            </div>
-                            <CheckBox
-                                id={`current-${entry.id}`}
-                                className="justify-self-start"
-                                checked={entry.current === 1}
-                                onClick={(oldChecked) => {
-                                    setCurrent({
-                                        id: entry.id,
-                                        value: !oldChecked,
-                                    });
-                                }}
-                            />
-
-                            <div className="justify-self-end">
-                                <input
-                                    className="hidden"
-                                    onChange={changeHandler}
-                                    id={`${entry.id}-willAdd`}
-                                    name="willAdd"
-                                    checked={entry.willAdd === 1}
-                                    type="checkbox"
-                                />
-                                <label
-                                    className="cursor-pointer"
-                                    htmlFor={`${entry.id}-willAdd`}
-                                >
-                                    Will add
-                                </label>
-                            </div>
-                            <CheckBox
-                                id={`willAdd-${entry.id}`}
-                                className="justify-self-start"
-                                checked={entry.willAdd === 1}
-                                onClick={(oldChecked) => {
-                                    changeEntry({
-                                        id: entry.id,
-                                        willAdd: oldChecked ? 0 : 1,
-                                    });
-                                }}
-                            />
-                        </form>
-                        <button
-                            onClick={() => {
-                                setCurrentEntry(entry);
-                                modalEditRef.current?.showModal();
-                            }}
-                            className="rounded border border-transparent bg-sky-800 p-2 hover:border-sky-400 sm:col-span-2"
-                        >
-                            Open edit
-                        </button>
-                    </li>
-                );
-            })}
+                        );
+                    })}
+                </SortableContext>
+                <DragOverlay>
+                    {activeId !== null ? <ModQueueEntry id={activeId} /> : null}
+                </DragOverlay>
+            </DndContext>
             <ModalEdit
-                modalRef={modalEditRef}
-                entry={currentEntry}
+                modalRef={modalChangeRef}
+                entry={selectedEntry}
                 changeEntry={changeEntry}
             />
             <ModalDelete
                 modalRef={modalDeleteRef}
-                id={currentEntry?.id}
-                songName={currentEntry?.songName}
-                donorName={currentEntry?.donorName}
+                id={selectedEntry?.id}
+                songName={selectedEntry?.songName}
+                donorName={selectedEntry?.donorName}
             />
         </>
     );

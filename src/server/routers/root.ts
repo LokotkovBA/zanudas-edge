@@ -1,6 +1,7 @@
 /**
  * This file contains the root router of your tRPC-backend
  */
+import type { inferRouterOutputs, inferRouterInputs } from "@trpc/server";
 import { encrypt } from "../encryption";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { queueRouter } from "./queue";
@@ -28,3 +29,6 @@ export const appRouter = createTRPCRouter({
 });
 
 export type AppRouter = typeof appRouter;
+
+export type RouterInput = inferRouterInputs<AppRouter>;
+export type RouterOutput = inferRouterOutputs<AppRouter>;

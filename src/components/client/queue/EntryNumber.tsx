@@ -5,6 +5,7 @@ type EntryNumberProps = {
     current: boolean;
     played: boolean;
     visible: boolean;
+    className?: string;
 };
 
 export function EntryNumber({
@@ -12,13 +13,15 @@ export function EntryNumber({
     visible,
     played,
     current,
+    className,
 }: EntryNumberProps) {
     return (
         <span
-            className={clsx("self-start rounded p-1 text-center leading-none", {
+            className={clsx("rounded p-1 text-center leading-none", className, {
+                "self-start": !className,
                 "bg-sky-800": !current && !played && visible,
                 "bg-amber-400 text-black": current && visible,
-                "bg-slate-700": played && !current,
+                "bg-slate-700": played && !current && visible,
                 "bg-red-800": !visible,
             })}
         >

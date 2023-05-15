@@ -11,6 +11,8 @@
     },
     "dependencies": {
         "@auth/core": "^0.7.1",
+        "@dnd-kit/core": "^6.0.8",
+        "@dnd-kit/sortable": "^7.0.2",
         "@libsql/client": "^0.1.6",
         "@tanstack/query-core": "^4.29.5",
         "@tanstack/react-query": "^4.29.5",

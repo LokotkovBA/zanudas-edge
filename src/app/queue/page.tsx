@@ -41,7 +41,7 @@ export default async function Queue() {
 async function ModPart() {
     const queueData = await serverAPI.queue.getAll.fetch();
 
-    if (!queueData.length) {
+    if (!queueData.order.length) {
         return <EmptyQueue />;
     }
 
