@@ -75,6 +75,21 @@ export function ModView() {
     const [activeId, setActiveId] = useState<string | null>(null);
     const [order, setOrder] = useState(queueData?.order);
 
+    const { mutate: changeOrder } = clientAPI.queue.changeOrder.useMutation({
+        onMutate() {
+            toast.loading("Setting order");
+        },
+        onSuccess() {
+            toast.dismiss();
+            toast.success("Success");
+            socketClient.emit("invalidate", { username: userData?.encUser });
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Error: ${error.message}`);
+        },
+    });
+
     function onDragEnd(event: DragEndEvent) {
         const { active, over } = event;
         if (!order || !over || active.id === over.id) {
@@ -83,10 +98,15 @@ export function ModView() {
 
         const oldIndex = order.findIndex((id) => id === active.id);
         const newIndex = order.findIndex((id) => id === over.id);
-        // const newOrder = arrayMove(queueData.order, oldIndex, newIndex);
-        setOrder((oldOrder) =>
-            oldOrder ? arrayMove(oldOrder, oldIndex, newIndex) : undefined,
-        );
+        setOrder((oldOrder) => {
+            if (!oldOrder) {
+                return oldOrder;
+            }
+
+            const newOrder = arrayMove(oldOrder, oldIndex, newIndex);
+            changeOrder(newOrder);
+            return newOrder;
+        });
     }
     return (
         <>

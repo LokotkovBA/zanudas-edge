@@ -10,6 +10,7 @@ import {
     changedQueueEntrySchema,
 } from "~/drizzle/types";
 import { type RouterOutput } from "./root";
+import { type ResultSet } from "@libsql/client";
 
 export type QueueGetAllOutput = RouterOutput["queue"]["getAll"];
 
@@ -50,12 +51,25 @@ export const queueRouter = createTRPCRouter({
 
     changeOrder: privateProcedure
         .input(z.array(z.string()))
-        .mutation(({ ctx, input: newOrder }) => {
+        .mutation(async ({ ctx, input: newOrder }) => {
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
+            console.time("order");
+            const promises: Promise<ResultSet>[] = new Array(newOrder.length);
+            let index = 0;
+            for (const id of newOrder) {
+                promises[index] = ctx.drizzle
+                    .update(queue)
+                    .set({ queueNumber: index })
+                    .where(eq(queue.id, parseInt(id)))
+                    .run();
+                index++;
+            }
 
-            // ctx.drizzle.update(queue).set()
+            await Promise.all(promises);
+            console.timeEnd("order");
+            return null;
         }),
 
     getFiltered: publicProcedure.query(async ({ ctx }) => {
