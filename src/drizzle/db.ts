@@ -8,4 +8,4 @@ const client = createClient({
     authToken: env.DATABASE_AUTH_TOKEN,
 });
 
-export const drizzleClient = drizzle(client);
+export const drizzleClient = drizzle(client, { logger: true });
