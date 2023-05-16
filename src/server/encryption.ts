@@ -5,6 +5,5 @@ const iv = CryptoJS.SHA256(env.SOCKET_SECRET);
 const key = CryptoJS.SHA256(env.SOCKET_KEY);
 
 export function encrypt(msg: string) {
-    const kek = CryptoJS.AES.encrypt(msg, key, { iv });
-    return kek.toString();
+    return CryptoJS.AES.encrypt(msg, key, { iv }).toString();
 }
