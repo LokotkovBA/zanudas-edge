@@ -47,7 +47,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
             return <></>;
         }
 
-        const index = queueData.order.findIndex((entry) => entry === id);
+        const index = queueData.order.findIndex((entry) => entry === id) + 1;
 
         function changeHandler(event: ChangeEvent<HTMLInputElement>) {
             changeEntry?.({
@@ -68,9 +68,10 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
             >
                 <h2 className="col-span-2 flex items-start gap-2 sm:col-span-1">
                     <button
+                        id={`grip-${index}`}
                         className={clsx("rounded py-1", {
-                            "cursor-grab hover:bg-slate-700": !!style,
-                            "cursor-grabbing bg-slate-800": !style,
+                            "cursor-grab hover:bg-sky-800": !!style,
+                            "cursor-grabbing bg-sky-900": !style,
                         })}
                         {...attributes}
                         {...listeners}
@@ -78,7 +79,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                         <GripVertical size="2rem" className="fill-white" />
                     </button>
                     <EntryNumber
-                        number={index + 1}
+                        number={index}
                         current={!!entry.current}
                         visible={!!entry.visible}
                         played={!!entry.played}

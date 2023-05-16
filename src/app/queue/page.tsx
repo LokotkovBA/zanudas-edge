@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
 import { AddButton } from "~/components/client/queue/AddButton";
+import { AdminButton } from "~/components/client/queue/AdminButton";
+import { DAControl } from "~/components/client/queue/DAControl";
 import { ModView } from "~/components/client/queue/ModView";
 import { PlebView } from "~/components/client/queue/PlebView";
 import { QueueSocketsSub } from "~/components/client/queue/QueueSocketsSub";
@@ -20,7 +22,17 @@ export default async function Queue() {
         <main className="flex flex-col items-center gap-2 py-2">
             {isMod(userData?.privileges) && (
                 <>
-                    <AddButton />
+                    <menu className="flex items-center gap-2">
+                        <li>
+                            <AdminButton />
+                        </li>
+                        <li>
+                            <AddButton />
+                        </li>
+                        <li>
+                            <DAControl />
+                        </li>
+                    </menu>
                     <Suspense fallback={<Spinner />}>
                         {/* @ts-expect-error Async Server Component */}
                         <ModPart />

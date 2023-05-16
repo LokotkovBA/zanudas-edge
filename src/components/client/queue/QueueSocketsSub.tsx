@@ -23,6 +23,8 @@ export function QueueSocketsSub({ privileges }: { privileges?: number }) {
             return;
         }
 
+        socketClient.emit("sub admin");
+
         socketClient.on("success", (message) => {
             toast.success(message);
         });
@@ -32,7 +34,9 @@ export function QueueSocketsSub({ privileges }: { privileges?: number }) {
         });
 
         socketClient.on("info", (message) => {
-            toast.success(message);
+            toast(message, {
+                icon: "❕",
+            });
         });
 
         return () => {
@@ -40,6 +44,7 @@ export function QueueSocketsSub({ privileges }: { privileges?: number }) {
                 return;
             }
 
+            socketClient.emit("unsub admin");
             socketClient.off("error");
             socketClient.off("info");
             socketClient.off("success");

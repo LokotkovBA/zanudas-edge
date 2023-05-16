@@ -11,11 +11,12 @@ type CheckBoxProps = {
 
 export function CheckBox({ checked, onClick, className, id }: CheckBoxProps) {
     return (
-        <div
+        <button
+            type="button"
             onClick={() => onClick(checked)}
             className={clsx("cursor-pointer rounded-xl px-4 py-1", className, {
                 "bg-sky-600 dark:bg-sky-900": checked,
-                "bg-neutral-300 dark:bg-neutral-800": !checked,
+                "bg-slate-300 dark:bg-slate-700": !checked,
             })}
         >
             <div
@@ -38,6 +39,6 @@ export function CheckBox({ checked, onClick, className, id }: CheckBoxProps) {
                     />
                 )}
             </div>
-        </div>
+        </button>
     );
 }

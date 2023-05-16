@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
 import { inputStyles } from "~/components/styles/input";
-import { type ChangedQueueEntry, type QueueEntry } from "~/drizzle/types";
+import type { ChangedQueueEntry, QueueEntry } from "~/drizzle/types";
 import { socketClient } from "~/client/socketClient";
 import { ModQueueEntry } from "./ModQueueEntry";
 import {
