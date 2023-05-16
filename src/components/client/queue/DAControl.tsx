@@ -1,12 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { clientAPI } from "~/client/ClientProvider";
 import { socketClient } from "~/client/socketClient";
 import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 
-export function DAControl() {
-    const { data: userData } = clientAPI.getAuth.useQuery();
-
+export function DAControl({ encUser }: { encUser: string }) {
     const [isRunning, setIsRunning] = useState(false);
 
     useEffect(() => {
@@ -29,7 +26,7 @@ export function DAControl() {
             className="flex items-center gap-1 rounded border-2 border-transparent bg-red-800 fill-white p-1 hover:border-red-300"
             onClick={() =>
                 socketClient.emit("centrifuge stop", {
-                    username: userData?.encUser,
+                    username: encUser,
                 })
             }
         >
@@ -40,7 +37,7 @@ export function DAControl() {
             className="flex items-center gap-1 rounded border-2 border-transparent bg-green-800 fill-white p-1 hover:border-green-300"
             onClick={() =>
                 socketClient.emit("centrifuge start", {
-                    username: userData?.encUser,
+                    username: encUser,
                 })
             }
         >

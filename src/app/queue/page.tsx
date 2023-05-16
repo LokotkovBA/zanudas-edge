@@ -20,7 +20,7 @@ export default async function Queue() {
 
     return (
         <main className="flex flex-col items-center gap-2 py-2">
-            {isMod(userData?.privileges) && (
+            {isMod(userData?.privileges) && userData?.encUser && (
                 <>
                     <menu className="flex items-center gap-2">
                         <li>
@@ -30,7 +30,7 @@ export default async function Queue() {
                             <AddButton />
                         </li>
                         <li>
-                            <DAControl />
+                            <DAControl encUser={userData.encUser} />
                         </li>
                     </menu>
                     <Suspense fallback={<Spinner />}>
