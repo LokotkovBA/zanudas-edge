@@ -33,7 +33,7 @@ export default async function Queue() {
                     <PlebPart />
                 </Suspense>
             )}
-            <QueueSocketsSub />
+            <QueueSocketsSub privileges={userData?.privileges} />
         </main>
     );
 }
