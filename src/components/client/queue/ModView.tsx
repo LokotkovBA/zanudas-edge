@@ -144,7 +144,9 @@ export function ModView() {
                     })}
                 </SortableContext>
                 <DragOverlay>
-                    {activeId !== null ? <ModQueueEntry id={activeId} /> : null}
+                    {activeId !== null ? (
+                        <ModQueueEntry className="opacity-90" id={activeId} />
+                    ) : null}
                 </DragOverlay>
             </DndContext>
             <ModalEdit
