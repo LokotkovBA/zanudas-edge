@@ -232,7 +232,9 @@ const FilteredList = memo(function FilteredList({
                                                 {!!song.likeCount && (
                                                     <>
                                                         <span className="text-end">
-                                                            {song.likeCount}
+                                                            {Math.abs(
+                                                                song.likeCount,
+                                                            )}
                                                         </span>
                                                         {song.likeCount > 0 && (
                                                             <ThumbsUp
@@ -465,11 +467,21 @@ function ModalEdit({
     const [artistValue, setArtistValue] = useState("");
     const [songNameValue, setSongNameValue] = useState("");
     const [tagValue, setTagValue] = useState("");
+    const [playCountValue, setPlayCountValue] = useState(0);
+    const [likeCountValue, setLikeCountValue] = useState(0);
     useEffect(() => {
         setArtistValue(song?.artist ?? "");
         setSongNameValue(song?.songName ?? "");
         setTagValue(song?.tag ?? "");
-    }, [song?.songName, song?.tag, song?.artist]);
+        setPlayCountValue(song?.playCount ?? 0);
+        setLikeCountValue(song?.likeCount ?? 0);
+    }, [
+        song?.songName,
+        song?.tag,
+        song?.artist,
+        song?.playCount,
+        song?.likeCount,
+    ]);
 
     const { mutate: changeSong } = clientAPI.songlist.changeSong.useMutation({
         onSuccess() {
@@ -498,6 +510,8 @@ function ModalEdit({
                     artist: artistValue,
                     songName: songNameValue,
                     tag: tagValue,
+                    playCount: playCountValue,
+                    likeCount: likeCountValue,
                 });
             }}
             ref={modalRef}
@@ -532,6 +546,26 @@ function ModalEdit({
                     id="tag-edit"
                     className={inputStyles}
                     type="text"
+                />
+                <label htmlFor="play-count-edit">Play count</label>
+                <input
+                    onChange={(event) =>
+                        setPlayCountValue(parseInt(event.target.value))
+                    }
+                    value={playCountValue}
+                    id="play-count-edit"
+                    className={inputStyles}
+                    type="number"
+                />
+                <label htmlFor="like-count-edit">Like count</label>
+                <input
+                    onChange={(event) =>
+                        setLikeCountValue(parseInt(event.target.value))
+                    }
+                    value={likeCountValue}
+                    id="like-count-edit"
+                    className={inputStyles}
+                    type="number"
                 />
                 <button type="submit" className={`${buttonStyles} col-span-2`}>
                     Change

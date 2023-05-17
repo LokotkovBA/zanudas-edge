@@ -43,6 +43,8 @@ export const songsRouter = createTRPCRouter({
                 artist: z.string(),
                 songName: z.string(),
                 tag: z.string(),
+                playCount: z.number(),
+                likeCount: z.number(),
             }),
         )
         .mutation(({ ctx, input }) => {
