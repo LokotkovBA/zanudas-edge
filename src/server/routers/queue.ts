@@ -11,6 +11,7 @@ import {
 } from "~/drizzle/types";
 import { type RouterOutput } from "./root";
 import { type ResultSet } from "@libsql/client";
+import { songs } from "~/drizzle/schemas/songlist";
 
 export type QueueGetAllOutput = RouterOutput["queue"]["getAll"];
 
@@ -183,7 +184,7 @@ export const queueRouter = createTRPCRouter({
 
     delete: privateProcedure
         .input(z.object({ id: z.number() }))
-        .mutation(({ ctx, input: { id } }) => {
+        .mutation(async ({ ctx, input: { id } }) => {
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
@@ -194,7 +195,66 @@ export const queueRouter = createTRPCRouter({
                 });
             }
 
-            return ctx.drizzle.delete(queue).where(eq(queue.id, id)).run();
+            const deletedEntry = await ctx.drizzle
+                .delete(queue)
+                .where(eq(queue.id, id))
+                .returning()
+                .get();
+            if (!deletedEntry) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                });
+            }
+
+            if (deletedEntry.played === 0) {
+                return deletedEntry;
+            }
+
+            const song = await ctx.drizzle
+                .select({
+                    id: songs.id,
+                    playCount: songs.playCount,
+                    likeCount: songs.likeCount,
+                    tag: songs.tag,
+                    lastPlayed: songs.lastPlayed,
+                })
+                .from(songs)
+                .where(
+                    and(
+                        eq(songs.artist, deletedEntry.artist),
+                        eq(songs.songName, deletedEntry.songName),
+                    ),
+                )
+                .limit(1)
+                .get();
+            if (!song && deletedEntry.willAdd === 0) {
+                return deletedEntry;
+            }
+
+            if (!song) {
+                return ctx.drizzle
+                    .insert(songs)
+                    .values({
+                        artist: deletedEntry.artist,
+                        songName: deletedEntry.songName,
+                        likeCount: deletedEntry.likeCount,
+                        tag: deletedEntry.tag,
+                        playCount: 1,
+                        lastPlayed: new Date().toISOString(),
+                    })
+                    .run();
+            }
+
+            song.playCount++;
+            song.likeCount += deletedEntry.likeCount;
+            song.lastPlayed = new Date().toISOString();
+            song.tag = deletedEntry.tag;
+
+            return ctx.drizzle
+                .update(songs)
+                .set(song)
+                .where(eq(songs.id, song.id))
+                .run();
         }),
 
     add: privateProcedure
