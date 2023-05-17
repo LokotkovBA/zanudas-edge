@@ -14,7 +14,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
     const [isTextVisible, setIsTextVisible] = useState(false);
     const [overlayFontSize, setOverlayFontSize] = useState("");
     const [overlayText, setOverlayText] = useState("");
-    const [overlayEntryCount, setOvertlayEntryCount] = useState(0);
+    const [overlayEntryCount, setOvertlayEntryCount] = useState("");
 
     const { data: userData } = clientAPI.getAuth.useQuery();
 
@@ -50,7 +50,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
         });
 
         socketClient.on("overlay entry count", (message) => {
-            const newEntryCount = z.number().safeParse(message);
+            const newEntryCount = z.string().safeParse(message);
             if (!newEntryCount.success) {
                 toast.error("wrong entry count");
                 return;
@@ -91,6 +91,12 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
             username: userData?.encUser,
             message: {
                 value: overlayFontSize,
+            },
+        });
+        socketClient.emit("change overlay entry count", {
+            username: userData?.encUser,
+            message: {
+                value: overlayEntryCount,
             },
         });
         modalRef.current?.close();
@@ -148,7 +154,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
                     <input
                         id="entry count"
                         onChange={(event) =>
-                            setOvertlayEntryCount(parseInt(event.target.value))
+                            setOvertlayEntryCount(event.target.value)
                         }
                         value={overlayEntryCount}
                         type="number"
