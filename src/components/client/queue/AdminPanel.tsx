@@ -14,16 +14,11 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
     const [isTextVisible, setIsTextVisible] = useState(false);
     const [overlayFontSize, setOverlayFontSize] = useState("");
     const [overlayText, setOverlayText] = useState("");
+    const [overlayEntryCount, setOvertlayEntryCount] = useState(0);
 
     const { data: userData } = clientAPI.getAuth.useQuery();
 
     useEffect(() => {
-        socketClient.on("show overlay text", () => {
-            setIsTextVisible(true);
-        });
-        socketClient.on("hide overlay text", () => {
-            setIsTextVisible(false);
-        });
         socketClient.on("overlay font size", (message) => {
             const newFontSize = z.string().safeParse(message);
             if (!newFontSize.success) {
@@ -32,8 +27,8 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
             }
 
             setOverlayFontSize(newFontSize.data);
-            toast.success("overlay font size");
         });
+
         socketClient.on("overlay text", (message) => {
             const newText = z.string().safeParse(message);
             if (!newText.success) {
@@ -42,8 +37,8 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
             }
 
             setOverlayText(newText.data);
-            toast.success("overlay text");
         });
+
         socketClient.on("overlay text visibility", (message) => {
             const newVisibility = z.string().safeParse(message);
             if (!newVisibility.success) {
@@ -52,19 +47,28 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
             }
 
             setIsTextVisible(newVisibility.data === "show");
-            toast.success("overlay text visibility");
+        });
+
+        socketClient.on("overlay entry count", (message) => {
+            const newEntryCount = z.number().safeParse(message);
+            if (!newEntryCount.success) {
+                toast.error("wrong entry count");
+                return;
+            }
+
+            setOvertlayEntryCount(newEntryCount.data);
         });
 
         socketClient.emit("get overlay text");
         socketClient.emit("get overlay text visibility");
         socketClient.emit("get overlay font size");
+        socketClient.emit("get overlay entry count");
 
         return () => {
-            socketClient.off("show overlay text");
-            socketClient.off("hide overlay text");
             socketClient.off("overlay font size");
             socketClient.off("overlay text");
             socketClient.off("overlay text visibility");
+            socketClient.off("overlay entry count");
         };
     }, []);
 
@@ -72,6 +76,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
         socketClient.emit("change overlay text visibility", {
             username: userData?.encUser,
         });
+        toast.success("Success");
     }
 
     function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -89,6 +94,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
             },
         });
         modalRef.current?.close();
+        toast.success("Success");
     }
 
     return (
@@ -119,7 +125,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
                         className="hidden"
                     />
                     <CheckBox
-                        className="self-center"
+                        className="ml-auto self-center"
                         id="text-visibility"
                         checked={isTextVisible}
                         onClick={changeTextVisibility}
@@ -134,7 +140,19 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
                         }
                         value={overlayFontSize}
                         type="text"
-                        className={`ml-auto w-16 rounded border border-slate-400 bg-slate-950 p-2 sm:w-20`}
+                        className={`ml-auto w-14 rounded border border-slate-400 bg-slate-950 p-2 sm:w-20`}
+                    />
+                </section>
+                <section className="flex items-center gap-2">
+                    <label htmlFor="entry-count">Overlay entry count</label>
+                    <input
+                        id="entry count"
+                        onChange={(event) =>
+                            setOvertlayEntryCount(parseInt(event.target.value))
+                        }
+                        value={overlayEntryCount}
+                        type="number"
+                        className={`ml-auto w-12 rounded border border-slate-400 bg-slate-950 p-2 sm:w-20`}
                     />
                 </section>
                 <label>Overlay text</label>
