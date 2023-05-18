@@ -16,12 +16,12 @@ export default async function Users() {
     }
 
     return (
-        <main className="flex flex-col items-center gap-2 py-2">
+        <>
             <Suspense fallback={<Spinner />}>
                 {/* @ts-expect-error Async Server Component */}
                 <UsersList />
             </Suspense>
-        </main>
+        </>
     );
 }
 

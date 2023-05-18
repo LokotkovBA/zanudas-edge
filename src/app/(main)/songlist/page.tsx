@@ -13,13 +13,13 @@ export default async function SongList() {
     const userData = await serverAPI.getAuth.fetch();
 
     return (
-        <main className="flex flex-col items-center gap-2 px-5 sm:px-20">
+        <>
             {isAdmin(userData?.privileges) && <FileUploader />}
             <Suspense fallback={<Spinner />}>
                 {/* @ts-expect-error Async Server Component */}
                 <List privileges={userData?.privileges} />
             </Suspense>
-        </main>
+        </>
     );
 }
 

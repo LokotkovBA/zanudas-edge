@@ -19,7 +19,7 @@ export default async function Queue() {
     const userData = await serverAPI.getAuth.fetch();
 
     return (
-        <main className="flex flex-col items-center gap-2 py-2">
+        <>
             {isMod(userData?.privileges) && userData?.encUser && (
                 <>
                     <menu className="flex items-center gap-2">
@@ -46,7 +46,7 @@ export default async function Queue() {
                 </Suspense>
             )}
             <QueueSocketsSub privileges={userData?.privileges} />
-        </main>
+        </>
     );
 }
 

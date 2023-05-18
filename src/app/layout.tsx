@@ -1,8 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
-import { Menu } from "~/components/server/Menu";
+import { type PropsWithChildren } from "react";
 import { ClientProvider } from "~/client/ClientProvider";
-import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
     subsets: ["latin", "cyrillic"],
@@ -19,31 +18,10 @@ export const metadata = {
     },
 };
 
-export default async function RootLayout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+export default async function RootLayout({ children }: PropsWithChildren) {
     return (
-        <html lang="en" className="scroll-smooth">
-            <body
-                className={`${inter.variable} bg-slate-900 font-sans text-slate-50`}
-            >
-                <header
-                    id="top"
-                    className="border-b border-b-slate-500 bg-slate-950 px-2 py-4 xl:px-40"
-                >
-                    {/* @ts-expect-error Async Server Component */}
-                    <Menu />
-                </header>
-                <ClientProvider>{children}</ClientProvider>
-                <Toaster
-                    toastOptions={{
-                        className:
-                            "bg-slate-950 text-slate-50 border border-slate-500",
-                    }}
-                />
-            </body>
+        <html lang="en" className={`${inter.className} scroll-smooth`}>
+            <ClientProvider>{children}</ClientProvider>
         </html>
     );
 }
