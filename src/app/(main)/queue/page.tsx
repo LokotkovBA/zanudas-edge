@@ -59,11 +59,9 @@ async function ModPart() {
 
     const state = await serverAPI.dehydrate();
     return (
-        <ul className="flex flex-col gap-3 rounded border border-slate-400 bg-slate-950 p-5">
-            <HydrateClient state={state}>
-                <ModView />
-            </HydrateClient>
-        </ul>
+        <HydrateClient state={state}>
+            <ModView />
+        </HydrateClient>
     );
 }
 

@@ -116,39 +116,44 @@ export function ModView() {
     }
     return (
         <>
-            <DndContext
-                onDragStart={(event) => {
-                    const { active } = event;
-                    setActiveId(active.id.toString());
-                }}
-                onDragEnd={onDragEnd}
-                sensors={sensors}
-                collisionDetection={closestCorners}
-            >
-                <SortableContext
-                    strategy={verticalListSortingStrategy}
-                    items={order ?? []}
+            <ul className="flex flex-col gap-3 rounded border border-slate-400 bg-slate-950 p-5">
+                <DndContext
+                    onDragStart={(event) => {
+                        const { active } = event;
+                        setActiveId(active.id.toString());
+                    }}
+                    onDragEnd={onDragEnd}
+                    sensors={sensors}
+                    collisionDetection={closestCorners}
                 >
-                    {order?.map((id) => {
-                        return (
-                            <SortableModQueueEntry
-                                key={id}
-                                id={id}
-                                setCurrent={setCurrent}
-                                changeEntry={changeEntry}
-                                modalChangeRef={modalChangeRef}
-                                modalDeleteRef={modalDeleteRef}
-                                setSelectedEntry={setSelectedEntry}
+                    <SortableContext
+                        strategy={verticalListSortingStrategy}
+                        items={order ?? []}
+                    >
+                        {order?.map((id) => {
+                            return (
+                                <SortableModQueueEntry
+                                    key={id}
+                                    id={id}
+                                    setCurrent={setCurrent}
+                                    changeEntry={changeEntry}
+                                    modalChangeRef={modalChangeRef}
+                                    modalDeleteRef={modalDeleteRef}
+                                    setSelectedEntry={setSelectedEntry}
+                                />
+                            );
+                        })}
+                    </SortableContext>
+                    <DragOverlay>
+                        {activeId !== null ? (
+                            <ModQueueEntry
+                                className="opacity-90"
+                                id={activeId}
                             />
-                        );
-                    })}
-                </SortableContext>
-                <DragOverlay>
-                    {activeId !== null ? (
-                        <ModQueueEntry className="opacity-90" id={activeId} />
-                    ) : null}
-                </DragOverlay>
-            </DndContext>
+                        ) : null}
+                    </DragOverlay>
+                </DndContext>
+            </ul>
             <ModalEdit
                 modalRef={modalChangeRef}
                 entry={selectedEntry}
