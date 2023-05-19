@@ -68,7 +68,6 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
             >
                 <h2 className="col-span-2 flex items-start gap-2 sm:col-span-1">
                     <button
-                        id={`grip-${index}`}
                         className={clsx("rounded py-1", {
                             "cursor-grab hover:bg-sky-800": !!style,
                             "cursor-grabbing bg-sky-900": !style,
@@ -76,7 +75,11 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                         {...attributes}
                         {...listeners}
                     >
-                        <GripVertical size="2rem" className="fill-white" />
+                        <GripVertical
+                            id={index.toString()}
+                            size="2rem"
+                            className="fill-white"
+                        />
                     </button>
                     <EntryNumber
                         number={index}

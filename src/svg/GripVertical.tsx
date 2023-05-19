@@ -1,17 +1,20 @@
 type GripVerticalProps = {
     size: string;
     className: string;
+    id: string;
 };
-export function GripVertical({ size, className }: GripVerticalProps) {
+export function GripVertical({ size, className, id }: GripVerticalProps) {
     return (
         <svg
             className={className}
+            aria-labelledby={`grip-${id}`}
             width={size}
             height={size}
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
         >
+            <title id={`grip-${id}`}>{`Grip ${id}`}</title>
             <path
                 fillRule="evenodd"
                 clipRule="evenodd"
