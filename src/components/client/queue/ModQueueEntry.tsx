@@ -1,5 +1,4 @@
 import { forwardRef, type ChangeEvent } from "react";
-import { EntryNumber } from "./EntryNumber";
 import type { ChangedQueueEntry, QueueEntry } from "~/drizzle/types";
 import { clientAPI } from "~/client/ClientProvider";
 import { LikeBlock } from "./LikeBlock";
@@ -8,6 +7,7 @@ import { type SyntheticListenerMap } from "@dnd-kit/core/dist/hooks/utilities";
 import { type DraggableAttributes } from "@dnd-kit/core";
 import clsx from "clsx";
 import { GripVertical } from "~/svg/GripVertical";
+import { EntryNumber } from "~/components/server/queue/EntryNumber";
 
 type ModQueueEntryProps = {
     style?: {

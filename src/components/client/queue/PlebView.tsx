@@ -2,7 +2,7 @@
 
 import { clientAPI } from "~/client/ClientProvider";
 import { LikeBlock } from "./LikeBlock";
-import { EntryNumber } from "./EntryNumber";
+import { EntryNumber } from "~/components/server/queue/EntryNumber";
 
 export function PlebView() {
     const { data: filteredQueueData } = clientAPI.queue.getFiltered.useQuery();
