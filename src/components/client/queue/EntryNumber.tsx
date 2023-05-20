@@ -4,13 +4,13 @@ type EntryNumberProps = {
     number: number;
     current: boolean;
     played: boolean;
-    visible: boolean;
+    visible?: boolean;
     className?: string;
 };
 
 export function EntryNumber({
     number,
-    visible,
+    visible = true,
     played,
     current,
     className,

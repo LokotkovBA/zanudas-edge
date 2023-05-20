@@ -33,7 +33,6 @@ export function PlebView() {
                             <EntryNumber
                                 number={index + 1}
                                 current={!!current}
-                                visible={true}
                                 played={!!played}
                             />
                             <span className="font-bold text-sky-400">
