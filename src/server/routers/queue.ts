@@ -88,6 +88,7 @@ export const queueRouter = createTRPCRouter({
             out = await ctx.drizzle
                 .select()
                 .from(queue)
+                .where(eq(queue.visible, 1))
                 .orderBy(asc(queue.queueNumber))
                 .leftJoin(userLikes, eq(queue.id, userLikes.songId))
                 .all();
@@ -95,12 +96,13 @@ export const queueRouter = createTRPCRouter({
             const data = await ctx.drizzle
                 .select()
                 .from(queue)
+                .where(eq(queue.visible, 1))
                 .orderBy(asc(queue.queueNumber))
                 .all();
             out = data.map((queue) => ({ queue, userLikes: null }));
         }
 
-        return out.filter((entry) => entry.queue.visible);
+        return out;
     }),
 
     like: privateProcedure
