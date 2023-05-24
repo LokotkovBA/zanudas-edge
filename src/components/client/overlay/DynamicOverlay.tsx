@@ -95,6 +95,7 @@ function OverlayEntry({
             <span
                 className={clsx("justify-self-end", {
                     "text-slate-400": isPlayed,
+                    "self-center": isCurrent,
                 })}
             >
                 {isCurrent ? (
