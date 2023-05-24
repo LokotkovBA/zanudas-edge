@@ -288,4 +288,65 @@ export const queueRouter = createTRPCRouter({
                 .returning()
                 .get();
         }),
+
+    getOverlay: publicProcedure
+        .input(
+            z.object({
+                maxDisplay: z.number(),
+                oldCurrent: z.number().optional(),
+            }),
+        )
+        .query(async ({ ctx, input: { maxDisplay, oldCurrent } }) => {
+            const queueEntries = await ctx.drizzle
+                .select({
+                    id: queue.id,
+                    artist: queue.artist,
+                    songName: queue.songName,
+                    likeCount: queue.likeCount,
+                    current: queue.current,
+                    played: queue.played,
+                    queueNumber: queue.queueNumber,
+                })
+                .from(queue)
+                .where(eq(queue.visible, 1))
+                .orderBy(asc(queue.queueNumber))
+                .all();
+
+            let current = 0;
+            if (oldCurrent) {
+                current = oldCurrent;
+            } else {
+                for (const entry of queueEntries) {
+                    if (entry.current === 1) {
+                        break;
+                    }
+                    current++;
+                }
+            }
+
+            let min = current - Math.floor(maxDisplay / 2);
+            min =
+                queueEntries.length - min - 1 >= maxDisplay
+                    ? min
+                    : queueEntries.length - maxDisplay;
+
+            let displayed = 0;
+            const out: typeof queueEntries = [];
+
+            let index = 0;
+            for (const entry of queueEntries) {
+                if (min <= index) {
+                    displayed++;
+                    entry.queueNumber = index;
+                    out.push(entry);
+                }
+
+                index++;
+                if (displayed === maxDisplay) {
+                    break;
+                }
+            }
+
+            return out;
+        }),
 });
