@@ -111,7 +111,7 @@ function OverlayEntry({
             </span>
             <span
                 className={clsx("col-span-2 flex gap-2 justify-self-end", {
-                    "self-": isCurrent,
+                    "self-center leading-none": isCurrent,
                 })}
             >
                 {likeCount >= 0 && (
