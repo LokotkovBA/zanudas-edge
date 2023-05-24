@@ -313,7 +313,7 @@ export const queueRouter = createTRPCRouter({
                 .all();
 
             let current = 0;
-            if (oldCurrent) {
+            if (oldCurrent !== undefined) {
                 current = oldCurrent;
             } else {
                 for (const entry of queueEntries) {

@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { redirect } from "next/navigation";
 import { OverlaySocketsSub } from "~/components/client/overlay/OverlaySocketsSub";
 import { serverAPI } from "~/server/api";
 import { PlayIcon } from "~/svg/PlayIcon";
@@ -31,17 +32,28 @@ export default async function Overlay({
                         likeCount,
                         played,
                         current,
-                    }) => (
-                        <OverlayEntry
-                            key={id}
-                            index={queueNumber + 1}
-                            artist={artist}
-                            songName={songName}
-                            isCurrent={current === 1}
-                            isPlayed={played === 1}
-                            likeCount={likeCount}
-                        />
-                    ),
+                    }) => {
+                        if (
+                            (oldCurrent === undefined ||
+                                oldCurrent !== queueNumber) &&
+                            current === 1
+                        ) {
+                            redirect(
+                                `/overlay?maxDisplay=${maxDisplay}&oldCurrent=${queueNumber}`,
+                            );
+                        }
+                        return (
+                            <OverlayEntry
+                                key={id}
+                                index={queueNumber + 1}
+                                artist={artist}
+                                songName={songName}
+                                isCurrent={current === 1}
+                                isPlayed={played === 1}
+                                likeCount={likeCount}
+                            />
+                        );
+                    },
                 )}
             </ul>
             <OverlaySocketsSub />
