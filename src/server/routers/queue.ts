@@ -56,7 +56,6 @@ export const queueRouter = createTRPCRouter({
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
-            console.time("order");
             const promises: Promise<ResultSet>[] = new Array(newOrder.length);
             let index = 0;
             for (const id of newOrder) {
@@ -69,8 +68,14 @@ export const queueRouter = createTRPCRouter({
             }
 
             await Promise.all(promises);
-            console.timeEnd("order");
-            return null;
+
+            const current = await ctx.drizzle
+                .select({ queueNumber: queue.queueNumber })
+                .from(queue)
+                .where(eq(queue.current, 1))
+                .all();
+            const currentQueueNumber = current[0]?.queueNumber;
+            return currentQueueNumber !== undefined ? currentQueueNumber : -1;
         }),
 
     getFiltered: publicProcedure.query(async ({ ctx }) => {
@@ -161,8 +166,10 @@ export const queueRouter = createTRPCRouter({
         }),
 
     setCurrent: privateProcedure
-        .input(z.object({ id: z.number(), value: z.boolean() }))
-        .mutation(async ({ ctx, input: { id, value } }) => {
+        .input(
+            z.object({ id: z.number(), value: z.boolean(), index: z.number() }),
+        )
+        .mutation(async ({ ctx, input: { id, value, index } }) => {
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
@@ -177,11 +184,13 @@ export const queueRouter = createTRPCRouter({
                 await ctx.drizzle.update(queue).set({ current: 0 }).run();
             }
 
-            return ctx.drizzle
+            await ctx.drizzle
                 .update(queue)
                 .set({ current: value ? 1 : 0 })
                 .where(eq(queue.id, id))
                 .run();
+
+            return index;
         }),
 
     delete: privateProcedure
@@ -289,64 +298,20 @@ export const queueRouter = createTRPCRouter({
                 .get();
         }),
 
-    getOverlay: publicProcedure
-        .input(
-            z.object({
-                maxDisplay: z.number(),
-                oldCurrent: z.number().optional(),
-            }),
-        )
-        .query(async ({ ctx, input: { maxDisplay, oldCurrent } }) => {
-            const queueEntries = await ctx.drizzle
-                .select({
-                    id: queue.id,
-                    artist: queue.artist,
-                    songName: queue.songName,
-                    likeCount: queue.likeCount,
-                    current: queue.current,
-                    played: queue.played,
-                    queueNumber: queue.queueNumber,
-                })
-                .from(queue)
-                .where(eq(queue.visible, 1))
-                .orderBy(asc(queue.queueNumber))
-                .all();
-
-            let current = 0;
-            if (oldCurrent !== undefined) {
-                current = oldCurrent;
-            } else {
-                for (const entry of queueEntries) {
-                    if (entry.current === 1) {
-                        break;
-                    }
-                    current++;
-                }
-            }
-
-            let min = current - Math.floor(maxDisplay / 2);
-            min =
-                queueEntries.length - min - 1 >= maxDisplay
-                    ? min
-                    : queueEntries.length - maxDisplay;
-
-            let displayed = 0;
-            const out: typeof queueEntries = [];
-
-            let index = 0;
-            for (const entry of queueEntries) {
-                if (min <= index) {
-                    displayed++;
-                    entry.queueNumber = index;
-                    out.push(entry);
-                }
-
-                index++;
-                if (displayed === maxDisplay) {
-                    break;
-                }
-            }
-
-            return out;
-        }),
+    getOverlay: publicProcedure.query(async ({ ctx }) => {
+        return await ctx.drizzle
+            .select({
+                id: queue.id,
+                artist: queue.artist,
+                songName: queue.songName,
+                likeCount: queue.likeCount,
+                current: queue.current,
+                played: queue.played,
+                queueNumber: queue.queueNumber,
+            })
+            .from(queue)
+            .where(eq(queue.visible, 1))
+            .orderBy(asc(queue.queueNumber))
+            .all();
+    }),
 });

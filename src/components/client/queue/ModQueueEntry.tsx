@@ -20,7 +20,7 @@ type ModQueueEntryProps = {
     id: string;
     changeEntry?: (entry: ChangedQueueEntry) => void;
     setSelectedEntry?: (entry: QueueEntry) => void;
-    setCurrent?: (value: { id: number; value: boolean }) => void;
+    setCurrent?: (value: { id: number; value: boolean; index: number }) => void;
     modalDeleteRef?: React.RefObject<HTMLDialogElement>;
     modalChangeRef?: React.RefObject<HTMLDialogElement>;
 };
@@ -168,6 +168,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                                 setCurrent?.({
                                     id: entry.id,
                                     value: event.target.checked,
+                                    index,
                                 });
                             }}
                             id={`${entry.id}-current`}
@@ -190,6 +191,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                             setCurrent?.({
                                 id: entry.id,
                                 value: !oldChecked,
+                                index,
                             });
                         }}
                     />

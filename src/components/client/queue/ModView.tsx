@@ -50,9 +50,16 @@ export function ModView() {
         onMutate() {
             toast.loading("Changing");
         },
-        onSuccess() {
+        onSuccess(index) {
             toast.dismiss();
             toast.success("Changed");
+
+            socketClient.emit("change current", {
+                username: userData?.encUser,
+                message: {
+                    queueNumber: index,
+                },
+            });
             socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
@@ -85,9 +92,16 @@ export function ModView() {
         onMutate() {
             toast.loading("Setting order");
         },
-        onSuccess() {
+        onSuccess(currentQueueNumber) {
             toast.dismiss();
             toast.success("Success");
+            if (currentQueueNumber !== -1) {
+                socketClient.emit("change current", {
+                    username: userData?.encUser,
+                    message: { queueNumber: currentQueueNumber + 1 },
+                });
+            }
+
             socketClient.emit("invalidate", { username: userData?.encUser });
         },
         onError(error) {
