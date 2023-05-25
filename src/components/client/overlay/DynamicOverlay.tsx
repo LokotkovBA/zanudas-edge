@@ -8,6 +8,8 @@ import { ThumbsUp } from "~/svg/ThumbsUp";
 
 export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
     const [oldCurrent, setOldCurrent] = useState<number>();
+    const [text, setText] = useState("");
+    const [textVisible, setTextVisible] = useState(false);
 
     const { data: overlayData } = clientAPI.queue.getOverlay.useQuery();
     const ctx = clientAPI.useContext();
@@ -21,7 +23,25 @@ export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
             setOldCurrent(message);
         });
 
+        socketClient.on("overlay text", (message: string) => {
+            if (typeof message !== "string") {
+                return;
+            }
+
+            setText(message);
+        });
+
+        socketClient.on("overlay text visibility", (message: string) => {
+            if (typeof message !== "string") {
+                return;
+            }
+
+            setTextVisible(message === "show");
+        });
+
         socketClient.emit("sub admin");
+        socketClient.emit("get overlay text");
+        socketClient.emit("get overlay text visibility");
 
         return () => {
             socketClient.off("current");
@@ -41,28 +61,39 @@ export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
 
     return (
         <>
-            {filterMaxDisplay(maxDisplay, overlayData, oldCurrent)?.map(
-                ({
-                    id,
-                    artist,
-                    songName,
-                    current,
-                    played,
-                    queueNumber,
-                    likeCount,
-                }) => (
-                    <OverlayEntry
-                        key={id}
-                        artist={artist}
-                        songName={songName}
-                        isCurrent={current === 1}
-                        isPlayed={played === 1}
-                        index={queueNumber + 1}
-                        likeCount={likeCount}
-                    />
-                ),
-            )}
+            <ul className="flex flex-col gap-4 p-2">
+                {filterMaxDisplay(maxDisplay, overlayData, oldCurrent)?.map(
+                    ({
+                        id,
+                        artist,
+                        songName,
+                        current,
+                        played,
+                        queueNumber,
+                        likeCount,
+                    }) => (
+                        <OverlayEntry
+                            key={id}
+                            artist={artist}
+                            songName={songName}
+                            isCurrent={current === 1}
+                            isPlayed={played === 1}
+                            index={queueNumber + 1}
+                            likeCount={likeCount}
+                        />
+                    ),
+                )}
+            </ul>
+            {textVisible && <OverlayText text={text} />}
         </>
+    );
+}
+
+function OverlayText({ text }: { text: string }) {
+    return (
+        <section className="mt-4 flex w-full justify-center text-center text-4xl">
+            <h2 className="w-[22ch] whitespace-pre-line">{text}</h2>
+        </section>
     );
 }
 

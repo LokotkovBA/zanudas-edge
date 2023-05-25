@@ -16,11 +16,9 @@ export default async function Overlay({
 
     return (
         <main className="text-2xl drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]">
-            <ul className="flex flex-col gap-4 p-2">
-                <HydrateClient state={state}>
-                    <DynamicOverlay maxDisplay={maxDisplay} />
-                </HydrateClient>
-            </ul>
+            <HydrateClient state={state}>
+                <DynamicOverlay maxDisplay={maxDisplay} />
+            </HydrateClient>
         </main>
     );
 }
