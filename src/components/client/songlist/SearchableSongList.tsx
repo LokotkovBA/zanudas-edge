@@ -1,7 +1,7 @@
 "use client";
 
 import { clientAPI } from "~/client/ClientProvider";
-import { type SonglistEntry } from "~/drizzle/types";
+import { type Song } from "~/drizzle/types";
 import React, {
     type ChangeEvent,
     useState,
@@ -14,14 +14,10 @@ import { searchBarStyles } from "~/components/styles/searchBar";
 import { toast } from "react-hot-toast";
 import clsx from "clsx";
 import Link from "next/link";
-import { ThumbsUp } from "~/svg/ThumbsUp";
-import { isAdmin, isMod } from "~/utils/privileges";
+import { isAdmin } from "~/utils/privileges";
 import { buttonStyles } from "~/components/styles/button";
-import { ThumbsDown } from "~/svg/ThumbsDown";
-import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { inputStyles } from "~/components/styles/input";
-import { socketClient } from "~/client/socketClient";
-import { Cross } from "~/svg/Cross";
+import { ArtistBlock } from "./ArtistBlock";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -107,7 +103,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
     );
 }
 
-function exportJSON(songListData: SonglistEntry[]) {
+function exportJSON(songListData: Song[]) {
     const jsonStringData = `data:text/json;chatset=utf8,${encodeURIComponent(
         JSON.stringify(songListData),
     )}`;
@@ -129,37 +125,52 @@ const FilteredList = memo(function FilteredList({
     selectedCategoryIndex,
     privileges,
 }: FilteredListProps) {
-    const { data: songListData } = clientAPI.songlist.getAll.useQuery();
+    const { data: songListData } = clientAPI.songlist.getAll.useQuery(
+        undefined,
+        {
+            onSuccess(songList) {
+                setArtistBlocks(
+                    splitByArtist(
+                        artistFirstLettersRef.current,
+                        filterBySearch(
+                            defferedSearchValue,
+                            filterByCategorySonglist(
+                                selectedCategoryIndex,
+                                songList.categories,
+                                songList.songList,
+                            ),
+                        ),
+                    ),
+                );
+            },
+        },
+    );
 
     const modalEditRef = useRef<HTMLDialogElement>(null);
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
-    const [modalEditData, setModalData] = useState<SonglistEntry | null>(null);
+    const [modalEditData, setModalData] = useState<Song | null>(null);
     const artistFirstLettersRef = useRef<string[]>(
         songListData?.artistFirstLetters ?? [],
     );
     const [showMobileFirstLetters, setShowMobileFirstLetters] = useState(false);
 
-    const { data: userData } = clientAPI.getAuth.useQuery();
-    const { mutate: addToQueue } = clientAPI.queue.add.useMutation({
-        onMutate() {
-            toast.loading("Adding to queue");
-        },
-        onSuccess() {
-            toast.dismiss();
-            toast.success("Added");
-            socketClient.emit("invalidate", { username: userData?.encUser });
-        },
-        onError(error) {
-            toast.dismiss();
-            toast.error(`Error: ${error.message}`);
-        },
-    });
+    const [artistBlocks, setArtistBlocks] = useState(
+        splitByArtist(
+            artistFirstLettersRef.current,
+            filterBySearch(
+                defferedSearchValue,
+                filterByCategorySonglist(
+                    selectedCategoryIndex,
+                    songListData?.categories ?? [],
+                    songListData?.songList,
+                ),
+            ),
+        ),
+    );
 
     if (!songListData) {
         return <>The list is empty</>;
     }
-
-    const { categories, songList } = songListData;
 
     return (
         <>
@@ -192,121 +203,16 @@ const FilteredList = memo(function FilteredList({
                 />
             </nav>
             <ul className="w-full sm:w-2/3 xl:w-1/3">
-                {splitByAuthor(
-                    artistFirstLettersRef.current,
-                    filterBySearch(
-                        defferedSearchValue,
-                        filterByCategorySonglist(
-                            selectedCategoryIndex,
-                            categories,
-                            songList,
-                        ),
-                    ),
-                ).map((authorBlock) => {
-                    return (
-                        <li
-                            className="z-0 mb-2 rounded border border-slate-500 bg-slate-950 p-3 transition-transform duration-200 ease-in-out hover:scale-105 hover:shadow hover:shadow-black"
-                            key={authorBlock[0]?.id}
-                            id={authorBlock[0]?.artist[0]}
-                        >
-                            <h2 className="border-b border-b-sky-400 text-lg font-bold text-sky-400">
-                                {authorBlock[0]?.artist ?? "Empty list"}
-                            </h2>
-                            <div className="flex flex-col gap-2 py-2">
-                                {authorBlock.map((song, index) => (
-                                    <div
-                                        className="flex flex-wrap items-start gap-2 sm:flex-nowrap"
-                                        key={song.id}
-                                    >
-                                        <div
-                                            onClick={() =>
-                                                copyToClipboard(
-                                                    `${song.artist} - ${song.songName}`,
-                                                )
-                                            }
-                                            className="flex w-full cursor-pointer items-end justify-between hover:text-sky-500"
-                                        >
-                                            <p className="pt-2 leading-5">
-                                                {song.songName}
-                                            </p>
-                                            <section className="flex items-end gap-1 leading-none">
-                                                {!!song.likeCount && (
-                                                    <>
-                                                        <span className="text-end">
-                                                            {Math.abs(
-                                                                song.likeCount,
-                                                            )}
-                                                        </span>
-                                                        {song.likeCount > 0 && (
-                                                            <ThumbsUp
-                                                                size={"1.5rem"}
-                                                                className="fill-green-400"
-                                                            />
-                                                        )}
-                                                        {song.likeCount < 0 && (
-                                                            <ThumbsDown
-                                                                size={"1.5rem"}
-                                                                className="translate-y-2 fill-red-400"
-                                                            />
-                                                        )}
-                                                    </>
-                                                )}
-                                                {!!song.playCount &&
-                                                    song.playCount > 1 && (
-                                                        <p className="ml-1 whitespace-nowrap">
-                                                            x{song.playCount}🎹
-                                                        </p>
-                                                    )}
-                                            </section>
-                                        </div>
-                                        {isMod(privileges) && (
-                                            <button
-                                                onClick={() => {
-                                                    addToQueue({
-                                                        artist: song.artist,
-                                                        songName: song.songName,
-                                                        tag: song.tag,
-                                                    });
-                                                }}
-                                                className={buttonStyles}
-                                            >
-                                                Add
-                                            </button>
-                                        )}
-                                        {isAdmin(privileges) && (
-                                            <>
-                                                <button
-                                                    className={buttonStyles}
-                                                    onClick={() => {
-                                                        setModalData(song);
-                                                        modalEditRef.current?.showModal();
-                                                    }}
-                                                >
-                                                    Change
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setModalData(song);
-                                                        modalDeleteRef.current?.showModal();
-                                                    }}
-                                                    className={
-                                                        deleteButtonStyles
-                                                    }
-                                                >
-                                                    <Cross
-                                                        id={`${index}-close`}
-                                                        className="fill-slate-50"
-                                                        size="1.5rem"
-                                                    />
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </li>
-                    );
-                })}
+                {artistBlocks.map((block) => (
+                    <ArtistBlock
+                        key={block[0]?.artist ?? "no"}
+                        artist={block[0]?.artist ?? "no"}
+                        setModalData={setModalData}
+                        modalDeleteRef={modalDeleteRef}
+                        modalEditRef={modalEditRef}
+                        block={block}
+                    />
+                ))}
             </ul>
             {isAdmin(privileges) && (
                 <>
@@ -466,7 +372,7 @@ function ModalEdit({
     song,
     modalRef,
 }: {
-    song: SonglistEntry | null;
+    song: Song | null;
     modalRef: React.RefObject<HTMLDialogElement>;
 }) {
     const [artistValue, setArtistValue] = useState("");
@@ -606,24 +512,13 @@ function LetterButtons({
     );
 }
 
-function copyToClipboard(text: string) {
-    toast.promise(navigator.clipboard.writeText(text), {
-        loading: "Copying",
-        success: "Copied",
-        error: "Error",
-    });
-}
-
-function splitByAuthor(
-    artistFirstLetters: string[],
-    list?: SonglistEntry[],
-): SonglistEntry[][] {
+function splitByArtist(artistFirstLetters: string[], list?: Song[]): Song[][] {
     artistFirstLetters.length = 0;
-    const result: SonglistEntry[][] = [];
+    const result: Song[][] = [];
     if (list === undefined || list.length === 0) return result;
 
     let curArtist = list[0]?.artist;
-    let curArtistArray: SonglistEntry[] = [];
+    let curArtistArray: Song[] = [];
     for (const song of list) {
         if (song.artist !== curArtist) {
             result.push(curArtistArray);
@@ -663,7 +558,7 @@ function splitByAuthor(
 function filterByCategorySonglist(
     selectedCategoryIndex: number,
     categories: string[],
-    songList?: SonglistEntry[],
+    songList?: Song[],
 ) {
     const selectedCategory = categories[selectedCategoryIndex];
     return selectedCategory === undefined
@@ -675,7 +570,7 @@ function filterByCategorySonglist(
           });
 }
 
-function filterBySearch(search: string | null, songlist?: SonglistEntry[]) {
+function filterBySearch(search: string | null, songlist?: Song[]) {
     return songlist?.filter(({ artist, songName, tag }) => {
         if (!search) return true;
         const lowerSearch = search.toLowerCase();

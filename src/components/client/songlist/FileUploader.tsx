@@ -8,7 +8,7 @@ import { insertSongsSchema } from "~/drizzle/schemas/songlist";
 import { buttonStyles } from "~/components/styles/button";
 import toast from "react-hot-toast";
 import { Spinner } from "~/components/utils/Spinner";
-import { type SonglistEntry } from "~/drizzle/types";
+import { type Song } from "~/drizzle/types";
 
 export function FileUploader() {
     const onDrop: <T extends File>(acceptedFiles: T[]) => void = useCallback(
@@ -55,9 +55,7 @@ export function FileUploader() {
         },
         [],
     );
-    const [songlistForUpload, setSonglistForUpload] = useState<SonglistEntry[]>(
-        [],
-    );
+    const [songlistForUpload, setSonglistForUpload] = useState<Song[]>([]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
@@ -102,7 +100,7 @@ export function FileUploader() {
     );
 }
 
-function deleteId(list: SonglistEntry[]) {
+function deleteId(list: Song[]) {
     for (const song of list) {
         if (song.id !== undefined) {
             delete song.id;
@@ -111,7 +109,7 @@ function deleteId(list: SonglistEntry[]) {
 }
 
 function parseOldList(list: z.infer<typeof oldSonglistSchema>[]) {
-    const result: SonglistEntry[] = [];
+    const result: Song[] = [];
 
     for (const oldSong of list) {
         result.push({
