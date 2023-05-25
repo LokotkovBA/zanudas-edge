@@ -13,7 +13,7 @@ export function AdminButton() {
     return (
         <>
             <button onClick={onClick} className={buttonStyles}>
-                Admin panel
+                Overlay text
             </button>
             <AdminPanel modalRef={modalRef} />
         </>
