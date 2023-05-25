@@ -175,12 +175,16 @@ function OverlayEntry({
                     index
                 )}
             </span>
-            <span className="col-span-7 self-center">
+            <span
+                className={clsx("col-span-7 self-center", {
+                    "leading-none": isCurrent,
+                })}
+            >
                 {artist} - {songName}
             </span>
             <span
                 className={clsx("col-span-2 flex gap-2 justify-self-end", {
-                    "self-center leading-none": isCurrent,
+                    "self-center": isCurrent,
                 })}
             >
                 {likeCount >= 0 && (
