@@ -3,26 +3,42 @@ import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
 import { socketClient } from "~/client/socketClient";
+import { CheckMark } from "~/svg/CheckMark";
+import { ChevronDown } from "~/svg/ChevronDown";
 import { PlayIcon } from "~/svg/PlayIcon";
 import { ThumbsUp } from "~/svg/ThumbsUp";
 
 export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
-    const [oldCurrent, setOldCurrent] = useState<number>();
+    const [oldCurrent, setOldCurrent] = useState(0);
     const [text, setText] = useState("");
     const [textVisible, setTextVisible] = useState(false);
 
-    const { data: overlayData } = clientAPI.queue.getOverlay.useQuery();
     const ctx = clientAPI.useContext();
+    const { data: overlayData } = clientAPI.queue.getOverlay.useQuery(
+        undefined,
+        {
+            onSuccess(queueEntries) {
+                setOverlayEntries(
+                    filterMaxDisplay(maxDisplay, queueEntries, oldCurrent),
+                );
+            },
+        },
+    );
+    const [overlayEntries, setOverlayEntries] = useState<OverlayEntry[]>(
+        filterMaxDisplay(maxDisplay, overlayData, oldCurrent),
+    );
 
     useEffect(() => {
-        socketClient.on("current", (message: number) => {
-            if (typeof message !== "number") {
-                return;
-            }
-
-            setOldCurrent(message);
+        socketClient.on("invalidate", () => {
+            ctx.queue.getOverlay.invalidate();
         });
 
+        return () => {
+            socketClient.off("invalidate");
+        };
+    }, [ctx.queue.getOverlay]);
+
+    useEffect(() => {
         socketClient.on("overlay text", (message: string) => {
             if (typeof message !== "string") {
                 return;
@@ -42,27 +58,35 @@ export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
         socketClient.emit("sub admin");
         socketClient.emit("get overlay text");
         socketClient.emit("get overlay text visibility");
+        socketClient.emit("get current");
 
         return () => {
-            socketClient.off("current");
             socketClient.emit("unsub admin");
+            socketClient.off("overlay text");
+            socketClient.off("overlay text visibility");
         };
     }, []);
 
     useEffect(() => {
-        socketClient.on("invalidate", () => {
-            ctx.queue.getOverlay.invalidate();
-        });
+        socketClient.on("current", (message: number) => {
+            if (typeof message !== "number") {
+                return;
+            }
 
+            setOldCurrent(message);
+            setOverlayEntries(
+                filterMaxDisplay(maxDisplay, overlayData, message),
+            );
+        });
         return () => {
-            socketClient.off("invalidate");
+            socketClient.off("current");
         };
-    }, [ctx.queue.getOverlay]);
+    }, [maxDisplay, overlayData]);
 
     return (
         <>
             <ul className="flex flex-col gap-4 p-2">
-                {filterMaxDisplay(maxDisplay, overlayData, oldCurrent)?.map(
+                {overlayEntries.map(
                     ({
                         id,
                         artist,
@@ -83,9 +107,20 @@ export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
                         />
                     ),
                 )}
+                {oldCurrent + Math.floor(maxDisplay / 2) <
+                    (overlayData?.length ?? 0) &&
+                    (overlayData?.length ?? 0) > maxDisplay && <NotEndOfList />}
             </ul>
             {textVisible && <OverlayText text={text} />}
         </>
+    );
+}
+
+function NotEndOfList() {
+    return (
+        <li className="flex justify-center">
+            <ChevronDown size="2rem" className="fill-sky-400" />
+        </li>
     );
 }
 
@@ -124,15 +159,17 @@ function OverlayEntry({
             )}
         >
             <span
-                className={clsx("justify-self-end", {
-                    "text-slate-400": isPlayed,
+                className={clsx("justify-self-center", {
                     "self-center": isCurrent,
                 })}
             >
                 {isCurrent ? (
-                    <PlayIcon
-                        className="translate-x-5 fill-sky-400"
-                        size="2em"
+                    <PlayIcon className="fill-sky-400" size="2em" />
+                ) : isPlayed ? (
+                    <CheckMark
+                        id={index.toString()}
+                        size="2rem"
+                        className="fill-sky-400"
                     />
                 ) : (
                     index
@@ -173,7 +210,7 @@ function filterMaxDisplay(
     oldCurrent?: number,
 ) {
     if (!queueEntries) {
-        return;
+        return [];
     }
     let current = 0;
     if (oldCurrent !== undefined) {
