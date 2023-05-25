@@ -21,6 +21,7 @@ import { ThumbsDown } from "~/svg/ThumbsDown";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { inputStyles } from "~/components/styles/input";
 import { socketClient } from "~/client/socketClient";
+import { Cross } from "~/svg/Cross";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -212,7 +213,7 @@ const FilteredList = memo(function FilteredList({
                                 {authorBlock[0]?.artist ?? "Empty list"}
                             </h2>
                             <div className="flex flex-col gap-2 py-2">
-                                {authorBlock.map((song) => (
+                                {authorBlock.map((song, index) => (
                                     <div
                                         className="flex flex-wrap items-start gap-2 sm:flex-nowrap"
                                         key={song.id}
@@ -292,7 +293,11 @@ const FilteredList = memo(function FilteredList({
                                                         deleteButtonStyles
                                                     }
                                                 >
-                                                    ❌
+                                                    <Cross
+                                                        id={`${index}-close`}
+                                                        className="fill-slate-50"
+                                                        size="1.5rem"
+                                                    />
                                                 </button>
                                             </>
                                         )}

@@ -8,6 +8,7 @@ import { type DraggableAttributes } from "@dnd-kit/core";
 import clsx from "clsx";
 import { GripVertical } from "~/svg/GripVertical";
 import { EntryNumber } from "~/components/server/queue/EntryNumber";
+import { Cross } from "~/svg/Cross";
 
 type ModQueueEntryProps = {
     style?: {
@@ -96,7 +97,11 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                     }}
                     className="self-start justify-self-end rounded-full border border-transparent bg-sky-800 p-2 hover:border-sky-400"
                 >
-                    ❌
+                    <Cross
+                        id={`${index}-close`}
+                        className="fill-slate-50"
+                        size="1.5rem"
+                    />
                 </button>
                 <LikeBlock
                     songId={entry.id}

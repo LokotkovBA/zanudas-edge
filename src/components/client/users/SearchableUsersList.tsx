@@ -9,6 +9,7 @@ import { isMod } from "~/utils/privileges";
 import { buttonStyles } from "~/components/styles/button";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { toast } from "react-hot-toast";
+import { Cross } from "~/svg/Cross";
 
 export function SearchableUsersList() {
     const { data: usersData } = clientAPI.users.getAll.useQuery();
@@ -48,7 +49,7 @@ export function SearchableUsersList() {
                         }
                         return add;
                     })
-                    .map(({ id, name, image, privileges }) => (
+                    .map(({ id, name, image, privileges }, index) => (
                         <li
                             className="flex flex-col items-center gap-2"
                             key={id}
@@ -61,7 +62,11 @@ export function SearchableUsersList() {
                                 }}
                                 className={`${deleteButtonStyles} self-end`}
                             >
-                                ❌
+                                <Cross
+                                    id={`${index}-close`}
+                                    className="fill-slate-50"
+                                    size="1.5rem"
+                                />
                             </button>
                             <h2 className="text-amber-400">{name}</h2>
                             {image && (
