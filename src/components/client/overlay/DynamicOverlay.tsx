@@ -126,7 +126,7 @@ function NotEndOfList() {
 
 function OverlayText({ text }: { text: string }) {
     return (
-        <section className="mt-4 flex w-full justify-center text-center text-4xl">
+        <section className="mt-4 flex w-full justify-center text-center text-3xl">
             <h2 className="w-[22ch] whitespace-pre-line">{text}</h2>
         </section>
     );
