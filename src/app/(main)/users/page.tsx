@@ -9,6 +9,10 @@ import { SearchableUsersList } from "~/components/client/users/SearchableUsersLi
 export const runtime = "edge";
 export const preferredRegion = "arn1";
 
+export const metadata = {
+    title: "Users edit",
+};
+
 export default async function Users() {
     const user = await serverAPI.getAuth.fetch();
     if (!isAdmin(user?.privileges)) {

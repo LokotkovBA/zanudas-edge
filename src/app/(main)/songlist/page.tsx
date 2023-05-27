@@ -9,6 +9,10 @@ import { isAdmin } from "~/utils/privileges";
 export const runtime = "edge";
 export const preferredRegion = "arn1";
 
+export const metadata = {
+    title: "Zanuda's song list",
+};
+
 export default async function SongList() {
     const userData = await serverAPI.getAuth.fetch();
 

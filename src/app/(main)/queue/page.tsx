@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
     }
 
     if (!title) {
-        title = "Kalny app";
+        title = "Zanuda's queue";
     }
 
     return {
