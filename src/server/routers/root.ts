@@ -7,8 +7,10 @@ import { createTRPCRouter, publicProcedure } from "../trpc";
 import { queueRouter } from "./queue";
 import { songsRouter } from "./songs";
 import { usersRouter } from "./users";
+import { introRouter } from "./intro";
 
 export const appRouter = createTRPCRouter({
+    intro: introRouter,
     users: usersRouter,
     songlist: songsRouter,
     queue: queueRouter,

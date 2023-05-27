@@ -19,6 +19,16 @@ export default function AdminLinks() {
                     Users
                 </Link>
             </li>
+            <li>
+                <Link
+                    className={clsx(linkStyles, {
+                        "text-sky-400": pathname === "/intro",
+                    })}
+                    href="/intro"
+                >
+                    Intro
+                </Link>
+            </li>
         </>
     );
 }

@@ -6,7 +6,7 @@ export const intro = sqliteTable("intro", {
     mainMessage: text("main_message").notNull().default(""),
     preMessage: text("pre_message").notNull().default(""),
     symbol: text("symbol").notNull().default(""),
-    progress: text("progress").notNull().default(""),
+    progress: integer("progress"),
 });
 
 export const insertIntroSchema = createInsertSchema(intro);
