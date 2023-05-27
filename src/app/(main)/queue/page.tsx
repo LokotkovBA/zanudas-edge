@@ -1,3 +1,4 @@
+import { type Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { HydrateClient } from "~/client/HydrateClient";
@@ -14,6 +15,26 @@ import { isMod } from "~/utils/privileges";
 
 export const runtime = "edge";
 export const preferredRegion = "arn1";
+
+export async function generateMetadata(): Promise<Metadata> {
+    const queueData = await serverAPI.queue.getFiltered.fetch();
+    let title = "";
+
+    for (const entry of queueData) {
+        if (entry.queue.current) {
+            title = `${entry.queue.artist} - ${entry.queue.songName}`;
+            break;
+        }
+    }
+
+    if (!title) {
+        title = "Kalny app";
+    }
+
+    return {
+        title,
+    };
+}
 
 export default async function Queue() {
     const userData = await serverAPI.getAuth.fetch();

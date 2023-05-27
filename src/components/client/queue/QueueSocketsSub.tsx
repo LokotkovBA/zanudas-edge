@@ -1,22 +1,22 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { clientAPI } from "~/client/ClientProvider";
 import { socketClient } from "~/client/socketClient";
 import { isMod } from "~/utils/privileges";
 
 export function QueueSocketsSub({ privileges }: { privileges?: number }) {
-    const ctx = clientAPI.useContext();
+    const router = useRouter();
 
     useEffect(() => {
         socketClient.on("invalidate", () => {
-            ctx.queue.invalidate();
+            router.refresh();
         });
 
         return () => {
             socketClient.off("invalidate");
         };
-    }, [ctx.queue]);
+    }, [router]);
 
     useEffect(() => {
         if (!isMod(privileges)) {
