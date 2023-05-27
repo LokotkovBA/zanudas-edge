@@ -1,22 +1,24 @@
 "use client";
-import { useRouter } from "next/navigation";
+
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { clientAPI } from "~/client/ClientProvider";
 import { socketClient } from "~/client/socketClient";
 import { isMod } from "~/utils/privileges";
 
 export function QueueSocketsSub({ privileges }: { privileges?: number }) {
-    const router = useRouter();
+    const ctx = clientAPI.useContext();
 
     useEffect(() => {
         socketClient.on("invalidate", () => {
-            router.refresh();
+            document.title = "Zanuda's queue";
+            ctx.queue.invalidate();
         });
 
         return () => {
             socketClient.off("invalidate");
         };
-    }, [router]);
+    }, [ctx.queue]);
 
     useEffect(() => {
         if (!isMod(privileges)) {

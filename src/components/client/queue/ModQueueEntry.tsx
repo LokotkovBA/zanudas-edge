@@ -1,4 +1,4 @@
-import { forwardRef, type ChangeEvent } from "react";
+import { forwardRef, type ChangeEvent, useEffect } from "react";
 import type { ChangedQueueEntry, QueueEntry } from "~/drizzle/types";
 import { clientAPI } from "~/client/ClientProvider";
 import { LikeBlock } from "./LikeBlock";
@@ -44,6 +44,16 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
     ) {
         const { data: queueData } = clientAPI.queue.getAll.useQuery();
         const queueEntry = queueData?.map.get(id);
+        useEffect(() => {
+            if (
+                queueEntry?.queue.current &&
+                queueEntry?.queue.artist &&
+                queueEntry?.queue.songName
+            ) {
+                document.title = `${queueEntry.queue.artist} - ${queueEntry.queue.songName}`;
+            }
+        }, [queueEntry?.queue]);
+
         if (!queueEntry || !queueData) {
             return <></>;
         }
