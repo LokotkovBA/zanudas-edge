@@ -8,10 +8,10 @@ import { searchBarStyles } from "~/components/styles/searchBar";
 export function IntroAddButton() {
     const modalRef = useRef<HTMLDialogElement>(null);
 
-    const mainMessageRef = useRef<HTMLInputElement>(null);
-    const symbolRef = useRef<HTMLInputElement>(null);
+    const [mainMessageValue, setMainMessageValue] = useState("");
     const [preMessageValue, setPreMessageValue] = useState("");
     const [progressValue, setProgressValue] = useState("");
+    const [symbolValue, setSymbolValue] = useState("");
 
     const { mutate: addEntry } = clientAPI.intro.add.useMutation({
         onMutate() {
@@ -23,12 +23,8 @@ export function IntroAddButton() {
             modalRef.current?.close();
             setProgressValue("");
             setPreMessageValue("");
-            if (mainMessageRef.current) {
-                mainMessageRef.current.value = "";
-            }
-            if (symbolRef.current) {
-                symbolRef.current.value = "";
-            }
+            setMainMessageValue("");
+            setSymbolValue("");
         },
         onError(error) {
             toast.dismiss();
@@ -39,20 +35,14 @@ export function IntroAddButton() {
     function onSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
 
-        if (!mainMessageRef.current || !symbolRef.current) {
-            return toast.error("The impossible just happened");
-        }
-        if (progressValue !== "" && preMessageValue === "") {
-            return toast.error("Empty progress message");
-        }
-        if (mainMessageRef.current.value === "") {
+        if (mainMessageValue === "") {
             return toast.error("Empty main message");
         }
 
         addEntry({
-            mainMessage: mainMessageRef.current.value,
+            mainMessage: mainMessageValue,
             preMessage: preMessageValue,
-            symbol: symbolRef.current.value,
+            symbol: symbolValue,
             progress: progressValue === "" ? null : parseInt(progressValue),
         });
     }
@@ -77,11 +67,11 @@ export function IntroAddButton() {
                 </button>
                 <form className="grid gap-2" onSubmit={onSubmit}>
                     <label className="col-span-4" htmlFor="preMessage">
-                        Progress message
+                        Pre message
                     </label>
                     <input
                         id="preMessage"
-                        disabled={progressValue === ""}
+                        placeholder="Будет показано 7.5 секунд"
                         value={preMessageValue}
                         onChange={(event) => {
                             setPreMessageValue(event.target.value);
@@ -94,8 +84,11 @@ export function IntroAddButton() {
                     </label>
                     <input
                         id="mainMessage"
-                        className={`${inputStyles} col-span-4`}
-                        ref={mainMessageRef}
+                        className={`${inputStyles} col-span-4 lg:w-[60vw]`}
+                        value={mainMessageValue}
+                        onChange={(event) =>
+                            setMainMessageValue(event.target.value)
+                        }
                         type="text"
                     />
                     <label
@@ -113,7 +106,8 @@ export function IntroAddButton() {
                     <input
                         id="symbol"
                         className={`${searchBarStyles} col-span-2 w-[5ch] justify-self-center text-center`}
-                        ref={symbolRef}
+                        value={symbolValue}
+                        onChange={(event) => setSymbolValue(event.target.value)}
                         type="text"
                     />
                     <input
@@ -122,12 +116,8 @@ export function IntroAddButton() {
                         value={progressValue}
                         onChange={(event) => {
                             const value = parseInt(event.target.value);
-                            const valueIsNaN = isNaN(value);
-                            if (valueIsNaN) {
-                                setPreMessageValue("");
-                            }
                             setProgressValue(
-                                valueIsNaN ? "" : value.toString(),
+                                isNaN(value) ? "" : value.toString(),
                             );
                         }}
                         type="text"

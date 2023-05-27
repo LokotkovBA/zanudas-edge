@@ -16,28 +16,46 @@ import { Cross } from "~/svg/Cross";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 
 export function SearchableIntroList() {
-    const [filterString, setFilterString] = useState("");
-    const deferredFilterString = useDeferredValue(filterString);
+    const [filterMessage, setFilterMessage] = useState("");
+    const [filterSymbol, setFilterSymbol] = useState("");
+    const deferredFilterMessage = useDeferredValue(filterMessage);
+    const deferredFilterSymbol = useDeferredValue(filterSymbol);
 
     return (
         <>
             <IntroAddButton />
             <input
-                placeholder="Search"
+                placeholder="Search message"
                 className={searchBarStyles}
                 type="text"
-                value={filterString}
-                onChange={(event) => setFilterString(event.target.value)}
+                value={filterMessage}
+                onChange={(event) =>
+                    setFilterMessage(event.target.value.toLowerCase())
+                }
             />
-            <FilteredList filterString={deferredFilterString} />
+            <input
+                placeholder="Search symbol"
+                className={searchBarStyles}
+                type="text"
+                value={filterSymbol}
+                onChange={(event) =>
+                    setFilterSymbol(event.target.value.toLowerCase())
+                }
+            />
+            <FilteredList
+                filterMessage={deferredFilterMessage}
+                filterSymbol={deferredFilterSymbol}
+            />
         </>
     );
 }
 
 const FilteredList = memo(function FilteredList({
-    filterString,
+    filterSymbol,
+    filterMessage,
 }: {
-    filterString: string;
+    filterMessage: string;
+    filterSymbol: string;
 }) {
     const { data: introData } = clientAPI.intro.getAll.useQuery();
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
@@ -46,12 +64,16 @@ const FilteredList = memo(function FilteredList({
 
     return (
         <>
-            <ul className="flex flex-col gap-4 md:flex-row md:flex-wrap">
+            <ul className="flex flex-col gap-4">
                 {introData
                     ?.filter(
-                        ({ mainMessage, preMessage }) =>
-                            mainMessage.includes(filterString) ||
-                            preMessage.includes(filterString),
+                        ({ mainMessage, preMessage, progress }) =>
+                            mainMessage.toLowerCase().includes(filterMessage) ||
+                            progress?.toString().includes(filterMessage) ||
+                            preMessage.toLowerCase().includes(filterMessage),
+                    )
+                    .filter(({ symbol }) =>
+                        symbol.toLowerCase().includes(filterSymbol),
                     )
                     .map((entry) => (
                         <IntroEntry
@@ -121,9 +143,6 @@ function IntroEntry({
             return toast.error("The impossible just happened");
         }
 
-        if (progressValue !== "" && preMessageValue === "") {
-            return toast.error("Empty progress message");
-        }
         if (mainMessageRef.current.value === "") {
             return toast.error("Empty main message");
         }
@@ -158,16 +177,16 @@ function IntroEntry({
                     />
                 </button>
                 <label className="col-span-4" htmlFor={`${id}-preMessage`}>
-                    Progress message
+                    Pre message
                 </label>
                 <input
                     id={`${id}-preMessage`}
-                    disabled={progressValue === ""}
+                    placeholder="Pre message"
                     value={preMessageValue}
                     onChange={(event) => {
                         setPreMessageValue(event.target.value);
                     }}
-                    className={`${searchBarStyles} col-span-4 disabled:bg-slate-700`}
+                    className={`${searchBarStyles} col-span-4`}
                     type="text"
                 />
                 <label className="col-span-4" htmlFor={`${id}-mainMessage`}>
@@ -175,7 +194,7 @@ function IntroEntry({
                 </label>
                 <input
                     id={`${id}-mainMessage`}
-                    className={`${searchBarStyles} col-span-4`}
+                    className={`${searchBarStyles} col-span-4 lg:w-[60vw]`}
                     ref={mainMessageRef}
                     type="text"
                     defaultValue={mainMessage}
@@ -205,11 +224,7 @@ function IntroEntry({
                     value={progressValue}
                     onChange={(event) => {
                         const value = parseInt(event.target.value);
-                        const valueIsNaN = isNaN(value);
-                        if (valueIsNaN) {
-                            setPreMessageValue("");
-                        }
-                        setProgressValue(valueIsNaN ? "" : value.toString());
+                        setProgressValue(isNaN(value) ? "" : value.toString());
                     }}
                     type="text"
                 />

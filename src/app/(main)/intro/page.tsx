@@ -9,6 +9,10 @@ import { isAdmin } from "~/utils/privileges";
 export const runtime = "edge";
 export const preferredRegion = "arn1";
 
+export const metadata = {
+    title: "Intro edit",
+};
+
 export default async function Intro() {
     const user = await serverAPI.getAuth.fetch();
     if (!isAdmin(user?.privileges)) {
