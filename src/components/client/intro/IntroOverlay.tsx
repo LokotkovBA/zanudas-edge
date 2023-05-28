@@ -78,8 +78,9 @@ export function IntroOverlay({ introData }: IntroOverlayProps) {
     const [position, setPosition] = useState(0);
     const introArrayRef = useRef(introData);
     const buffArrayRef = useRef<typeof introData>([]);
-    const [message, setMessage] = useState("Ну ты и {говно} кодер {вот}");
-    const [symbol, setSymbol] = useState(introData[0]?.symbol ?? "");
+    const [message, setMessage] = useState("РАЗВОРАЧИВАЕМ СПИСОК БУСТЕРОВ");
+    const [symbol, setSymbol] = useState(".");
+    const [progress, setProgress] = useState<number | null>(null);
 
     useEffect(() => {
         const mainLoop = setInterval(async () => {
@@ -106,13 +107,14 @@ export function IntroOverlay({ introData }: IntroOverlayProps) {
             await sleep(500);
             setPosition(0);
             setSymbol(currEntry.symbol);
+            setProgress(currEntry.progress);
             if (currEntry.preMessage) {
                 setMessage(currEntry.preMessage);
                 await sleep(3000);
                 setSymbol("");
             }
             setMessage(currEntry.mainMessage);
-        }, 19000);
+        }, 20000);
 
         return () => {
             clearInterval(mainLoop);
@@ -140,8 +142,50 @@ export function IntroOverlay({ introData }: IntroOverlayProps) {
                 ),
             )}
             <RepeatedSymbol symbol={symbol} />
+            {progress && <Progress progress={progress} />}
         </h1>
     );
+}
+
+function increaseProgress(
+    currProgress: number,
+    step: number,
+    max: number,
+    progressLoop: ReturnType<typeof setInterval>,
+): number {
+    step = currProgress < 100 ? Math.min(step, 10) : step;
+    const next = currProgress + step;
+
+    if (next > max) {
+        clearInterval(progressLoop);
+        return max;
+    }
+
+    return next;
+}
+
+function Progress({
+    progress,
+    progressInterval = 900,
+}: {
+    progress: number;
+    progressInterval?: number;
+}) {
+    const [currProgress, setCurrProgress] = useState(0);
+    useEffect(() => {
+        const step = Math.floor(progress / (progress <= 100 ? 20 : 10));
+        const progressLoop = setInterval(() => {
+            setCurrProgress((prev) =>
+                increaseProgress(prev, step, progress, progressLoop),
+            );
+        }, progressInterval);
+
+        return () => {
+            clearInterval(progressLoop);
+        };
+    }, [progress, progressInterval]);
+
+    return <span>{currProgress}</span>;
 }
 
 function parseMessage(message: string): { word: string; isEffect: boolean }[] {
