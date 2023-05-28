@@ -18,6 +18,25 @@ module.exports = {
                 queue: "3fr 1fr",
                 mobileQueue: "1.5fr 1.5fr 1fr",
             },
+            animation: {
+                af: "af infinite 4s linear",
+            },
+            keyframes: {
+                af: {
+                    "0%, 100%": {
+                        "text-shadow": "0 0 12px white",
+                    },
+                    "25%": {
+                        "text-shadow": "0 0 6px white",
+                    },
+                    "50%": {
+                        "text-shadow": "0 0 9px white",
+                    },
+                    "75%": {
+                        "text-shadow": "0 0 0px white",
+                    },
+                },
+            },
         },
     },
     plugins: [],

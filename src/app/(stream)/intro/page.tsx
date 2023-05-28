@@ -1,3 +1,7 @@
-export default function Intro() {
-    return <h1 className="bg-slate-700">Kek</h1>;
+import { IntroOverlay } from "~/components/client/intro/IntroOverlay";
+import { serverAPI } from "~/server/api";
+
+export default async function Intro() {
+    const introData = await serverAPI.intro.getAll.fetch();
+    return <IntroOverlay introData={introData} />;
 }
