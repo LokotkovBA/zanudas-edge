@@ -85,7 +85,7 @@ export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
 
     return (
         <>
-            <ul className="flex flex-col gap-4 p-2">
+            <ul className="flex flex-col gap-2 p-2">
                 {overlayEntries.map(
                     ({
                         id,
@@ -119,7 +119,7 @@ export function DynamicOverlay({ maxDisplay }: { maxDisplay: number }) {
 function NotEndOfList() {
     return (
         <li className="flex justify-center">
-            <ChevronDown size="2rem" className="fill-sky-400" />
+            <ChevronDown size="2rem" className="animate-bounce fill-sky-400" />
         </li>
     );
 }
@@ -152,7 +152,7 @@ function OverlayEntry({
     return (
         <li
             className={clsx(
-                "grid grid-cols-10 items-start justify-start gap-4",
+                "mt-1 grid grid-cols-10 items-start justify-start gap-4",
                 {
                     "text-4xl": isCurrent,
                 },
