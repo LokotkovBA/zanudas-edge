@@ -10,6 +10,7 @@ module.exports = {
         extend: {
             fontFamily: {
                 sans: ["var(--font-inter)"],
+                comic: ["var(--font-comic)"],
             },
             gridTemplateColumns: {
                 desktopEdit: ".5fr 1fr",

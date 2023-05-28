@@ -22,9 +22,9 @@ export default function AdminLinks() {
             <li>
                 <Link
                     className={clsx(linkStyles, {
-                        "text-sky-400": pathname === "/intro",
+                        "text-sky-400": pathname === "/intro/edit",
                     })}
-                    href="/intro"
+                    href="/intro/edit"
                 >
                     Intro
                 </Link>
