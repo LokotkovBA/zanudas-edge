@@ -1,16 +1,12 @@
 import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { createTRPCRouter, privateProcedure } from "../trpc";
+import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { isAdmin } from "~/utils/privileges";
 import { insertIntroSchema, intro } from "~/drizzle/schemas/intro";
 import { eq } from "drizzle-orm";
 
 export const introRouter = createTRPCRouter({
-    getAll: privateProcedure.query(({ ctx }) => {
-        if (!isAdmin(ctx.user.privileges)) {
-            throw new TRPCError({ code: "FORBIDDEN" });
-        }
-
+    getAll: publicProcedure.query(({ ctx }) => {
         return ctx.drizzle.select().from(intro).all();
     }),
 
