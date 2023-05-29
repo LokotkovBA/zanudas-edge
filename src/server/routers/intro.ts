@@ -3,11 +3,11 @@ import { TRPCError } from "@trpc/server";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { isAdmin } from "~/utils/privileges";
 import { insertIntroSchema, intro } from "~/drizzle/schemas/intro";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export const introRouter = createTRPCRouter({
     getAll: publicProcedure.query(({ ctx }) => {
-        return ctx.drizzle.select().from(intro).all();
+        return ctx.drizzle.select().from(intro).orderBy(desc(intro.id)).all();
     }),
 
     delete: privateProcedure
