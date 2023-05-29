@@ -9,7 +9,7 @@ const comicSans = localFont({
 export default function OverlayLayout({ children }: PropsWithChildren) {
     return (
         <main
-            className={`${comicSans.className} flex justify-center bg-indigo-500 p-6 text-5xl`}
+            className={`${comicSans.className} flex justify-center bg-indigo-500 py-6 text-5xl`}
         >
             {children}
         </main>

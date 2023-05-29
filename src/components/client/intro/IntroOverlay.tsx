@@ -104,13 +104,13 @@ export function IntroOverlay({ introData }: IntroOverlayProps) {
             }
 
             buffArrayRef.current.push(currEntry);
-            await sleep(500);
+            await sleep(50);
             setPosition(0);
             setSymbol(currEntry.symbol);
             setProgress(currEntry.progress);
             if (currEntry.preMessage) {
                 setMessage(currEntry.preMessage);
-                await sleep(3000);
+                await sleep(10000);
                 setSymbol("");
             }
             setMessage(currEntry.mainMessage);
@@ -185,7 +185,7 @@ function Progress({
         };
     }, [progress, progressInterval]);
 
-    return <span>{currProgress}</span>;
+    return <span>{" " + currProgress}</span>;
 }
 
 function parseMessage(message: string): { word: string; isEffect: boolean }[] {
