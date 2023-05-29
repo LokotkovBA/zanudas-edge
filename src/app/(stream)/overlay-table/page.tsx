@@ -3,7 +3,6 @@ import { serverAPI } from "~/server/api";
 import { PlayIcon } from "~/svg/PlayIcon";
 
 export const runtime = "edge";
-export const preferredRegion = "arn1";
 
 export default async function Overlay() {
     const data = await serverAPI.queue.getFiltered.fetch();

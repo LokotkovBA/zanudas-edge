@@ -18,6 +18,8 @@ export const metadata = {
     },
 };
 
+export const preferredRegion = ["arn1", "hnd1", "sfo1"];
+
 export default async function RootLayout({ children }: PropsWithChildren) {
     return (
         <html lang="en" className={`${inter.className} scroll-smooth`}>

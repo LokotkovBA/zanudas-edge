@@ -3,7 +3,6 @@ import { DynamicOverlay } from "~/components/client/overlay/DynamicOverlay";
 import { serverAPI } from "~/server/api";
 
 export const runtime = "edge";
-export const preferredRegion = "arn1";
 
 export default async function Overlay({
     searchParams,

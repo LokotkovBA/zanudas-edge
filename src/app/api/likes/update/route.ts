@@ -7,7 +7,6 @@ import { likes, queue } from "~/drizzle/schemas/queue";
 const updateLikesSchema = z.array(z.number());
 
 export const runtime = "edge";
-export const preferredRegion = "arn1";
 
 export async function PUT(request: Request) {
     const toUpdate = updateLikesSchema.safeParse(await request.json());

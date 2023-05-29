@@ -14,7 +14,6 @@ import DonationAlertsIcon from "~/svg/DonationAlertsIcon";
 import { isMod } from "~/utils/privileges";
 
 export const runtime = "edge";
-export const preferredRegion = "arn1";
 
 export async function generateMetadata(): Promise<Metadata> {
     const queueData = await serverAPI.queue.getFiltered.fetch();

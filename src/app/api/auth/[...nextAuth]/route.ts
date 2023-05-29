@@ -4,7 +4,6 @@ import { SolidAuthHandler } from "~/auth/server";
 import { env } from "~/env.mjs";
 
 export const runtime = "edge";
-export const preferredRegion = "arn1";
 
 async function handler(request: NextRequest) {
     const { prefix = "/api/auth", ...authOptions } = authConfig;

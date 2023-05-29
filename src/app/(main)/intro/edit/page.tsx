@@ -7,7 +7,6 @@ import { serverAPI } from "~/server/api";
 import { isAdmin } from "~/utils/privileges";
 
 export const runtime = "edge";
-export const preferredRegion = "arn1";
 
 export const metadata = {
     title: "Intro edit",
