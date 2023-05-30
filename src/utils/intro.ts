@@ -42,7 +42,7 @@ function parseMessage(message: string): MessageFX[] {
 }
 
 const initialSplitMessage = [
-    { stringPart: "РАЗВРАЧИВАЕМ СПИСОК БУСТЕРОВ", isEffect: false },
+    { stringPart: "РАЗВОРАЧИВАЕМ СПИСОК БУСТЕРОВ", isEffect: false },
 ];
 
 function messageReducer(oldMessage: MessageFX[], newMessage: string) {
