@@ -25,6 +25,7 @@ export function SearchableUsersList() {
     return (
         <>
             <input
+                name="user-search"
                 className={searchBarStyles}
                 placeholder="Search"
                 onChange={(event) =>

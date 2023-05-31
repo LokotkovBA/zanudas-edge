@@ -46,6 +46,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
         <>
             <header className="mt-2 flex flex-col gap-2 p-2">
                 <input
+                    name="songList-search"
                     className={searchBarStyles}
                     value={searchValue}
                     onChange={onSearchChange}

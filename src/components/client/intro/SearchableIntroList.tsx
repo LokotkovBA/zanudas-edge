@@ -25,6 +25,7 @@ export function SearchableIntroList() {
         <>
             <IntroAddButton />
             <input
+                name="intro-message-search"
                 placeholder="Search message"
                 className={searchBarStyles}
                 type="text"
@@ -34,6 +35,7 @@ export function SearchableIntroList() {
                 }
             />
             <input
+                name="intro-symbol-search"
                 placeholder="Search symbol"
                 className={searchBarStyles}
                 type="text"
