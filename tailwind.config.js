@@ -25,6 +25,7 @@ module.exports = {
         "xl:row-start-[10]",
         "xl:row-start-[11]",
         "xl:row-start-[12]",
+        "xl:row-start-[13]",
         "xl:row-end-[4]",
         "xl:row-end-[5]",
         "xl:row-end-[6]",
@@ -44,6 +45,7 @@ module.exports = {
                 comic: ["var(--font-comic)"],
             },
             gridTemplateColumns: {
+                schedule: ".2fr repeat(7, 1fr) .1fr",
                 desktopEdit: ".5fr 1fr",
                 mobileEdit: ".2fr 1fr",
                 queue: "3fr 1fr",

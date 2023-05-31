@@ -1,11 +1,11 @@
 "use client";
 
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
 import { isAdmin } from "~/utils/privileges";
 import { ModalChangeEvent } from "./ModalChangeEvent";
-import { type EventEntry } from "~/server/routers/events";
+import type { EventEntry, EventModifier } from "~/utils/types/schedule";
 
 export function WeekTable() {
     const [hourArray, setHourArray] = useState<number[]>([]);
@@ -16,7 +16,7 @@ export function WeekTable() {
         endDate: todayRef.current,
         description: "",
         title: "",
-        modifier: "Game",
+        modifier: "Variety",
     });
 
     const firstTableHourRef = useRef(
@@ -38,22 +38,40 @@ export function WeekTable() {
 
     return (
         <>
-            <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-8">
-                {tableHeader.map((header) => (
+            <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-schedule xl:gap-x-4  xl:gap-y-0">
+                {days.map((header, index) => (
                     <h3
-                        className="hidden justify-center xl:col-auto xl:flex"
+                        className={`row-start-1 hidden justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
+                            index + 2
+                        }]`}
                         key={header}
                     >
                         {header}
                     </h3>
                 ))}
-                {hourArray.map((hour) => (
-                    <h3
-                        className="col-start-1 hidden self-center justify-self-end xl:block"
-                        key={hour}
-                    >
-                        {hour}:00
-                    </h3>
+                <div className="z-[-1] col-span-9 col-start-1 row-start-1 hidden rounded-t bg-sky-950 xl:block" />
+                {hourArray.map((hour, index, array) => (
+                    <React.Fragment key={index}>
+                        <h3
+                            className={`p-2 xl:row-start-[${
+                                index + 2
+                            }] col-start-1 hidden self-center justify-self-end xl:block`}
+                        >
+                            {hour}:00
+                        </h3>
+                        <div
+                            className={clsx(
+                                `z-[-1] col-span-9 col-start-1 hidden xl:block xl:row-start-[${
+                                    index + 2
+                                }]`,
+                                {
+                                    "bg-sky-950": index % 2 === 1,
+                                    "bg-sky-900": index % 2 === 0,
+                                    "rounded-b": index + 1 === array.length,
+                                },
+                            )}
+                        />
+                    </React.Fragment>
                 ))}
                 {eventsData?.map((event) => (
                     <Event
@@ -97,7 +115,7 @@ type EventProps = {
     startHour: number;
     endHour: number;
     title: string;
-    modifier?: "Music" | "Moroshka" | "Game" | "Free" | string;
+    modifier: EventModifier;
 };
 function Event({
     onClick,
@@ -115,16 +133,20 @@ function Event({
         <section
             onClick={onClick}
             className={clsx(
-                `col-star1685864661000t-1 rounded-sm p-6 row-span-[${
+                `col-start-1 rounded-sm p-6 xl:py-0 row-span-[${
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstTableHour + 2
                 }] xl:row-end-[${endHour - firstTableHour + 2}]`,
                 {
-                    "bg-sky-700": modifier === "Game",
-                    "bg-fuchsia-700": modifier === "Music",
-                    "bg-orange-700": modifier === "Moroshka",
-                    "bg-green-700": modifier === "Free",
+                    "border-4 border-green-700 bg-green-800":
+                        modifier === "Variety",
+                    "border-4 border-sky-700 bg-sky-800": modifier === "VKPlay",
+                    "border-4 border-fuchsia-700 bg-fuchsia-800":
+                        modifier === "Music",
+                    "border-4 border-orange-700 bg-orange-800":
+                        modifier === "Moroshka",
+                    "border-4 border-gray-700 bg-gray-800": modifier === "Free",
                     "cursor-pointer transition-all hover:scale-110": editable,
                 },
             )}
@@ -153,16 +175,6 @@ const days = [
     "Saturday",
     "Sunday",
 ];
-const tableHeader = [
-    "",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-] as const;
 
 export function generateHourArray(startHour = 10, size = 13) {
     const hourArray: number[] = new Array(size);

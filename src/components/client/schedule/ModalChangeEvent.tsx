@@ -15,7 +15,8 @@ import { Calendar } from "./Calendar";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { Cross } from "~/svg/Cross";
-import { type EventEntry } from "~/server/routers/events";
+import { type EventEntry } from "~/utils/types/schedule";
+import { modifierArray } from "~/utils/schedule";
 
 type ModalAddProps = {
     event: EventEntry;
@@ -133,12 +134,12 @@ export function ModalChangeEvent({
                     >
                         Close
                     </button>
-                    <label
+                    <h2
                         onClick={() => calendarRef.current?.showModal()}
                         className="mr-auto cursor-pointer"
                     >
                         {startDate.toDateString()}
-                    </label>
+                    </h2>
                     <button
                         className={buttonStyles}
                         onClick={() => calendarRef.current?.showModal()}
@@ -160,15 +161,16 @@ export function ModalChangeEvent({
                     onSubmit={onSubmit}
                     className="grid-cols-songEdit grid items-center gap-2"
                 >
-                    <label htmlFor="title-starthour">Range</label>
+                    <label htmlFor="range-change">Range</label>
                     <div className="flex justify-around">
                         <select
+                            id="range-change"
                             value={startHourValue}
                             onChange={(event) =>
                                 setStartHourValue(event.target.value)
                             }
                             className="border border-slate-400 bg-slate-950 p-2"
-                            id="select-starthour"
+                            name="startHour-change"
                         >
                             {hourArrayRef.current.map((hour) => (
                                 <option key={hour} value={hour}>
@@ -182,7 +184,7 @@ export function ModalChangeEvent({
                                 setEndHourValue(event.target.value)
                             }
                             className="border border-slate-400 bg-slate-950 p-2"
-                            id="select-endhour"
+                            name="endHour-change"
                         >
                             {hourArrayRef.current.map((hour) => (
                                 <option key={hour} value={hour}>
@@ -191,8 +193,9 @@ export function ModalChangeEvent({
                             ))}
                         </select>
                     </div>
-                    <label htmlFor="modifier-add">Modifier</label>
+                    <label htmlFor="modifier-change">Modifier</label>
                     <select
+                        id="modifier-change"
                         value={modifier}
                         onChange={onSelectChange}
                         name="modifier"
@@ -204,21 +207,21 @@ export function ModalChangeEvent({
                             </option>
                         ))}
                     </select>
-                    <label htmlFor="title-add">Title</label>
+                    <label htmlFor="title-change">Title</label>
                     <input
                         onChange={onInputChange}
                         value={title}
                         name="title"
-                        id="title-add"
+                        id="title-change"
                         className={searchBarStyles}
                         type="text"
                     />
-                    <label htmlFor="description-add">Description</label>
+                    <label htmlFor="description-change">Description</label>
                     <input
                         onChange={onInputChange}
                         value={description}
                         name="description"
-                        id="description-add"
+                        id="description-change"
                         className={searchBarStyles}
                         type="text"
                     />
@@ -240,5 +243,3 @@ export function ModalChangeEvent({
         </>
     );
 }
-
-const modifierArray = ["Game", "Music", "Free", "Moroshka"];

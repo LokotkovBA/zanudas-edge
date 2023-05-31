@@ -7,6 +7,7 @@ import { buttonStyles } from "~/components/styles/button";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import { Calendar } from "./Calendar";
 import { generateHourArray } from "./WeekTable";
+import { modifierArray } from "~/utils/schedule";
 
 export function AddEventButton() {
     const modalAddRef = useRef<HTMLDialogElement>(null);
@@ -97,12 +98,12 @@ function ModalAdd({ modalRef }: ModalAddProps) {
                     >
                         Close
                     </button>
-                    <label
+                    <h2
                         onClick={() => calendarRef.current?.showModal()}
                         className="mr-auto cursor-pointer"
                     >
                         {selectedDateValue.toDateString()}
-                    </label>
+                    </h2>
                     <button
                         className={buttonStyles}
                         onClick={() => calendarRef.current?.showModal()}
@@ -114,13 +115,13 @@ function ModalAdd({ modalRef }: ModalAddProps) {
                     onSubmit={onSubmit}
                     className="grid-cols-songEdit grid items-center gap-2"
                 >
-                    <label htmlFor="title-add">Range</label>
+                    <label htmlFor="range-add">Range</label>
                     <div className="flex justify-around">
                         <select
                             ref={startHourRef}
                             className="border border-slate-400 bg-slate-950 p-2"
                             defaultValue="10"
-                            id="select-starthour"
+                            id="range-add"
                         >
                             {hourArrayRef.current.map((hour) => (
                                 <option key={hour} value={hour}>
@@ -132,7 +133,7 @@ function ModalAdd({ modalRef }: ModalAddProps) {
                             ref={endHourRef}
                             className="border border-slate-400 bg-slate-950 p-2"
                             defaultValue="11"
-                            id="select-starthour"
+                            id="select-endhour"
                         >
                             {hourArrayRef.current.map((hour) => (
                                 <option key={hour} value={hour}>
@@ -143,6 +144,7 @@ function ModalAdd({ modalRef }: ModalAddProps) {
                     </div>
                     <label htmlFor="modifier-add">Modifier</label>
                     <select
+                        id="modifier-add"
                         ref={modifierRef}
                         className="rounded border border-slate-400 bg-slate-950 p-2"
                     >
@@ -186,5 +188,3 @@ function ModalAdd({ modalRef }: ModalAddProps) {
         </>
     );
 }
-
-const modifierArray = ["Game", "Music", "Free", "Moroshka"];

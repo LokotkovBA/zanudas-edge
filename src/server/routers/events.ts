@@ -5,12 +5,12 @@ import { z } from "zod";
 import { isAdmin } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { type RouterOutput } from "./root";
-
-type ArrayElement<ArrayType extends readonly unknown[]> =
-    ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-
-export type Events = RouterOutput["events"]["getWeek"];
-export type EventEntry = ArrayElement<Events>;
+import { type ArrayElement } from "~/utils/types/helpers";
+import {
+    type EventModifier,
+    isEventModifier,
+    type EventEntry,
+} from "~/utils/types/schedule";
 
 export const eventsRouter = createTRPCRouter({
     getWeek: publicProcedure
@@ -36,29 +36,34 @@ export const eventsRouter = createTRPCRouter({
                     )
                     .orderBy(asc(events.startTimestamp))
                     .all();
-                return eventsData.map(
-                    ({
+
+                const out: EventEntry[] = [];
+                for (const {
+                    id,
+                    startTimestamp,
+                    endTimestamp,
+                    title,
+                    modifier,
+                    description,
+                } of eventsData) {
+                    if (!isEventModifier(modifier)) {
+                        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+                    }
+
+                    const startDate = new Date(startTimestamp);
+                    const endDate = new Date(endTimestamp);
+
+                    out.push({
                         id,
-                        startTimestamp,
-                        endTimestamp,
+                        startDate,
+                        endDate,
                         title,
-                        modifier,
                         description,
-                    }) => {
-                        const startDate = new Date();
-                        startDate.setTime(startTimestamp);
-                        const endDate = new Date();
-                        endDate.setTime(endTimestamp);
-                        return {
-                            id,
-                            startDate,
-                            endDate,
-                            title,
-                            description,
-                            modifier,
-                        };
-                    },
-                );
+                        modifier,
+                    });
+                }
+
+                return out;
             },
         ),
     add: privateProcedure
