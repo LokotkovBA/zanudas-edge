@@ -21,16 +21,14 @@ export const eventsRouter = createTRPCRouter({
                 const eventsData = await ctx.drizzle
                     .select()
                     .from(events)
-                    // .where(
-                    //     and(
-                    //         lte(events.startTimestamp, weekStartTimestamp),
-                    //         gte(events.endTimestamp, weekEndTimestamp),
-                    //     ),
-                    // )
+                    .where(
+                        and(
+                            gte(events.startTimestamp, weekStartTimestamp),
+                            lte(events.endTimestamp, weekEndTimestamp),
+                        ),
+                    )
                     .orderBy(asc(events.startTimestamp))
                     .all();
-                console.log(weekStartTimestamp);
-                console.log(weekEndTimestamp);
                 return eventsData.map(
                     ({
                         id,
