@@ -3,13 +3,26 @@
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
+import { isAdmin } from "~/utils/privileges";
+import { ModalChangeEvent } from "./ModalChangeEvent";
+import { type EventEntry } from "~/server/routers/events";
 
 export function WeekTable() {
     const [hourArray, setHourArray] = useState<number[]>([]);
     const todayRef = useRef(new Date());
+    const [eventEntry, setEventEntry] = useState<EventEntry>({
+        id: -1,
+        startDate: todayRef.current,
+        endDate: todayRef.current,
+        description: "",
+        title: "",
+        modifier: "Game",
+    });
+
     const firstTableHourRef = useRef(
         fromZanudasToLocalHour(10, todayRef.current),
     );
+    const modalChangeRef = useRef<HTMLDialogElement>(null);
     const [weekStartTimestamp, weekEndTimestamp] = getWeekRange(
         todayRef.current,
     );
@@ -20,39 +33,50 @@ export function WeekTable() {
     });
 
     useEffect(() => {
-        setHourArray(generateHourArray(firstTableHourRef.current, 12));
+        setHourArray(generateHourArray(firstTableHourRef.current, 12)); // HACK: this fixes the hydration error if the client's timezone is different from the server's
     }, []);
 
     return (
-        <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-8">
-            {tableHeader.map((header) => (
-                <h3
-                    className="hidden justify-center xl:col-auto xl:flex"
-                    key={header}
-                >
-                    {header}
-                </h3>
-            ))}
-            {hourArray.map((hour) => (
-                <h3
-                    className="col-start-1 hidden self-center justify-self-end xl:block"
-                    key={hour}
-                >
-                    {hour}:00
-                </h3>
-            ))}
-            {eventsData?.map((event) => (
-                <Event
-                    key={event.id}
-                    firstTableHour={firstTableHourRef.current}
-                    day={getDay(event.startDate)}
-                    startHour={event.startDate.getHours()}
-                    endHour={event.endDate.getHours()}
-                    title={event.title}
-                    modifier={event.modifier}
-                />
-            ))}
-        </section>
+        <>
+            <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-8">
+                {tableHeader.map((header) => (
+                    <h3
+                        className="hidden justify-center xl:col-auto xl:flex"
+                        key={header}
+                    >
+                        {header}
+                    </h3>
+                ))}
+                {hourArray.map((hour) => (
+                    <h3
+                        className="col-start-1 hidden self-center justify-self-end xl:block"
+                        key={hour}
+                    >
+                        {hour}:00
+                    </h3>
+                ))}
+                {eventsData?.map((event) => (
+                    <Event
+                        onClick={() => {
+                            modalChangeRef.current?.showModal();
+                            setEventEntry(event);
+                        }}
+                        key={event.id}
+                        firstTableHour={firstTableHourRef.current}
+                        day={getDay(event.startDate)}
+                        startHour={event.startDate.getHours()}
+                        endHour={event.endDate.getHours()}
+                        title={event.title}
+                        modifier={event.modifier}
+                    />
+                ))}
+            </section>
+            <ModalChangeEvent
+                event={eventEntry}
+                setEvent={setEventEntry}
+                modalRef={modalChangeRef}
+            />
+        </>
     );
 }
 
@@ -67,6 +91,7 @@ function fromZanudasToLocalHour(hour: number, date: Date) {
 }
 
 type EventProps = {
+    onClick: () => void;
     firstTableHour: number;
     day: number;
     startHour: number;
@@ -75,6 +100,7 @@ type EventProps = {
     modifier?: "Music" | "Moroshka" | "Game" | "Free" | string;
 };
 function Event({
+    onClick,
     firstTableHour,
     day,
     startHour,
@@ -82,8 +108,12 @@ function Event({
     title,
     modifier,
 }: EventProps) {
+    const { data: userData } = clientAPI.getAuth.useQuery();
+    const editable = isAdmin(userData?.privileges);
+
     return (
         <section
+            onClick={onClick}
             className={clsx(
                 `col-star1685864661000t-1 rounded-sm p-6 row-span-[${
                     endHour - startHour + 1
@@ -95,6 +125,7 @@ function Event({
                     "bg-fuchsia-700": modifier === "Music",
                     "bg-orange-700": modifier === "Moroshka",
                     "bg-green-700": modifier === "Free",
+                    "cursor-pointer transition-all hover:scale-110": editable,
                 },
             )}
         >
