@@ -8,8 +8,10 @@ import { queueRouter } from "./queue";
 import { songsRouter } from "./songs";
 import { usersRouter } from "./users";
 import { introRouter } from "./intro";
+import { eventsRouter } from "./events";
 
 export const appRouter = createTRPCRouter({
+    events: eventsRouter,
     intro: introRouter,
     users: usersRouter,
     songlist: songsRouter,
