@@ -75,15 +75,17 @@ export function Schedule({
     useEffect(() => {
         selectedDateRef.current = new Date();
         const weekRange = getTimeRange(selectedDateRef.current);
-        // setWeekRangeString(`${weekRange[0]}/${weekRange[1]}`);
+
         changeRange({
             type: "NewRange",
             payload: weekRange,
         });
+
         const localFirstHour = fromZanudasToLocalHour(
             10,
             selectedDateRef.current,
         );
+
         setFirstScheduleHour(localFirstHour);
         setHourArray(generateHourArray(localFirstHour, 12));
     }, []);

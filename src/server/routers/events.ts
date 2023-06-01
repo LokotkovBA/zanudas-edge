@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, asc, eq, gte, lte } from "drizzle-orm";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { events, insertEventsSchema } from "~/drizzle/schemas/events";
 import { z } from "zod";
@@ -74,6 +74,7 @@ export async function getEventEntries(
                 lte(events.endTimestamp, weekEndTimestamp),
             ),
         )
+        .orderBy(asc(events.startTimestamp))
         .all();
     const out: EventEntry[] = [];
     for (const {
