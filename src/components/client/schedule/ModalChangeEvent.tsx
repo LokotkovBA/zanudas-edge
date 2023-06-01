@@ -17,6 +17,7 @@ import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { Cross } from "~/svg/Cross";
 import { type EventEntry } from "~/utils/types/schedule";
 import { modifierArray } from "~/utils/schedule";
+import { inputStyles } from "~/components/styles/input";
 
 type ModalAddProps = {
     event: EventEntry;
@@ -93,14 +94,11 @@ export function ModalChangeEvent({
         });
     }
 
-    function onInputChange(event: ChangeEvent<HTMLInputElement>) {
-        setEvent((prev) => ({
-            ...prev,
-            [event.target.name]: event.target.value,
-        }));
-    }
-
-    function onSelectChange(event: ChangeEvent<HTMLSelectElement>) {
+    function onChange(
+        event: ChangeEvent<
+            HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >,
+    ) {
         setEvent((prev) => ({
             ...prev,
             [event.target.name]: event.target.value,
@@ -183,7 +181,7 @@ export function ModalChangeEvent({
                     <select
                         id="modifier-change"
                         value={modifier}
-                        onChange={onSelectChange}
+                        onChange={onChange}
                         name="modifier"
                         className="rounded border border-slate-400 bg-slate-950 p-2"
                     >
@@ -194,17 +192,16 @@ export function ModalChangeEvent({
                         ))}
                     </select>
                     <label htmlFor="title-change">Title</label>
-                    <input
-                        onChange={onInputChange}
+                    <textarea
+                        onChange={onChange}
                         value={title}
                         name="title"
                         id="title-change"
-                        className={searchBarStyles}
-                        type="text"
+                        className={inputStyles}
                     />
                     <label htmlFor="description-change">Description</label>
                     <input
-                        onChange={onInputChange}
+                        onChange={onChange}
                         value={description}
                         name="description"
                         id="description-change"

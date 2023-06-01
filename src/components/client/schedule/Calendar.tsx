@@ -23,7 +23,7 @@ export function Calendar({
     return (
         <dialog
             ref={modalRef}
-            className="w-64 rounded border border-slate-400 bg-slate-950 p-4 text-xs text-slate-50"
+            className="w-64 rounded border border-slate-400 bg-slate-900 p-4 text-xs text-slate-50"
         >
             {modeSelect === 0 && (
                 <DatePicker

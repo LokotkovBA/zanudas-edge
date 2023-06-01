@@ -155,12 +155,11 @@ function ModalAdd({ modalRef }: ModalAddProps) {
                         ))}
                     </select>
                     <label htmlFor="title-add">Title</label>
-                    <input
+                    <textarea
                         onChange={(event) => setTitleValue(event.target.value)}
                         value={titleValue}
                         id="title-add"
                         className={searchBarStyles}
-                        type="text"
                     />
                     <label htmlFor="description-add">Description</label>
                     <input
