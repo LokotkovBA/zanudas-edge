@@ -21,11 +21,11 @@ import { modifierArray } from "~/utils/schedule";
 type ModalAddProps = {
     event: EventEntry;
     setEvent: Dispatch<SetStateAction<EventEntry>>;
-    modalRef: React.RefObject<HTMLDialogElement>;
+    modalChangeRef: React.RefObject<HTMLDialogElement>;
 };
 
 export function ModalChangeEvent({
-    modalRef,
+    modalChangeRef,
     setEvent,
     event: { id, title, description, modifier, startDate, endDate },
 }: ModalAddProps) {
@@ -43,6 +43,7 @@ export function ModalChangeEvent({
     }, [endDate]);
 
     const hourArrayRef = useRef(generateHourArray());
+    const modalDeleteRef = useRef<HTMLDialogElement>(null);
 
     const { mutate: changeEvent } = clientAPI.events.change.useMutation({
         onMutate() {
@@ -51,22 +52,7 @@ export function ModalChangeEvent({
         onSuccess() {
             toast.dismiss();
             toast.success("Changed");
-            modalRef.current?.close();
-        },
-        onError(error) {
-            toast.dismiss();
-            toast.error(`Error: ${error.message}`);
-        },
-    });
-
-    const { mutate: deleteEvent } = clientAPI.events.delete.useMutation({
-        onMutate() {
-            toast.loading("Deleting");
-        },
-        onSuccess() {
-            toast.dismiss();
-            toast.success("Deleted");
-            modalRef.current?.close();
+            modalChangeRef.current?.close();
         },
         onError(error) {
             toast.dismiss();
@@ -124,12 +110,12 @@ export function ModalChangeEvent({
     return (
         <>
             <dialog
-                ref={modalRef}
+                ref={modalChangeRef}
                 className="border border-slate-500 bg-slate-900 text-slate-50"
             >
                 <section className="mb-2 flex items-center gap-2">
                     <button
-                        onClick={() => modalRef.current?.close()}
+                        onClick={() => modalChangeRef.current?.close()}
                         className={`${buttonStyles} mr-auto`}
                     >
                         Close
@@ -147,7 +133,7 @@ export function ModalChangeEvent({
                         Set date
                     </button>
                     <button
-                        onClick={() => deleteEvent(id)}
+                        onClick={() => modalDeleteRef.current?.showModal()}
                         className={deleteButtonStyles}
                     >
                         <Cross
@@ -240,6 +226,67 @@ export function ModalChangeEvent({
                     }
                 />
             </dialog>
+            <ModalDelete
+                modalChangeRef={modalChangeRef}
+                modalDeleteRef={modalDeleteRef}
+                id={id}
+                title={title}
+            />
         </>
+    );
+}
+
+type ModalDeleteProps = {
+    id: number;
+    title: string;
+    modalDeleteRef: React.RefObject<HTMLDialogElement>;
+    modalChangeRef: React.RefObject<HTMLDialogElement>;
+};
+
+export function ModalDelete({
+    id,
+    title,
+    modalDeleteRef,
+    modalChangeRef,
+}: ModalDeleteProps) {
+    const { mutate: deleteEvent } = clientAPI.events.delete.useMutation({
+        onMutate() {
+            toast.loading("Deleting");
+        },
+        onSuccess() {
+            toast.dismiss();
+            toast.success("Deleted");
+            modalChangeRef.current?.close();
+            modalDeleteRef.current?.close();
+        },
+        onError(error) {
+            toast.dismiss();
+            toast.error(`Error: ${error.message}`);
+        },
+    });
+
+    return (
+        <dialog
+            ref={modalDeleteRef}
+            className="border border-slate-500 bg-slate-900 text-slate-50"
+        >
+            <section className="grid grid-cols-2 gap-1 ">
+                <h2 className="col-start-1 col-end-3">
+                    Are you sure you want to delete {title}?
+                </h2>
+                <button
+                    className={buttonStyles}
+                    onClick={() => deleteEvent(id)}
+                >
+                    Yes!
+                </button>
+                <button
+                    className="rounded border-2 border-transparent bg-slate-600 p-1 hover:border-slate-300"
+                    onClick={() => modalDeleteRef.current?.close()}
+                >
+                    No!✋
+                </button>
+            </section>
+        </dialog>
     );
 }

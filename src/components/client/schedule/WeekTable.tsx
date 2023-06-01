@@ -36,6 +36,9 @@ export function WeekTable() {
         setHourArray(generateHourArray(firstTableHourRef.current, 12)); // HACK: this fixes the hydration error if the client's timezone is different from the server's
     }, []);
 
+    const { data: userData } = clientAPI.getAuth.useQuery();
+    const editable = isAdmin(userData?.privileges);
+
     return (
         <>
             <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-schedule xl:gap-x-4  xl:gap-y-0">
@@ -76,6 +79,9 @@ export function WeekTable() {
                 {eventsData?.map((event) => (
                     <Event
                         onClick={() => {
+                            if (!editable) {
+                                return;
+                            }
                             modalChangeRef.current?.showModal();
                             setEventEntry(event);
                         }}
@@ -89,11 +95,13 @@ export function WeekTable() {
                     />
                 ))}
             </section>
-            <ModalChangeEvent
-                event={eventEntry}
-                setEvent={setEventEntry}
-                modalRef={modalChangeRef}
-            />
+            {editable && (
+                <ModalChangeEvent
+                    event={eventEntry}
+                    setEvent={setEventEntry}
+                    modalChangeRef={modalChangeRef}
+                />
+            )}
         </>
     );
 }
@@ -126,9 +134,6 @@ function Event({
     title,
     modifier,
 }: EventProps) {
-    const { data: userData } = clientAPI.getAuth.useQuery();
-    const editable = isAdmin(userData?.privileges);
-
     return (
         <section
             onClick={onClick}
@@ -137,7 +142,9 @@ function Event({
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstTableHour + 2
-                }] xl:row-end-[${endHour - firstTableHour + 2}]`,
+                }] xl:row-end-[${
+                    endHour - firstTableHour + 2
+                }] cursor-pointer transition-all hover:scale-110`,
                 {
                     "border-4 border-green-700 bg-green-800":
                         modifier === "Variety",
@@ -147,7 +154,6 @@ function Event({
                     "border-4 border-orange-700 bg-orange-800":
                         modifier === "Moroshka",
                     "border-4 border-gray-700 bg-gray-800": modifier === "Free",
-                    "cursor-pointer transition-all hover:scale-110": editable,
                 },
             )}
         >

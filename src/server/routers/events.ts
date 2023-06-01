@@ -4,13 +4,7 @@ import { events, insertEventsSchema } from "~/drizzle/schemas/events";
 import { z } from "zod";
 import { isAdmin } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
-import { type RouterOutput } from "./root";
-import { type ArrayElement } from "~/utils/types/helpers";
-import {
-    type EventModifier,
-    isEventModifier,
-    type EventEntry,
-} from "~/utils/types/schedule";
+import { isEventModifier, type EventEntry } from "~/utils/types/schedule";
 
 export const eventsRouter = createTRPCRouter({
     getWeek: publicProcedure

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import type { insertSongsSchema } from "./schemas/songlist";
 import type { selectLikesSchema, selectQueueSchema } from "./schemas/queue";
-import type { selectEventsSchema } from "./schemas/events";
 
 export type Song = z.infer<typeof insertSongsSchema>;
 export type QueueEntry = z.infer<typeof selectQueueSchema>;
