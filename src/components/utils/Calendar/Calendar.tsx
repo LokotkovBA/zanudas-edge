@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { useCalendar } from "./useCalendar";
 import { MonthPicker } from "./MonthPicker";
 import { DatePicker } from "./DatePicker";
 import { YearPicker } from "./YearPicker";
+import { useCalendar } from "./hooks/useCalendar";
 
 type CalendarProps = {
     defaultMode?: number;
@@ -11,7 +11,7 @@ type CalendarProps = {
     modalRef: React.RefObject<HTMLDialogElement>;
 };
 
-export function Calendar({
+export default function Calendar({
     modalRef,
     selectedDate,
     dateSetter,

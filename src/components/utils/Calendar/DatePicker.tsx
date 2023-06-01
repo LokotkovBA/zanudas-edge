@@ -1,8 +1,8 @@
 import { ChevronLeft } from "~/svg/ChevronLeft";
 import { ChevronRight } from "~/svg/ChevronRight";
-import { daysOfWeek, months } from "./utils";
 import clsx from "clsx";
-import { type useCalendar } from "./useCalendar";
+import { type useCalendar } from "./hooks/useCalendar";
+import { daysOfWeek, months } from "~/utils/calendar";
 
 type DatePickerProps = {
     selectedDate: Date;
@@ -11,27 +11,6 @@ type DatePickerProps = {
     changeMode: React.Dispatch<React.SetStateAction<number>>;
     modalRef: React.RefObject<HTMLDialogElement>;
 };
-const arrowStyles =
-    "hover:bg-neutral-800 rounded-lg duration-200 hover:scale-125";
-const headingTextStyles =
-    "text-xl focus:underline hover:text-sky-500 hover:cursor-pointer";
-
-function dateStyles(
-    isToday: boolean,
-    isUserSelected: boolean,
-    isSelectedMonth: boolean,
-) {
-    const isTodayNotSelected = !isUserSelected && isToday;
-    return clsx(
-        "cursor-pointer border-2 duration-200 hover:scale-125 hover:font-bold hover:underline p-1.5 leading-none w-8 text-center",
-        {
-            "text-sky-500 font-bold": isTodayNotSelected,
-            "text-white bg-sky-700 border-sky-500 rounded": isUserSelected,
-            "border-transparent": !isUserSelected,
-            "text-neutral-400": !isSelectedMonth && !isTodayNotSelected,
-        },
-    );
-}
 
 export function DatePicker({
     modalRef,
@@ -69,25 +48,25 @@ export function DatePicker({
             <h3 className="mb-2 flex gap-2">
                 <button
                     onClick={() => incrementMonth(-1)}
-                    className={`mr-auto ${arrowStyles}`}
+                    className="mr-auto rounded-lg duration-200 hover:scale-125 hover:bg-neutral-800"
                 >
                     <ChevronLeft size="1.5rem" className="fill-neutral-50" />
                 </button>
                 <button
                     onClick={() => changeMode(1)}
-                    className={`font-medium ${headingTextStyles}`}
+                    className="text-xl font-medium hover:cursor-pointer hover:text-sky-500 focus:underline"
                 >
                     {months[selectedMonth]}
                 </button>
                 <button
                     onClick={() => changeMode(2)}
-                    className={`font-light text-neutral-400 ${headingTextStyles}`}
+                    className="text-xl font-light text-neutral-400 hover:cursor-pointer hover:text-sky-500 focus:underline"
                 >
                     {selectedYear}
                 </button>
                 <button
                     onClick={() => incrementMonth(1)}
-                    className={`ml-auto ${arrowStyles}`}
+                    className="ml-auto rounded-lg duration-200 hover:scale-125 hover:bg-neutral-800"
                 >
                     <ChevronRight size="1.5rem" className="fill-neutral-50" />
                 </button>
@@ -109,10 +88,21 @@ export function DatePicker({
                     return (
                         <button
                             onClick={() => onDateClick(index)}
-                            className={dateStyles(
-                                index === todayIndex,
-                                index === userSelectedDateIndex,
-                                arrayOfMonths[index] === 0,
+                            className={clsx(
+                                "w-8 cursor-pointer border-2 p-1.5 text-center leading-none duration-200 hover:scale-125 hover:font-bold hover:underline",
+                                {
+                                    "font-bold text-sky-500":
+                                        index === todayIndex &&
+                                        index !== userSelectedDateIndex,
+                                    "rounded border-sky-500 bg-sky-700 text-white":
+                                        index === userSelectedDateIndex,
+                                    "border-transparent":
+                                        index !== userSelectedDateIndex,
+                                    "text-neutral-400":
+                                        arrayOfMonths[index] !== 0 &&
+                                        (index !== todayIndex ||
+                                            index === userSelectedDateIndex),
+                                },
                             )}
                             key={index}
                         >

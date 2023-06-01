@@ -5,13 +5,41 @@ import React, { useEffect, useReducer, useRef, useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
 import { isAdmin } from "~/utils/privileges";
 import { ModalChangeEvent } from "./ModalChangeEvent";
-import type { EventEntry, EventModifier } from "~/utils/types/schedule";
+import type { EventEntry } from "~/utils/types/schedule";
 import { ChevronLeft } from "~/svg/ChevronLeft";
 import { ChevronRight } from "~/svg/ChevronRight";
+import {
+    fromZanudasToLocalHour,
+    generateDays,
+    generateHourArray,
+    getDay,
+    getTimeRange,
+    weeekReducer,
+} from "~/utils/schedule";
+import { Event } from "./Event";
 
-export function WeekTable() {
-    const [hourArray, setHourArray] = useState<number[]>([]);
-    const selectedDateRef = useRef(new Date());
+type ScheduleProps = {
+    weekStartUTC: number;
+    weekEndUTC: number;
+    eventEntries: EventEntry[];
+};
+
+export function Schedule({
+    weekStartUTC,
+    weekEndUTC,
+    eventEntries,
+}: ScheduleProps) {
+    const selectedDateRef = useRef(new Date(weekStartUTC));
+
+    const [firstScheduleHour, setFirstScheduleHour] = useState(
+        fromZanudasToLocalHour(10, selectedDateRef.current),
+    );
+    const [hourArray, setHourArray] = useState<number[]>(
+        generateHourArray(firstScheduleHour, 12),
+    );
+
+    const [localEventEntries, setLocalEventEntries] = useState(eventEntries);
+
     const [eventEntry, setEventEntry] = useState<EventEntry>({
         id: -1,
         startDate: selectedDateRef.current,
@@ -21,9 +49,6 @@ export function WeekTable() {
         modifier: "Variety",
     });
 
-    const firstTableHourRef = useRef(
-        fromZanudasToLocalHour(10, selectedDateRef.current),
-    );
     const modalChangeRef = useRef<HTMLDialogElement>(null);
     const [
         {
@@ -32,16 +57,35 @@ export function WeekTable() {
         changeRange,
     ] = useReducer(weeekReducer, {
         currentDate: selectedDateRef.current,
-        timeRange: getTimeRange(selectedDateRef.current),
+        timeRange: [weekStartUTC, weekEndUTC],
     });
 
-    const { data: eventsData } = clientAPI.events.getWeek.useQuery({
-        weekStartTimestamp,
-        weekEndTimestamp,
-    });
+    clientAPI.events.getWeek.useQuery(
+        {
+            weekStartTimestamp,
+            weekEndTimestamp,
+        },
+        {
+            onSuccess(events) {
+                setLocalEventEntries(events);
+            },
+        },
+    );
 
     useEffect(() => {
-        setHourArray(generateHourArray(firstTableHourRef.current, 12)); // HACK: this fixes the hydration error if the client's timezone is different from the server's
+        selectedDateRef.current = new Date();
+        const weekRange = getTimeRange(selectedDateRef.current);
+        // setWeekRangeString(`${weekRange[0]}/${weekRange[1]}`);
+        changeRange({
+            type: "NewRange",
+            payload: weekRange,
+        });
+        const localFirstHour = fromZanudasToLocalHour(
+            10,
+            selectedDateRef.current,
+        );
+        setFirstScheduleHour(localFirstHour);
+        setHourArray(generateHourArray(localFirstHour, 12));
     }, []);
 
     const { data: userData } = clientAPI.getAuth.useQuery();
@@ -51,7 +95,7 @@ export function WeekTable() {
         <section className="flex flex-col items-center">
             <header className="flex items-center gap-2 rounded-t-xl bg-sky-950">
                 <button
-                    onClick={() => changeRange("Prev")}
+                    onClick={() => changeRange({ type: "Prev" })}
                     className="rounded-br-xl rounded-tl-xl hover:bg-sky-900"
                 >
                     <ChevronLeft size="2rem" className="fill-slate-50" />
@@ -61,7 +105,7 @@ export function WeekTable() {
                     {new Date(weekEndTimestamp).toDateString().slice(4)}
                 </h2>
                 <button
-                    onClick={() => changeRange("Next")}
+                    onClick={() => changeRange({ type: "Next" })}
                     className="rounded-bl-xl rounded-tr-xl hover:bg-sky-900"
                 >
                     <ChevronRight size="2rem" className="fill-slate-50" />
@@ -107,7 +151,7 @@ export function WeekTable() {
                         />
                     </React.Fragment>
                 ))}
-                {eventsData?.map((event) => (
+                {localEventEntries.map((event) => (
                     <Event
                         onClick={() => {
                             if (!editable) {
@@ -117,7 +161,7 @@ export function WeekTable() {
                             setEventEntry(event);
                         }}
                         key={event.id}
-                        firstTableHour={firstTableHourRef.current}
+                        firstTableHour={firstScheduleHour}
                         day={getDay(event.startDate)}
                         startHour={event.startDate.getHours()}
                         endHour={event.endDate.getHours()}
@@ -135,133 +179,4 @@ export function WeekTable() {
             )}
         </section>
     );
-}
-
-function weeekReducer(
-    {
-        currentDate,
-    }: { timeRange: readonly [number, number]; currentDate: Date },
-    actionType: "Prev" | "Next",
-) {
-    const diff = actionType === "Prev" ? -7 : 7;
-    currentDate.setDate(currentDate.getDate() + diff);
-
-    const timeRange = getTimeRange(currentDate);
-
-    return {
-        currentDate,
-        timeRange,
-    };
-}
-
-function getDay(date: Date) {
-    const day = date.getDay();
-    return day === 0 ? 7 : day;
-}
-
-function fromZanudasToLocalHour(hour: number, date: Date) {
-    const localHourDiff = Math.floor(date.getTimezoneOffset() / 60);
-    return hour - 3 - localHourDiff;
-}
-
-type EventProps = {
-    onClick: () => void;
-    firstTableHour: number;
-    day: number;
-    startHour: number;
-    endHour: number;
-    title: string;
-    modifier: EventModifier;
-};
-function Event({
-    onClick,
-    firstTableHour,
-    day,
-    startHour,
-    endHour,
-    title,
-    modifier,
-}: EventProps) {
-    return (
-        <section
-            onClick={onClick}
-            className={clsx(
-                `col-start-1 rounded-sm p-6 xl:py-0 row-span-[${
-                    endHour - startHour + 1
-                }] xl:col-start-[${day + 1}] xl:row-start-[${
-                    startHour - firstTableHour + 2
-                }] xl:row-end-[${
-                    endHour - firstTableHour + 2
-                }] cursor-pointer transition-all hover:scale-110`,
-                {
-                    "border-4 border-green-700 bg-green-800":
-                        modifier === "Variety",
-                    "border-4 border-sky-700 bg-sky-800": modifier === "VKPlay",
-                    "border-4 border-fuchsia-700 bg-fuchsia-800":
-                        modifier === "Music",
-                    "border-4 border-orange-700 bg-orange-800":
-                        modifier === "Moroshka",
-                    "border-4 border-gray-700 bg-gray-800": modifier === "Free",
-                },
-            )}
-        >
-            <h2 className="flex h-full w-full items-center justify-between whitespace-pre-line xl:justify-center">
-                <span className="mr-10 justify-self-start xl:hidden">
-                    {days[day - 1]}
-                    {`
-                    `}
-                    {startHour}:00 - {endHour}:00
-                </span>
-                <span className="max-w-[15ch] text-right xl:text-left">
-                    {title}
-                </span>
-            </h2>
-        </section>
-    );
-}
-
-function generateDays(weekStartTimestamp: number) {
-    const startDate = new Date(weekStartTimestamp);
-    const out: { dayNumber: number; dayWeek: string }[] = [];
-
-    for (const day of days) {
-        out.push({ dayNumber: startDate.getDate(), dayWeek: day });
-        startDate.setDate(startDate.getDate() + 1);
-    }
-
-    return out;
-}
-
-const days = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-];
-
-export function generateHourArray(startHour = 10, size = 13) {
-    const hourArray: number[] = new Array(size);
-    for (let i = 0; i < size; i++) {
-        const hour = (startHour + i) % 24;
-        hourArray[i] = hour < 0 ? 24 + hour : hour;
-    }
-
-    return hourArray;
-}
-
-function getTimeRange(weekStart = new Date()) {
-    let dayDiff = weekStart.getDay() - 1;
-    if (dayDiff < 0) {
-        dayDiff = 6;
-    }
-    weekStart.setDate(weekStart.getDate() - dayDiff);
-    weekStart.setHours(0, 0, 0, 0);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
-
-    return [weekStart.getTime(), weekEnd.getTime()] as const;
 }

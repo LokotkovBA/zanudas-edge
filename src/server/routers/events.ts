@@ -1,10 +1,11 @@
-import { and, asc, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, lte } from "drizzle-orm";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { events, insertEventsSchema } from "~/drizzle/schemas/events";
 import { z } from "zod";
 import { isAdmin } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { isEventModifier, type EventEntry } from "~/utils/types/schedule";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 
 export const eventsRouter = createTRPCRouter({
     getWeek: publicProcedure
@@ -14,51 +15,8 @@ export const eventsRouter = createTRPCRouter({
                 weekEndTimestamp: z.number(),
             }),
         )
-        .query(
-            async ({
-                ctx,
-                input: { weekStartTimestamp, weekEndTimestamp },
-            }) => {
-                const eventsData = await ctx.drizzle
-                    .select()
-                    .from(events)
-                    .where(
-                        and(
-                            gte(events.startTimestamp, weekStartTimestamp),
-                            lte(events.endTimestamp, weekEndTimestamp),
-                        ),
-                    )
-                    .orderBy(asc(events.startTimestamp))
-                    .all();
-
-                const out: EventEntry[] = [];
-                for (const {
-                    id,
-                    startTimestamp,
-                    endTimestamp,
-                    title,
-                    modifier,
-                    description,
-                } of eventsData) {
-                    if (!isEventModifier(modifier)) {
-                        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-                    }
-
-                    const startDate = new Date(startTimestamp);
-                    const endDate = new Date(endTimestamp);
-
-                    out.push({
-                        id,
-                        startDate,
-                        endDate,
-                        title,
-                        description,
-                        modifier,
-                    });
-                }
-
-                return out;
-            },
+        .query(({ ctx, input: { weekStartTimestamp, weekEndTimestamp } }) =>
+            getEventEntries(weekStartTimestamp, weekEndTimestamp, ctx.drizzle),
         ),
     add: privateProcedure
         .input(insertEventsSchema)
@@ -101,3 +59,47 @@ export const eventsRouter = createTRPCRouter({
         return ctx.drizzle.delete(events).where(eq(events.id, input)).run();
     }),
 });
+
+export async function getEventEntries(
+    weekStartTimestamp: number,
+    weekEndTimestamp: number,
+    db: LibSQLDatabase<Record<string, never>>,
+) {
+    const eventsData = await db
+        .select()
+        .from(events)
+        .where(
+            and(
+                gte(events.startTimestamp, weekStartTimestamp),
+                lte(events.endTimestamp, weekEndTimestamp),
+            ),
+        )
+        .all();
+    const out: EventEntry[] = [];
+    for (const {
+        id,
+        startTimestamp,
+        endTimestamp,
+        title,
+        modifier,
+        description,
+    } of eventsData) {
+        if (!isEventModifier(modifier)) {
+            continue;
+        }
+
+        const startDate = new Date(startTimestamp);
+        const endDate = new Date(endTimestamp);
+
+        out.push({
+            id,
+            startDate,
+            endDate,
+            title,
+            description,
+            modifier,
+        });
+    }
+
+    return out;
+}
