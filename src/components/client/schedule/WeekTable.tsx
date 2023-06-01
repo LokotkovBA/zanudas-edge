@@ -1,31 +1,39 @@
 "use client";
 
 import clsx from "clsx";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
 import { isAdmin } from "~/utils/privileges";
 import { ModalChangeEvent } from "./ModalChangeEvent";
 import type { EventEntry, EventModifier } from "~/utils/types/schedule";
+import { ChevronLeft } from "~/svg/ChevronLeft";
+import { ChevronRight } from "~/svg/ChevronRight";
 
 export function WeekTable() {
     const [hourArray, setHourArray] = useState<number[]>([]);
-    const todayRef = useRef(new Date());
+    const selectedDateRef = useRef(new Date());
     const [eventEntry, setEventEntry] = useState<EventEntry>({
         id: -1,
-        startDate: todayRef.current,
-        endDate: todayRef.current,
+        startDate: selectedDateRef.current,
+        endDate: selectedDateRef.current,
         description: "",
         title: "",
         modifier: "Variety",
     });
 
     const firstTableHourRef = useRef(
-        fromZanudasToLocalHour(10, todayRef.current),
+        fromZanudasToLocalHour(10, selectedDateRef.current),
     );
     const modalChangeRef = useRef<HTMLDialogElement>(null);
-    const [weekStartTimestamp, weekEndTimestamp] = getWeekRange(
-        todayRef.current,
-    );
+    const [
+        {
+            timeRange: [weekStartTimestamp, weekEndTimestamp],
+        },
+        changeRange,
+    ] = useReducer(weeekReducer, {
+        currentDate: selectedDateRef.current,
+        timeRange: getTimeRange(selectedDateRef.current),
+    });
 
     const { data: eventsData } = clientAPI.events.getWeek.useQuery({
         weekStartTimestamp,
@@ -40,18 +48,41 @@ export function WeekTable() {
     const editable = isAdmin(userData?.privileges);
 
     return (
-        <>
+        <section className="flex flex-col items-center">
+            <header className="flex items-center gap-2 rounded-t-xl bg-sky-950">
+                <button
+                    onClick={() => changeRange("Prev")}
+                    className="rounded-br-xl rounded-tl-xl hover:bg-sky-900"
+                >
+                    <ChevronLeft size="2rem" className="fill-slate-50" />
+                </button>
+                <h2>
+                    {new Date(weekStartTimestamp).toDateString().slice(4)} -{" "}
+                    {new Date(weekEndTimestamp).toDateString().slice(4)}
+                </h2>
+                <button
+                    onClick={() => changeRange("Next")}
+                    className="rounded-bl-xl rounded-tr-xl hover:bg-sky-900"
+                >
+                    <ChevronRight size="2rem" className="fill-slate-50" />
+                </button>
+            </header>
             <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-schedule xl:gap-x-4  xl:gap-y-0">
-                {days.map((header, index) => (
-                    <h3
-                        className={`row-start-1 hidden justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
-                            index + 2
-                        }]`}
-                        key={header}
-                    >
-                        {header}
-                    </h3>
-                ))}
+                {generateDays(weekStartTimestamp).map(
+                    ({ dayWeek, dayNumber }, index) => {
+                        return (
+                            <h3
+                                className={`row-start-1 hidden justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
+                                    index + 2
+                                }]`}
+                                key={dayWeek}
+                            >
+                                {dayWeek}, {dayNumber}
+                            </h3>
+                        );
+                    },
+                )}
+
                 <div className="z-[-1] col-span-9 col-start-1 row-start-1 hidden rounded-t bg-sky-950 xl:block" />
                 {hourArray.map((hour, index, array) => (
                     <React.Fragment key={index}>
@@ -102,8 +133,25 @@ export function WeekTable() {
                     modalChangeRef={modalChangeRef}
                 />
             )}
-        </>
+        </section>
     );
+}
+
+function weeekReducer(
+    {
+        currentDate,
+    }: { timeRange: readonly [number, number]; currentDate: Date },
+    actionType: "Prev" | "Next",
+) {
+    const diff = actionType === "Prev" ? -7 : 7;
+    currentDate.setDate(currentDate.getDate() + diff);
+
+    const timeRange = getTimeRange(currentDate);
+
+    return {
+        currentDate,
+        timeRange,
+    };
 }
 
 function getDay(date: Date) {
@@ -172,6 +220,18 @@ function Event({
     );
 }
 
+function generateDays(weekStartTimestamp: number) {
+    const startDate = new Date(weekStartTimestamp);
+    const out: { dayNumber: number; dayWeek: string }[] = [];
+
+    for (const day of days) {
+        out.push({ dayNumber: startDate.getDate(), dayWeek: day });
+        startDate.setDate(startDate.getDate() + 1);
+    }
+
+    return out;
+}
+
 const days = [
     "Monday",
     "Tuesday",
@@ -192,20 +252,16 @@ export function generateHourArray(startHour = 10, size = 13) {
     return hourArray;
 }
 
-function getWeekRange(weekDate = new Date()) {
-    const weekStart = weekDate;
+function getTimeRange(weekStart = new Date()) {
     let dayDiff = weekStart.getDay() - 1;
     if (dayDiff < 0) {
         dayDiff = 6;
     }
     weekStart.setDate(weekStart.getDate() - dayDiff);
     weekStart.setHours(0, 0, 0, 0);
-    const weekEnd = new Date();
+    const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 6);
     weekEnd.setHours(23, 59, 59, 999);
 
-    return [
-        Date.parse(weekStart.toUTCString()),
-        Date.parse(weekEnd.toUTCString()),
-    ] as const;
+    return [weekStart.getTime(), weekEnd.getTime()] as const;
 }
