@@ -1,4 +1,6 @@
 import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+import { createQueryString } from "./routing";
+import { type ReadonlyURLSearchParams } from "next/navigation";
 
 export const modifierArray = [
     "Variety",
@@ -29,21 +31,30 @@ export const eventLinks = {
 export function getRangeParams(
     currentWeekTimestamp: number,
     type: "Prev" | "Next",
+    searchParams: ReadonlyURLSearchParams,
 ) {
     const diff = type === "Next" ? 7 : -7;
 
     const date = new Date(currentWeekTimestamp);
     date.setDate(date.getDate() + diff);
     const [, , weekStartTimestamp, weekEndTimestamp] = getTimeRange(date);
-    return `/?weekRange=${weekStartTimestamp}-${weekEndTimestamp}`;
+    return (
+        "?" +
+        createQueryString(
+            "weekRange",
+            searchParams,
+            `${weekStartTimestamp}-${weekEndTimestamp}`,
+        )
+    );
 }
 
 export function switchWeek(
     currentWeekTimestamp: number,
     type: "Prev" | "Next",
     router: AppRouterInstance,
+    searchParams: ReadonlyURLSearchParams,
 ) {
-    router.push(getRangeParams(currentWeekTimestamp, type));
+    router.push(getRangeParams(currentWeekTimestamp, type, searchParams));
 }
 
 export function generateDays(weekStartTimestamp: number) {

@@ -17,7 +17,7 @@ import {
     switchWeek,
 } from "~/utils/schedule";
 import { Event } from "./Event";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDynamicTime } from "./hooks/useDynamicTime";
 
 type ScheduleProps = {
@@ -64,10 +64,15 @@ export function Schedule({
     const editable = isAdmin(userData?.privileges);
 
     const router = useRouter();
+    const searchParams = useSearchParams();
     useEffect(() => {
-        router.prefetch(getRangeParams(weekStartTimestamp, "Next"));
-        router.prefetch(getRangeParams(weekStartTimestamp, "Prev"));
-    }, [router, weekStartTimestamp]);
+        router.prefetch(
+            getRangeParams(weekStartTimestamp, "Next", searchParams),
+        );
+        router.prefetch(
+            getRangeParams(weekStartTimestamp, "Prev", searchParams),
+        );
+    }, [router, searchParams, weekStartTimestamp]);
 
     const [currentHour, currentWeekDay, isCurrentWeek] = useDynamicTime(
         weekStartTimestamp,
@@ -84,7 +89,12 @@ export function Schedule({
             >
                 <button
                     onClick={() =>
-                        switchWeek(weekStartTimestamp, "Prev", router)
+                        switchWeek(
+                            weekStartTimestamp,
+                            "Prev",
+                            router,
+                            searchParams,
+                        )
                     }
                     className={clsx("rounded-br-xl rounded-tl-xl", {
                         "hover:bg-slate-700": !isCurrentWeek,
@@ -99,7 +109,12 @@ export function Schedule({
                 </h2>
                 <button
                     onClick={() =>
-                        switchWeek(weekStartTimestamp, "Next", router)
+                        switchWeek(
+                            weekStartTimestamp,
+                            "Next",
+                            router,
+                            searchParams,
+                        )
                     }
                     className={clsx("rounded-bl-xl rounded-tr-xl", {
                         "hover:bg-slate-700": !isCurrentWeek,
