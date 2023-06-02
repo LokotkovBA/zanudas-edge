@@ -4,7 +4,7 @@ import { type EventModifier } from "~/utils/types/schedule";
 
 type EventProps = {
     onClick: () => void;
-    firstTableHour: number;
+    firstScheduleHour: number;
     day: number;
     startHour: number;
     endHour: number;
@@ -14,19 +14,26 @@ type EventProps = {
 
 export function Event({
     onClick,
-    firstTableHour,
+    firstScheduleHour,
     day,
     startHour,
     endHour,
     title,
     modifier,
 }: EventProps) {
+    // if (startHour < 0) {
+    //     startHour += 24;
+    // }
+    // if (endHour < 0) {
+    //     endHour += 24;
+    // }
+
     if (startHour > endHour) {
         const range = endHour + 24 - startHour;
         endHour = startHour + range;
     }
 
-    if (firstTableHour > startHour) {
+    if (firstScheduleHour > startHour) {
         startHour += 24;
         endHour += 24;
     }
@@ -38,9 +45,9 @@ export function Event({
                 `col-start-1 rounded-sm p-6 xl:py-0 row-span-[${
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
-                    startHour - firstTableHour + 2
+                    startHour - firstScheduleHour + 2
                 }] xl:row-end-[${
-                    endHour - firstTableHour + 2
+                    endHour - firstScheduleHour + 2
                 }] cursor-pointer transition-all hover:scale-110`,
                 {
                     "border-4 border-green-700 bg-green-800":

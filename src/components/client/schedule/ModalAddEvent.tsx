@@ -2,16 +2,11 @@ import { type FormEvent, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
-import {
-    fromZanudasToLocalHour,
-    generateHourArray,
-    getUTCWeekDay,
-    modifierArray,
-    toUTCHour,
-} from "~/utils/schedule";
+import { getUTCWeekDay, modifierArray, toUTCHour } from "~/utils/schedule";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import Calendar from "~/components/utils/Calendar";
 import { useRouter } from "next/navigation";
+import { useSelectHours } from "./hooks/useSelectHours";
 
 type ModalAddEventProps = {
     modalRef: React.RefObject<HTMLDialogElement>;
@@ -27,9 +22,8 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
 
     const [titleValue, setTitleValue] = useState("");
     const [descriptionValue, setDescriptionValue] = useState("");
-    const hourArrayRef = useRef(
-        generateHourArray(fromZanudasToLocalHour(10, selectedDateValue)),
-    );
+
+    const hourArray = useSelectHours();
 
     const router = useRouter();
 
@@ -126,7 +120,7 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
                             defaultValue="10"
                             id="range-add"
                         >
-                            {hourArrayRef.current.map((hour) => (
+                            {hourArray.map((hour) => (
                                 <option key={hour} value={hour}>
                                     {hour}:00
                                 </option>
@@ -138,7 +132,7 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
                             defaultValue="11"
                             id="select-endhour"
                         >
-                            {hourArrayRef.current.map((hour) => (
+                            {hourArray.map((hour) => (
                                 <option key={hour} value={hour}>
                                     {hour}:00
                                 </option>

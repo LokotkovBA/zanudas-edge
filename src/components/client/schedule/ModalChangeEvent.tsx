@@ -16,7 +16,6 @@ import { Cross } from "~/svg/Cross";
 import { type EventEntry } from "~/utils/types/schedule";
 import {
     fromZanudasToLocalHour,
-    generateHourArray,
     getUTCWeekDay,
     modifierArray,
     toUTCHour,
@@ -25,6 +24,7 @@ import { inputStyles } from "~/components/styles/input";
 import { ModalDeleteEvent } from "./ModalDeleteEvent";
 import Calendar from "~/components/utils/Calendar";
 import { useRouter } from "next/navigation";
+import { useSelectHours } from "./hooks/useSelectHours";
 
 type ModalAddProps = {
     event: EventEntry;
@@ -54,7 +54,7 @@ export function ModalChangeEvent({
         setEndHourValue(endDate.getHours().toString());
     }, [endDate]);
 
-    const hourArrayRef = useRef(generateHourArray(parseInt(startHourValue)));
+    const hourArray = useSelectHours();
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
 
     const router = useRouter();
@@ -173,7 +173,7 @@ export function ModalChangeEvent({
                             className="border border-slate-400 bg-slate-950 p-2"
                             name="startHour-change"
                         >
-                            {hourArrayRef.current.map((hour) => (
+                            {hourArray.map((hour) => (
                                 <option key={hour} value={hour}>
                                     {hour}:00
                                 </option>
@@ -187,7 +187,7 @@ export function ModalChangeEvent({
                             className="border border-slate-400 bg-slate-950 p-2"
                             name="endHour-change"
                         >
-                            {hourArrayRef.current.map((hour) => (
+                            {hourArray.map((hour) => (
                                 <option key={hour} value={hour}>
                                     {hour}:00
                                 </option>

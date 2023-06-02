@@ -89,7 +89,7 @@ export function toUTCHour(hour: number, localHourDiff: number) {
 
 export function fromZanudasToLocalHour(hour: number, date = new Date()) {
     const localHourDiff = Math.floor(date.getTimezoneOffset() / 60);
-    let localHour = hour - 3 - localHourDiff;
+    let localHour = hour - 3 - localHourDiff; // NOTE: Zanuda's local time zone is UTC +3
     if (localHour < 0) {
         localHour += 24;
     }

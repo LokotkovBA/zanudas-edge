@@ -31,6 +31,7 @@ export function Schedule({
     weekStartDate,
     weekEndDate,
 }: ScheduleProps) {
+    const [utcOffset, setUtcOffset] = useState(0);
     const [firstScheduleHour, setFirstScheduleHour] = useState(7);
     const [hourArray, setHourArray] = useState<number[]>(
         generateHourArray(7, 12),
@@ -40,6 +41,7 @@ export function Schedule({
         const localFirstScheduleHour = fromZanudasToLocalHour(10);
         setFirstScheduleHour(localFirstScheduleHour);
         setHourArray(generateHourArray(localFirstScheduleHour, 12));
+        setUtcOffset(Math.floor(new Date().getTimezoneOffset() / 60));
     }, []);
 
     const [eventEntry, setEventEntry] = useState<EventEntry>({
@@ -137,10 +139,12 @@ export function Schedule({
                             setEventEntry(event);
                         }}
                         key={event.id}
-                        firstTableHour={firstScheduleHour}
+                        firstScheduleHour={firstScheduleHour}
                         day={event.weekDay}
-                        startHour={event.startDate.getHours()}
-                        endHour={event.endDate.getHours()}
+                        startHour={
+                            (event.startDate.getUTCHours() - utcOffset) % 24
+                        }
+                        endHour={(event.endDate.getUTCHours() - utcOffset) % 24}
                         title={event.title}
                         modifier={event.modifier}
                     />
