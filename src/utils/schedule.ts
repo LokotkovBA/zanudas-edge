@@ -18,6 +18,14 @@ export const days = [
     "Sunday",
 ];
 
+export const eventLinks = {
+    Variety: "https://twitch.tv/zanuda",
+    Music: "https://twitch.tv/zanuda",
+    Free: "https://t.me/etzalert",
+    Moroshka: "https://twitch.tv/koshkamoroshka",
+    VKPlay: "https://vkplay.live/zanuda",
+};
+
 export function getRangeParams(
     currentWeekTimestamp: number,
     type: "Prev" | "Next",

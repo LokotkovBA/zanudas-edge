@@ -9,6 +9,7 @@ import type { EventEntry } from "~/utils/types/schedule";
 import { ChevronLeft } from "~/svg/ChevronLeft";
 import { ChevronRight } from "~/svg/ChevronRight";
 import {
+    eventLinks,
     fromZanudasToLocalHour,
     generateDays,
     generateHourArray,
@@ -177,6 +178,7 @@ export function Schedule({
                     <Event
                         onClick={() => {
                             if (!editable) {
+                                window.open(eventLinks[event.modifier]);
                                 return;
                             }
                             modalChangeRef.current?.showModal();
