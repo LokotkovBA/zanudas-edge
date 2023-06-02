@@ -2,7 +2,13 @@ import { type FormEvent, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
-import { generateHourArray, modifierArray } from "~/utils/schedule";
+import {
+    fromZanudasToLocalHour,
+    generateHourArray,
+    getUTCWeekDay,
+    modifierArray,
+    toUTCHour,
+} from "~/utils/schedule";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import Calendar from "~/components/utils/Calendar";
 
@@ -20,7 +26,9 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
 
     const [titleValue, setTitleValue] = useState("");
     const [descriptionValue, setDescriptionValue] = useState("");
-    const hourArrayRef = useRef(generateHourArray());
+    const hourArrayRef = useRef(
+        generateHourArray(fromZanudasToLocalHour(10, selectedDateValue)),
+    );
 
     const { mutate: addEvent } = clientAPI.events.add.useMutation({
         onMutate() {
@@ -41,8 +49,19 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
 
     function onSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const startHour = parseInt(startHourRef.current?.value ?? "");
-        const endHour = parseInt(endHourRef.current?.value ?? "");
+        const localHourDiff = Math.floor(
+            selectedDateValue.getTimezoneOffset() / 60,
+        );
+        const startHour = toUTCHour(
+            parseInt(startHourRef.current?.value ?? ""),
+            localHourDiff,
+        );
+        const endHour = toUTCHour(
+            parseInt(endHourRef.current?.value ?? ""),
+            localHourDiff,
+        );
+        console.log(startHour, endHour);
+
         if (endHour < startHour || endHour === startHour) {
             return toast.error("Incorrect range");
         }
@@ -50,13 +69,10 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
             return toast.error("Empty title");
         }
 
-        const startDate = new Date();
-        const endDate = new Date();
-        const selectedDateTimestamp = selectedDateValue.getTime();
-        startDate.setTime(selectedDateTimestamp);
-        startDate.setHours(startHour, 0, 0, 0);
-        endDate.setTime(selectedDateTimestamp);
-        endDate.setHours(endHour, 0, 0, 0);
+        const startDate = new Date(selectedDateValue);
+        const endDate = new Date(selectedDateValue);
+        startDate.setUTCHours(startHour, 0, 0, 0);
+        endDate.setUTCHours(endHour, 0, 0, 0);
 
         addEvent({
             title: titleValue,
@@ -64,6 +80,7 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
             modifier: modifierRef.current?.value,
             startTimestamp: startDate.getTime(),
             endTimestamp: endDate.getTime(),
+            weekDay: getUTCWeekDay(startDate),
         });
     }
 
@@ -84,7 +101,7 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
                         onClick={() => calendarRef.current?.showModal()}
                         className="mr-auto cursor-pointer"
                     >
-                        {selectedDateValue.toDateString()}
+                        {selectedDateValue.toUTCString().slice(0, 16)}
                     </h2>
                     <button
                         className={buttonStyles}

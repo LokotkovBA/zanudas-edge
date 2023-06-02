@@ -61,8 +61,8 @@ export function generateDays(weekStartTimestamp: number) {
     const out: { dayNumber: number; dayWeek: string }[] = [];
 
     for (const day of days) {
-        out.push({ dayNumber: startDate.getDate(), dayWeek: day });
-        startDate.setDate(startDate.getDate() + 1);
+        out.push({ dayNumber: startDate.getUTCDate(), dayWeek: day });
+        startDate.setUTCDate(startDate.getUTCDate() + 1);
     }
 
     return out;
@@ -79,25 +79,38 @@ export function generateHourArray(startHour = 10, size = 13) {
 }
 
 export function getTimeRange(weekStart = new Date()) {
-    let dayDiff = weekStart.getDay() - 1;
-    if (dayDiff < 0) {
-        dayDiff = 6;
-    }
-    weekStart.setDate(weekStart.getDate() - dayDiff);
-    weekStart.setHours(0, 0, 0, 0);
+    const dayDiff = getUTCWeekDay(weekStart) - 1;
+
+    weekStart.setUTCDate(weekStart.getUTCDate() - dayDiff);
+    weekStart.setUTCHours(0, 0, 0, 0);
     const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    weekEnd.setHours(23, 59, 59, 999);
+    weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
+    weekEnd.setUTCHours(23, 59, 59, 999);
 
     return [weekStart.getTime(), weekEnd.getTime()] as const;
 }
 
-export function getDay(date: Date) {
-    const day = date.getDay();
-    return day === 0 ? 7 : day;
+export function getUTCWeekDay(date: Date) {
+    let weekDay = date.getUTCDay();
+    if (weekDay === 0) {
+        weekDay = 7;
+    }
+    return weekDay === 0 ? 7 : weekDay;
 }
 
-export function fromZanudasToLocalHour(hour: number, date: Date) {
+export function toUTCHour(hour: number, localHourDiff: number) {
+    console.log(hour, localHourDiff);
+    const utcHour = (hour + localHourDiff) % 24;
+
+    return utcHour < 0 ? utcHour + 24 : utcHour;
+}
+
+export function fromZanudasToLocalHour(hour: number, date = new Date()) {
     const localHourDiff = Math.floor(date.getTimezoneOffset() / 60);
-    return hour - 3 - localHourDiff;
+    let localHour = hour - 3 - localHourDiff;
+    if (localHour < 0) {
+        localHour += 24;
+    }
+
+    return localHour;
 }

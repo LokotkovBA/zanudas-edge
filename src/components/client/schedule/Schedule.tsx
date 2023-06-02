@@ -12,24 +12,23 @@ import {
     fromZanudasToLocalHour,
     generateDays,
     generateHourArray,
-    getDay,
     getTimeRange,
     weeekReducer,
 } from "~/utils/schedule";
 import { Event } from "./Event";
 
 type ScheduleProps = {
-    weekStartUTC: number;
-    weekEndUTC: number;
+    weekStartServer: number;
+    weekEndServer: number;
     eventEntries: EventEntry[];
 };
 
 export function Schedule({
-    weekStartUTC,
-    weekEndUTC,
+    weekStartServer: weekStartServer,
+    weekEndServer: weekEndServer,
     eventEntries,
 }: ScheduleProps) {
-    const selectedDateRef = useRef(new Date(weekStartUTC));
+    const selectedDateRef = useRef(new Date(weekStartServer));
 
     const [firstScheduleHour, setFirstScheduleHour] = useState(
         fromZanudasToLocalHour(10, selectedDateRef.current),
@@ -47,6 +46,7 @@ export function Schedule({
         description: "",
         title: "",
         modifier: "Variety",
+        weekDay: -1,
     });
 
     const modalChangeRef = useRef<HTMLDialogElement>(null);
@@ -57,7 +57,7 @@ export function Schedule({
         changeRange,
     ] = useReducer(weeekReducer, {
         currentDate: selectedDateRef.current,
-        timeRange: [weekStartUTC, weekEndUTC],
+        timeRange: [weekStartServer, weekEndServer],
     });
 
     clientAPI.events.getWeek.useQuery(
@@ -164,7 +164,7 @@ export function Schedule({
                         }}
                         key={event.id}
                         firstTableHour={firstScheduleHour}
-                        day={getDay(event.startDate)}
+                        day={event.weekDay}
                         startHour={event.startDate.getHours()}
                         endHour={event.endDate.getHours()}
                         title={event.title}

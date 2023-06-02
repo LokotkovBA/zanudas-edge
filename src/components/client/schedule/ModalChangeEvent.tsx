@@ -14,7 +14,13 @@ import { searchBarStyles } from "~/components/styles/searchBar";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { Cross } from "~/svg/Cross";
 import { type EventEntry } from "~/utils/types/schedule";
-import { generateHourArray, modifierArray } from "~/utils/schedule";
+import {
+    fromZanudasToLocalHour,
+    generateHourArray,
+    getUTCWeekDay,
+    modifierArray,
+    toUTCHour,
+} from "~/utils/schedule";
 import { inputStyles } from "~/components/styles/input";
 import { ModalDeleteEvent } from "./ModalDeleteEvent";
 import Calendar from "~/components/utils/Calendar";
@@ -32,8 +38,12 @@ export function ModalChangeEvent({
 }: ModalAddProps) {
     const calendarRef = useRef<HTMLDialogElement>(null);
 
-    const [startHourValue, setStartHourValue] = useState("10");
-    const [endHourValue, setEndHourValue] = useState("11");
+    const [startHourValue, setStartHourValue] = useState(
+        fromZanudasToLocalHour(10, startDate).toString(),
+    );
+    const [endHourValue, setEndHourValue] = useState(
+        fromZanudasToLocalHour(11, startDate).toString(),
+    );
 
     useLayoutEffect(() => {
         setStartHourValue(startDate.getHours().toString());
@@ -43,7 +53,7 @@ export function ModalChangeEvent({
         setEndHourValue(endDate.getHours().toString());
     }, [endDate]);
 
-    const hourArrayRef = useRef(generateHourArray());
+    const hourArrayRef = useRef(generateHourArray(parseInt(startHourValue)));
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
 
     const { mutate: changeEvent } = clientAPI.events.change.useMutation({
@@ -63,8 +73,10 @@ export function ModalChangeEvent({
 
     function onSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const startHour = parseInt(startHourValue);
-        const endHour = parseInt(endHourValue);
+
+        const localHourDiff = Math.floor(startDate.getTimezoneOffset() / 60);
+        const startHour = toUTCHour(parseInt(startHourValue), localHourDiff);
+        const endHour = toUTCHour(parseInt(endHourValue), localHourDiff);
 
         if (endHour < startHour || endHour === startHour) {
             return toast.error("Incorrect range");
@@ -73,8 +85,8 @@ export function ModalChangeEvent({
             return toast.error("Empty title");
         }
 
-        startDate.setHours(startHour, 0, 0, 0);
-        endDate.setHours(endHour, 0, 0, 0);
+        startDate.setUTCHours(startHour, 0, 0, 0);
+        endDate.setUTCHours(endHour, 0, 0, 0);
         const startTimestamp = startDate.getTime();
         const endTimestamp = endDate.getTime();
 
@@ -91,6 +103,7 @@ export function ModalChangeEvent({
             modifier,
             startTimestamp,
             endTimestamp,
+            weekDay: getUTCWeekDay(startDate),
         });
     }
 
@@ -122,7 +135,7 @@ export function ModalChangeEvent({
                         onClick={() => calendarRef.current?.showModal()}
                         className="mr-auto cursor-pointer"
                     >
-                        {startDate.toDateString()}
+                        {startDate.toUTCString().slice(0, 16)}
                     </h2>
                     <button
                         className={buttonStyles}

@@ -21,6 +21,16 @@ export function Event({
     title,
     modifier,
 }: EventProps) {
+    if (startHour > endHour) {
+        const range = endHour + 24 - startHour;
+        endHour = startHour + range;
+    }
+
+    if (firstTableHour > startHour) {
+        startHour += 24;
+        endHour += 24;
+    }
+
     return (
         <section
             onClick={onClick}
@@ -49,7 +59,7 @@ export function Event({
                     {days[day - 1]}
                     {`
                     `}
-                    {startHour}:00 - {endHour}:00
+                    {startHour % 24}:00 - {endHour % 24}:00
                 </span>
                 <span className="max-w-[15ch] text-right xl:text-left">
                     {title}

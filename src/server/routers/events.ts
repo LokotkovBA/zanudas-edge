@@ -37,6 +37,7 @@ export const eventsRouter = createTRPCRouter({
                 modifier: z.string(),
                 startTimestamp: z.number(),
                 endTimestamp: z.number(),
+                weekDay: z.number(),
             }),
         )
         .mutation(({ ctx, input }) => {
@@ -84,6 +85,7 @@ export async function getEventEntries(
         title,
         modifier,
         description,
+        weekDay,
     } of eventsData) {
         if (!isEventModifier(modifier)) {
             continue;
@@ -99,6 +101,7 @@ export async function getEventEntries(
             title,
             description,
             modifier,
+            weekDay,
         });
     }
 

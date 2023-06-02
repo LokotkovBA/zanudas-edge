@@ -34,7 +34,7 @@ export function DatePicker({
         }
         const selectedMonth = arrayOfMonths[index];
         if (!selectedMonth) {
-            selectedDate.setDate(userSelectedDay);
+            selectedDate.setUTCDate(userSelectedDay);
             updateDate();
             setUserSelectedDateIndex(index);
             return;

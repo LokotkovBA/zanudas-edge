@@ -35,8 +35,8 @@ async function InitialSchedule() {
     return (
         <Schedule
             eventEntries={eventEntries}
-            weekStartUTC={weekStartTimestamp}
-            weekEndUTC={weekEndTimestamp}
+            weekStartServer={weekStartTimestamp}
+            weekEndServer={weekEndTimestamp}
         />
     );
 }
