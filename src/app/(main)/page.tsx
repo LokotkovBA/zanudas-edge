@@ -17,9 +17,8 @@ export default async function Home({
 }) {
     const userData = await serverAPI.getAuth.fetch();
 
-    const [weekStartTimestamp, weekEndTimestamp] = parseWeekRange(
-        searchParams.weekRange,
-    );
+    const [weekStartDate, weekEndDate, weekStartTimestamp, weekEndTimestamp] =
+        parseWeekRange(searchParams.weekRange);
     console.log(weekStartTimestamp, weekEndTimestamp);
     return (
         <>
@@ -29,6 +28,8 @@ export default async function Home({
                 <InitialSchedule
                     weekStartTimestamp={weekStartTimestamp}
                     weekEndTimestamp={weekEndTimestamp}
+                    weekStartDate={weekStartDate}
+                    weekEndDate={weekEndDate}
                 />
             </Suspense>
         </>
@@ -38,11 +39,15 @@ export default async function Home({
 type InitialScheduleProps = {
     weekStartTimestamp: number;
     weekEndTimestamp: number;
+    weekStartDate: Date;
+    weekEndDate: Date;
 };
 
 async function InitialSchedule({
     weekStartTimestamp,
     weekEndTimestamp,
+    weekStartDate,
+    weekEndDate,
 }: InitialScheduleProps) {
     const eventEntries = await getEventEntries(
         weekStartTimestamp,
@@ -50,13 +55,11 @@ async function InitialSchedule({
         drizzleClient,
     );
 
-    const weekStartDate = new Date(weekStartTimestamp);
-    const weekEndDate = new Date(weekEndTimestamp);
-
     return (
         <Schedule
             eventEntries={eventEntries}
             weekStartTimestamp={weekStartTimestamp}
+            weekEndTimestamp={weekEndTimestamp}
             weekStartDate={weekStartDate}
             weekEndDate={weekEndDate}
         />
@@ -68,6 +71,15 @@ function parseWeekRange(input: string | string[] | undefined) {
         console.log(input);
         return getTimeRange();
     }
-    const output = input.split("-").map((elem) => parseInt(elem));
-    return output.length === 2 ? output : getTimeRange();
+    const [weekStartTimestamp, weekEndTimestamp] = input
+        .split("-")
+        .map((elem) => parseInt(elem));
+    return weekStartTimestamp && weekEndTimestamp
+        ? ([
+              new Date(weekStartTimestamp),
+              new Date(weekEndTimestamp),
+              weekStartTimestamp,
+              weekEndTimestamp,
+          ] as const)
+        : getTimeRange();
 }

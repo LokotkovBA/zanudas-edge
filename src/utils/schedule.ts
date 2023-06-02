@@ -26,8 +26,8 @@ export function getRangeParams(
 
     const date = new Date(currentWeekTimestamp);
     date.setDate(date.getDate() + diff);
-    const timeRange = getTimeRange(date);
-    return `/?weekRange=${timeRange[0]}-${timeRange[1]}`;
+    const [, , weekStartTimestamp, weekEndTimestamp] = getTimeRange(date);
+    return `/?weekRange=${weekStartTimestamp}-${weekEndTimestamp}`;
 }
 
 export function switchWeek(
@@ -69,7 +69,12 @@ export function getTimeRange(weekStart = new Date()) {
     weekEnd.setUTCDate(weekStart.getUTCDate() + 6);
     weekEnd.setUTCHours(23, 59, 59, 999);
 
-    return [weekStart.getTime(), weekEnd.getTime()] as const;
+    return [
+        weekStart,
+        weekEnd,
+        weekStart.getTime(),
+        weekEnd.getTime(),
+    ] as const;
 }
 
 export function getUTCWeekDay(date: Date) {
@@ -81,7 +86,6 @@ export function getUTCWeekDay(date: Date) {
 }
 
 export function toUTCHour(hour: number, localHourDiff: number) {
-    console.log(hour, localHourDiff);
     const utcHour = (hour + localHourDiff) % 24;
 
     return utcHour < 0 ? utcHour + 24 : utcHour;
@@ -95,4 +99,15 @@ export function fromZanudasToLocalHour(hour: number, date = new Date()) {
     }
 
     return localHour;
+}
+
+export function getIsCurrentWeek(
+    todayTimestamp: number,
+    weekStartTimestamp: number,
+    weekEndTimestamp: number,
+) {
+    return (
+        weekStartTimestamp <= todayTimestamp &&
+        todayTimestamp <= weekEndTimestamp
+    );
 }

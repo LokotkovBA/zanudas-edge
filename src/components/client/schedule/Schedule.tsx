@@ -17,9 +17,11 @@ import {
 } from "~/utils/schedule";
 import { Event } from "./Event";
 import { useRouter } from "next/navigation";
+import { useDynamicTime } from "./hooks/useDynamicTime";
 
 type ScheduleProps = {
     weekStartTimestamp: number;
+    weekEndTimestamp: number;
     eventEntries: EventEntry[];
     weekStartDate: Date;
     weekEndDate: Date;
@@ -27,6 +29,7 @@ type ScheduleProps = {
 
 export function Schedule({
     weekStartTimestamp,
+    weekEndTimestamp,
     eventEntries,
     weekStartDate,
     weekEndDate,
@@ -65,14 +68,27 @@ export function Schedule({
         router.prefetch(getRangeParams(weekStartTimestamp, "Prev"));
     }, [router, weekStartTimestamp]);
 
+    const [currentHour, currentWeekDay, isCurrentWeek] = useDynamicTime(
+        weekStartTimestamp,
+        weekEndTimestamp,
+    );
+
     return (
         <section className="flex flex-col items-center">
-            <header className="flex items-center gap-2 rounded-t-xl bg-sky-950">
+            <header
+                className={clsx("flex items-center gap-2 rounded-t-xl", {
+                    "bg-slate-800": !isCurrentWeek,
+                    "bg-sky-950": isCurrentWeek,
+                })}
+            >
                 <button
                     onClick={() =>
                         switchWeek(weekStartTimestamp, "Prev", router)
                     }
-                    className="rounded-br-xl rounded-tl-xl hover:bg-sky-900"
+                    className={clsx("rounded-br-xl rounded-tl-xl", {
+                        "hover:bg-slate-700": !isCurrentWeek,
+                        "hover:bg-sky-900": isCurrentWeek,
+                    })}
                 >
                     <ChevronLeft size="2rem" className="fill-slate-50" />
                 </button>
@@ -84,7 +100,10 @@ export function Schedule({
                     onClick={() =>
                         switchWeek(weekStartTimestamp, "Next", router)
                     }
-                    className="rounded-bl-xl rounded-tr-xl hover:bg-sky-900"
+                    className={clsx("rounded-bl-xl rounded-tr-xl", {
+                        "hover:bg-slate-700": !isCurrentWeek,
+                        "hover:bg-sky-900": isCurrentWeek,
+                    })}
                 >
                     <ChevronRight size="2rem" className="fill-slate-50" />
                 </button>
@@ -94,9 +113,16 @@ export function Schedule({
                     ({ dayWeek, dayNumber }, index) => {
                         return (
                             <h3
-                                className={`row-start-1 hidden justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
-                                    index + 2
-                                }]`}
+                                className={clsx(
+                                    `row-start-1 hidden justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
+                                        index + 2
+                                    }]`,
+                                    {
+                                        "rounded-xl bg-indigo-950":
+                                            isCurrentWeek &&
+                                            index + 1 === currentWeekDay,
+                                    },
+                                )}
                                 key={dayWeek}
                             >
                                 {dayWeek}, {dayNumber}
@@ -105,30 +131,48 @@ export function Schedule({
                     },
                 )}
 
-                <div className="z-[-1] col-span-9 col-start-1 row-start-1 hidden rounded-t bg-sky-950 xl:block" />
-                {hourArray.map((hour, index, array) => (
-                    <React.Fragment key={index}>
-                        <h3
-                            className={`p-2 xl:row-start-[${
-                                index + 2
-                            }] col-start-1 hidden self-center justify-self-end xl:block`}
-                        >
-                            {hour}:00
-                        </h3>
-                        <div
-                            className={clsx(
-                                `z-[-1] col-span-9 col-start-1 hidden xl:block xl:row-start-[${
+                <div className="z-[-2] col-span-9 col-start-1 row-start-1 hidden rounded-t bg-sky-950 xl:block" />
+                {hourArray.map((hour, index, array) => {
+                    const isEven = index % 2 === 0;
+
+                    return (
+                        <React.Fragment key={index}>
+                            <h3
+                                className={`p-2 xl:row-start-[${
                                     index + 2
-                                }]`,
-                                {
-                                    "bg-sky-950": index % 2 === 1,
-                                    "bg-sky-900": index % 2 === 0,
-                                    "rounded-b": index + 1 === array.length,
-                                },
-                            )}
-                        />
-                    </React.Fragment>
-                ))}
+                                }] col-start-1 hidden self-center justify-self-end xl:block`}
+                            >
+                                {hour}:00
+                            </h3>
+                            <div
+                                className={clsx(
+                                    `z-[-2] col-span-9 col-start-1 hidden xl:block xl:row-start-[${
+                                        index + 2
+                                    }]`,
+                                    {
+                                        "bg-sky-950":
+                                            !isEven &&
+                                            (currentHour !== hour ||
+                                                !isCurrentWeek),
+                                        "bg-indigo-950":
+                                            !isEven &&
+                                            currentHour === hour &&
+                                            isCurrentWeek,
+                                        "bg-sky-900":
+                                            isEven &&
+                                            (currentHour !== hour ||
+                                                !isCurrentWeek),
+                                        "bg-indigo-900":
+                                            isEven &&
+                                            currentHour === hour &&
+                                            isCurrentWeek,
+                                        "rounded-b": index + 1 === array.length,
+                                    },
+                                )}
+                            />
+                        </React.Fragment>
+                    );
+                })}
                 {eventEntries.map((event) => (
                     <Event
                         onClick={() => {
@@ -147,6 +191,10 @@ export function Schedule({
                         endHour={(event.endDate.getUTCHours() - utcOffset) % 24}
                         title={event.title}
                         modifier={event.modifier}
+                        currentHour={currentHour}
+                        isToday={
+                            isCurrentWeek && event.weekDay === currentWeekDay
+                        }
                     />
                 ))}
             </section>

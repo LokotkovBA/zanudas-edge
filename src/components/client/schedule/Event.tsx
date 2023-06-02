@@ -10,6 +10,8 @@ type EventProps = {
     endHour: number;
     title: string;
     modifier: EventModifier;
+    currentHour: number;
+    isToday: boolean;
 };
 
 export function Event({
@@ -20,18 +22,16 @@ export function Event({
     endHour,
     title,
     modifier,
+    currentHour,
+    isToday,
 }: EventProps) {
-    // if (startHour < 0) {
-    //     startHour += 24;
-    // }
-    // if (endHour < 0) {
-    //     endHour += 24;
-    // }
-
     if (startHour > endHour) {
         const range = endHour + 24 - startHour;
         endHour = startHour + range;
     }
+
+    const isActive =
+        isToday && startHour <= currentHour && currentHour < endHour;
 
     if (firstScheduleHour > startHour) {
         startHour += 24;
@@ -42,7 +42,7 @@ export function Event({
         <section
             onClick={onClick}
             className={clsx(
-                `col-start-1 rounded-sm p-6 xl:py-0 row-span-[${
+                `col-start-1 rounded-md border-4 p-6 xl:py-0 row-span-[${
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
@@ -50,14 +50,17 @@ export function Event({
                     endHour - firstScheduleHour + 2
                 }] cursor-pointer transition-all hover:scale-110`,
                 {
-                    "border-4 border-green-700 bg-green-800":
-                        modifier === "Variety",
-                    "border-4 border-sky-700 bg-sky-800": modifier === "VKPlay",
-                    "border-4 border-fuchsia-700 bg-fuchsia-800":
-                        modifier === "Music",
-                    "border-4 border-orange-700 bg-orange-800":
-                        modifier === "Moroshka",
-                    "border-4 border-gray-700 bg-gray-800": modifier === "Free",
+                    "bg-green-800": modifier === "Variety",
+                    "bg-sky-800": modifier === "VKPlay",
+                    "bg-fuchsia-800": modifier === "Music",
+                    "bg-pink-800": modifier === "Moroshka",
+                    "bg-gray-800": modifier === "Free",
+                    "border-green-700": !isActive && modifier === "Variety",
+                    "border-sky-700": !isActive && modifier === "VKPlay",
+                    "border-fuchsia-700": !isActive && modifier === "Music",
+                    "border-pink-700": !isActive && modifier === "Moroshka",
+                    "border-gray-700": !isActive && modifier === "Free",
+                    "border-amber-400": isActive,
                 },
             )}
         >
