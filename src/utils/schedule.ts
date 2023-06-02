@@ -1,3 +1,5 @@
+import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context";
+
 export const modifierArray = [
     "Variety",
     "Music",
@@ -16,44 +18,24 @@ export const days = [
     "Sunday",
 ];
 
-export function weeekReducer(
-    state: { timeRange: readonly [number, number]; currentDate: Date },
-    {
-        type,
-        payload,
-    }: {
-        type: "Prev" | "Next" | "NewRange";
-        payload?: readonly [number, number];
-    },
+export function getRangeParams(
+    currentWeekTimestamp: number,
+    type: "Prev" | "Next",
 ) {
-    let diff = 7;
+    const diff = type === "Next" ? 7 : -7;
 
-    switch (type) {
-        case "Prev":
-            diff = -7;
-        //falls through
-        case "Next":
-            state.currentDate.setDate(state.currentDate.getDate() + diff);
-            const timeRange = getTimeRange(state.currentDate);
+    const date = new Date(currentWeekTimestamp);
+    date.setDate(date.getDate() + diff);
+    const timeRange = getTimeRange(date);
+    return `/?weekRange=${timeRange[0]}-${timeRange[1]}`;
+}
 
-            return {
-                currentDate: state.currentDate,
-                timeRange,
-            };
-        case "NewRange":
-            if (!payload) {
-                break;
-            }
-
-            return {
-                ...state,
-                timeRange: payload,
-            };
-        default:
-            break;
-    }
-
-    return state;
+export function switchWeek(
+    currentWeekTimestamp: number,
+    type: "Prev" | "Next",
+    router: AppRouterInstance,
+) {
+    router.push(getRangeParams(currentWeekTimestamp, type));
 }
 
 export function generateDays(weekStartTimestamp: number) {

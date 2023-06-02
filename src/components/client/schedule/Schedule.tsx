@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import React, { useEffect, useReducer, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { clientAPI } from "~/client/ClientProvider";
 import { isAdmin } from "~/utils/privileges";
 import { ModalChangeEvent } from "./ModalChangeEvent";
@@ -12,37 +12,40 @@ import {
     fromZanudasToLocalHour,
     generateDays,
     generateHourArray,
-    getTimeRange,
-    weeekReducer,
+    getRangeParams,
+    switchWeek,
 } from "~/utils/schedule";
 import { Event } from "./Event";
+import { useRouter } from "next/navigation";
 
 type ScheduleProps = {
-    weekStartServer: number;
-    weekEndServer: number;
+    weekStartTimestamp: number;
     eventEntries: EventEntry[];
+    weekStartDate: Date;
+    weekEndDate: Date;
 };
 
 export function Schedule({
-    weekStartServer: weekStartServer,
-    weekEndServer: weekEndServer,
+    weekStartTimestamp,
     eventEntries,
+    weekStartDate,
+    weekEndDate,
 }: ScheduleProps) {
-    const selectedDateRef = useRef(new Date(weekStartServer));
-
-    const [firstScheduleHour, setFirstScheduleHour] = useState(
-        fromZanudasToLocalHour(10, selectedDateRef.current),
-    );
+    const [firstScheduleHour, setFirstScheduleHour] = useState(7);
     const [hourArray, setHourArray] = useState<number[]>(
-        generateHourArray(firstScheduleHour, 12),
+        generateHourArray(7, 12),
     );
 
-    const [localEventEntries, setLocalEventEntries] = useState(eventEntries);
+    useEffect(() => {
+        const localFirstScheduleHour = fromZanudasToLocalHour(10);
+        setFirstScheduleHour(localFirstScheduleHour);
+        setHourArray(generateHourArray(localFirstScheduleHour, 12));
+    }, []);
 
     const [eventEntry, setEventEntry] = useState<EventEntry>({
         id: -1,
-        startDate: selectedDateRef.current,
-        endDate: selectedDateRef.current,
+        startDate: weekStartDate,
+        endDate: weekEndDate,
         description: "",
         title: "",
         modifier: "Variety",
@@ -50,64 +53,35 @@ export function Schedule({
     });
 
     const modalChangeRef = useRef<HTMLDialogElement>(null);
-    const [
-        {
-            timeRange: [weekStartTimestamp, weekEndTimestamp],
-        },
-        changeRange,
-    ] = useReducer(weeekReducer, {
-        currentDate: selectedDateRef.current,
-        timeRange: [weekStartServer, weekEndServer],
-    });
-
-    clientAPI.events.getWeek.useQuery(
-        {
-            weekStartTimestamp,
-            weekEndTimestamp,
-        },
-        {
-            onSuccess(events) {
-                setLocalEventEntries(events);
-            },
-        },
-    );
-
-    useEffect(() => {
-        selectedDateRef.current = new Date();
-        const weekRange = getTimeRange(selectedDateRef.current);
-
-        changeRange({
-            type: "NewRange",
-            payload: weekRange,
-        });
-
-        const localFirstHour = fromZanudasToLocalHour(
-            10,
-            selectedDateRef.current,
-        );
-
-        setFirstScheduleHour(localFirstHour);
-        setHourArray(generateHourArray(localFirstHour, 12));
-    }, []);
 
     const { data: userData } = clientAPI.getAuth.useQuery();
     const editable = isAdmin(userData?.privileges);
+
+    const router = useRouter();
+    useEffect(() => {
+        router.prefetch(getRangeParams(weekStartTimestamp, "Next"));
+        router.prefetch(getRangeParams(weekStartTimestamp, "Prev"));
+    }, [router, weekStartTimestamp]);
 
     return (
         <section className="flex flex-col items-center">
             <header className="flex items-center gap-2 rounded-t-xl bg-sky-950">
                 <button
-                    onClick={() => changeRange({ type: "Prev" })}
+                    onClick={() =>
+                        switchWeek(weekStartTimestamp, "Prev", router)
+                    }
                     className="rounded-br-xl rounded-tl-xl hover:bg-sky-900"
                 >
                     <ChevronLeft size="2rem" className="fill-slate-50" />
                 </button>
                 <h2>
-                    {new Date(weekStartTimestamp).toDateString().slice(4)} -{" "}
-                    {new Date(weekEndTimestamp).toDateString().slice(4)}
+                    {weekStartDate.toUTCString().slice(4, 16)} -{" "}
+                    {weekEndDate.toUTCString().slice(4, 16)}
                 </h2>
                 <button
-                    onClick={() => changeRange({ type: "Next" })}
+                    onClick={() =>
+                        switchWeek(weekStartTimestamp, "Next", router)
+                    }
                     className="rounded-bl-xl rounded-tr-xl hover:bg-sky-900"
                 >
                     <ChevronRight size="2rem" className="fill-slate-50" />
@@ -153,7 +127,7 @@ export function Schedule({
                         />
                     </React.Fragment>
                 ))}
-                {localEventEntries.map((event) => (
+                {eventEntries.map((event) => (
                     <Event
                         onClick={() => {
                             if (!editable) {

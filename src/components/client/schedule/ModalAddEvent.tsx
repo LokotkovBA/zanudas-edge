@@ -11,6 +11,7 @@ import {
 } from "~/utils/schedule";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import Calendar from "~/components/utils/Calendar";
+import { useRouter } from "next/navigation";
 
 type ModalAddEventProps = {
     modalRef: React.RefObject<HTMLDialogElement>;
@@ -30,6 +31,8 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
         generateHourArray(fromZanudasToLocalHour(10, selectedDateValue)),
     );
 
+    const router = useRouter();
+
     const { mutate: addEvent } = clientAPI.events.add.useMutation({
         onMutate() {
             toast.loading("Adding");
@@ -39,6 +42,7 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
             setDescriptionValue("");
             toast.dismiss();
             toast.success("Added");
+            router.refresh();
             modalRef.current?.close();
         },
         onError(error) {

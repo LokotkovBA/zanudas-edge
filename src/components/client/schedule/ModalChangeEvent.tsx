@@ -24,6 +24,7 @@ import {
 import { inputStyles } from "~/components/styles/input";
 import { ModalDeleteEvent } from "./ModalDeleteEvent";
 import Calendar from "~/components/utils/Calendar";
+import { useRouter } from "next/navigation";
 
 type ModalAddProps = {
     event: EventEntry;
@@ -56,6 +57,8 @@ export function ModalChangeEvent({
     const hourArrayRef = useRef(generateHourArray(parseInt(startHourValue)));
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
 
+    const router = useRouter();
+
     const { mutate: changeEvent } = clientAPI.events.change.useMutation({
         onMutate() {
             toast.loading("Changing");
@@ -64,6 +67,7 @@ export function ModalChangeEvent({
             toast.dismiss();
             toast.success("Changed");
             modalChangeRef.current?.close();
+            router.refresh();
         },
         onError(error) {
             toast.dismiss();

@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { clientAPI } from "~/client/ClientProvider";
 import { buttonStyles } from "~/components/styles/button";
@@ -15,6 +16,8 @@ export function ModalDeleteEvent({
     modalDeleteRef,
     modalChangeRef,
 }: ModalDeleteProps) {
+    const router = useRouter();
+
     const { mutate: deleteEvent } = clientAPI.events.delete.useMutation({
         onMutate() {
             toast.loading("Deleting");
@@ -24,6 +27,7 @@ export function ModalDeleteEvent({
             toast.success("Deleted");
             modalChangeRef.current?.close();
             modalDeleteRef.current?.close();
+            router.refresh();
         },
         onError(error) {
             toast.dismiss();
