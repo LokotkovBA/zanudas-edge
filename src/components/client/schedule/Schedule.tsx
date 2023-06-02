@@ -108,7 +108,7 @@ export function Schedule({
                     <ChevronRight size="2rem" className="fill-slate-50" />
                 </button>
             </header>
-            <section className="grid grid-cols-1 grid-rows-5 gap-2 xl:grid-cols-schedule xl:gap-x-4  xl:gap-y-0">
+            <section className="grid grid-cols-1 grid-rows-5 gap-2 rounded-xl border-x-8 border-b-8 border-sky-950 xl:grid-cols-schedule xl:gap-x-4 xl:gap-y-0">
                 {generateDays(weekStartTimestamp).map(
                     ({ dayWeek, dayNumber }, index) => {
                         return (

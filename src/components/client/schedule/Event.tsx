@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { Dot } from "~/svg/Dot";
 import { days } from "~/utils/schedule";
 import { type EventModifier } from "~/utils/types/schedule";
 
@@ -42,7 +43,7 @@ export function Event({
         <section
             onClick={onClick}
             className={clsx(
-                `col-start-1 rounded-md border-4 p-6 xl:py-0 row-span-[${
+                `relative col-start-1 rounded-md p-6 xl:py-0 row-span-[${
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
@@ -55,15 +56,22 @@ export function Event({
                     "bg-fuchsia-800": modifier === "Music",
                     "bg-pink-800": modifier === "Moroshka",
                     "bg-gray-800": modifier === "Free",
-                    "border-green-700": !isActive && modifier === "Variety",
-                    "border-sky-700": !isActive && modifier === "VKPlay",
-                    "border-fuchsia-700": !isActive && modifier === "Music",
-                    "border-pink-700": !isActive && modifier === "Moroshka",
-                    "border-gray-700": !isActive && modifier === "Free",
-                    "border-amber-400": isActive,
                 },
             )}
         >
+            {isActive && modifier !== "Free" && (
+                <>
+                    <Dot
+                        size="1.5rem"
+                        className="animate- absolute right-0 fill-sky-400 stroke-sky-400"
+                    />
+                    <Dot
+                        size="1.5rem"
+                        className="absolute right-0 animate-ping fill-sky-400 stroke-sky-400"
+                    />
+                </>
+            )}
+
             <h2 className="flex h-full w-full items-center justify-between whitespace-pre-line xl:justify-center">
                 <span className="mr-10 justify-self-start xl:hidden">
                     {days[day - 1]}

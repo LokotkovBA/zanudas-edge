@@ -58,7 +58,6 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
             parseInt(endHourRef.current?.value ?? ""),
             localHourDiff,
         );
-        console.log(startHour, endHour);
 
         if (endHour < startHour || endHour === startHour) {
             return toast.error("Incorrect range");
