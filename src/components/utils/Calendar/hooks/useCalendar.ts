@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { getCalendarDates } from "./utils";
+import { getCalendarDates } from "~/utils/calendar";
 
 export function useCalendar(date: Date, dateSetter: (date: Date) => void) {
-    const [selectedMonth, setSelectedMonth] = useState(date.getMonth());
+    const [selectedMonth, setSelectedMonth] = useState(date.getUTCMonth());
     const [userSelectedDateIndex, setUserSelectedDateIndex] = useState(0);
     const [dateData, setDateData] = useState(() => {
         const dateData = getCalendarDates(date);
@@ -14,41 +14,41 @@ export function useCalendar(date: Date, dateSetter: (date: Date) => void) {
         const newDateData = getCalendarDates(date);
         setUserSelectedDateIndex(newDateData.userSelectedDay);
         setDateData(newDateData);
-        setSelectedMonth(date.getMonth());
+        setSelectedMonth(date.getUTCMonth());
     }, [date]);
 
     function incrementMonth(dif: number, userSelectedDay?: number) {
-        let newMonth = date.getMonth() + dif;
+        let newMonth = date.getUTCMonth() + dif;
         if (newMonth < 0) {
             newMonth = 11;
-            date.setFullYear(date.getFullYear() - 1);
+            date.setUTCFullYear(date.getUTCFullYear() - 1);
         } else if (newMonth > 11) {
             newMonth = 0;
-            date.setFullYear(date.getFullYear() + 1);
+            date.setUTCFullYear(date.getUTCFullYear() + 1);
         }
-        date.setMonth(newMonth);
-        if (date.getMonth() !== newMonth) {
-            date.setDate(0);
+        date.setUTCMonth(newMonth);
+        if (date.getUTCMonth() !== newMonth) {
+            date.setUTCDate(0);
         }
         if (userSelectedDay) {
-            date.setDate(userSelectedDay);
+            date.setUTCDate(userSelectedDay);
         }
         updateDate();
     }
 
     function selectMonth(monthIndex: number) {
-        date.setMonth(monthIndex);
-        if (date.getMonth() !== monthIndex) {
-            date.setDate(0);
+        date.setUTCMonth(monthIndex);
+        if (date.getUTCMonth() !== monthIndex) {
+            date.setUTCDate(0);
         }
         updateDate();
     }
 
     function selectYear(year: number) {
-        const curMonth = date.getMonth();
-        date.setFullYear(year);
-        if (curMonth !== date.getMonth()) {
-            date.setDate(0);
+        const curMonth = date.getUTCMonth();
+        date.setUTCFullYear(year);
+        if (curMonth !== date.getUTCMonth()) {
+            date.setUTCDate(0);
         }
         updateDate();
     }
@@ -66,6 +66,6 @@ export function useCalendar(date: Date, dateSetter: (date: Date) => void) {
         userSelectedDateIndex,
         setUserSelectedDateIndex,
         selectYear,
-        selectedYear: date.getFullYear(),
+        selectedYear: date.getUTCFullYear(),
     } as const;
 }

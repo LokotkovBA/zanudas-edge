@@ -8,6 +8,7 @@ export type EventEntry = {
     title: string;
     description: string;
     modifier: EventModifier;
+    weekDay: number;
 };
 
 export type EventModifier = ArrayElement<typeof modifierArray>;

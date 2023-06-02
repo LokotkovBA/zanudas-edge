@@ -8,6 +8,7 @@ export const events = sqliteTable("events", {
     modifier: text("modifier").notNull().default("Game"),
     startTimestamp: integer("start_timestamp").notNull(),
     endTimestamp: integer("end_timestamp").notNull(),
+    weekDay: integer("week_day").notNull(),
 });
 
 export const insertEventsSchema = createInsertSchema(events);

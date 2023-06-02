@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { months } from "./utils";
+import { months } from "~/utils/calendar";
 
 type MonthPickerProps = {
     selectedMonth: number;

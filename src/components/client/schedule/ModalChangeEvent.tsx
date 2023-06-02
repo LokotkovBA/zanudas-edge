@@ -7,17 +7,24 @@ import {
     type Dispatch,
     type SetStateAction,
 } from "react";
-import { generateHourArray } from "./WeekTable";
 import { clientAPI } from "~/client/ClientProvider";
 import { toast } from "react-hot-toast";
 import { buttonStyles } from "~/components/styles/button";
-import { Calendar } from "./Calendar";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
 import { Cross } from "~/svg/Cross";
 import { type EventEntry } from "~/utils/types/schedule";
-import { modifierArray } from "~/utils/schedule";
+import {
+    fromZanudasToLocalHour,
+    getUTCWeekDay,
+    modifierArray,
+    toUTCHour,
+} from "~/utils/schedule";
 import { inputStyles } from "~/components/styles/input";
+import { ModalDeleteEvent } from "./ModalDeleteEvent";
+import Calendar from "~/components/utils/Calendar";
+import { useRouter } from "next/navigation";
+import { useSelectHours } from "./hooks/useSelectHours";
 
 type ModalAddProps = {
     event: EventEntry;
@@ -32,8 +39,12 @@ export function ModalChangeEvent({
 }: ModalAddProps) {
     const calendarRef = useRef<HTMLDialogElement>(null);
 
-    const [startHourValue, setStartHourValue] = useState("10");
-    const [endHourValue, setEndHourValue] = useState("11");
+    const [startHourValue, setStartHourValue] = useState(
+        fromZanudasToLocalHour(10, startDate).toString(),
+    );
+    const [endHourValue, setEndHourValue] = useState(
+        fromZanudasToLocalHour(11, startDate).toString(),
+    );
 
     useLayoutEffect(() => {
         setStartHourValue(startDate.getHours().toString());
@@ -43,8 +54,10 @@ export function ModalChangeEvent({
         setEndHourValue(endDate.getHours().toString());
     }, [endDate]);
 
-    const hourArrayRef = useRef(generateHourArray());
+    const hourArray = useSelectHours();
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
+
+    const router = useRouter();
 
     const { mutate: changeEvent } = clientAPI.events.change.useMutation({
         onMutate() {
@@ -54,6 +67,7 @@ export function ModalChangeEvent({
             toast.dismiss();
             toast.success("Changed");
             modalChangeRef.current?.close();
+            router.refresh();
         },
         onError(error) {
             toast.dismiss();
@@ -63,8 +77,10 @@ export function ModalChangeEvent({
 
     function onSubmit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
-        const startHour = parseInt(startHourValue);
-        const endHour = parseInt(endHourValue);
+
+        const localHourDiff = Math.floor(startDate.getTimezoneOffset() / 60);
+        const startHour = toUTCHour(parseInt(startHourValue), localHourDiff);
+        const endHour = toUTCHour(parseInt(endHourValue), localHourDiff);
 
         if (endHour < startHour || endHour === startHour) {
             return toast.error("Incorrect range");
@@ -73,8 +89,8 @@ export function ModalChangeEvent({
             return toast.error("Empty title");
         }
 
-        startDate.setHours(startHour, 0, 0, 0);
-        endDate.setHours(endHour, 0, 0, 0);
+        startDate.setUTCHours(startHour, 0, 0, 0);
+        endDate.setUTCHours(endHour, 0, 0, 0);
         const startTimestamp = startDate.getTime();
         const endTimestamp = endDate.getTime();
 
@@ -91,6 +107,7 @@ export function ModalChangeEvent({
             modifier,
             startTimestamp,
             endTimestamp,
+            weekDay: getUTCWeekDay(startDate),
         });
     }
 
@@ -122,7 +139,7 @@ export function ModalChangeEvent({
                         onClick={() => calendarRef.current?.showModal()}
                         className="mr-auto cursor-pointer"
                     >
-                        {startDate.toDateString()}
+                        {startDate.toUTCString().slice(0, 16)}
                     </h2>
                     <button
                         className={buttonStyles}
@@ -143,6 +160,14 @@ export function ModalChangeEvent({
                 </section>
                 <form
                     onSubmit={onSubmit}
+                    onKeyDown={(event) => {
+                        if (
+                            event.key === "Enter" &&
+                            (event.metaKey || event.ctrlKey)
+                        ) {
+                            onSubmit(event);
+                        }
+                    }}
                     className="grid-cols-songEdit grid items-center gap-2"
                 >
                     <label htmlFor="range-change">Range</label>
@@ -156,7 +181,7 @@ export function ModalChangeEvent({
                             className="border border-slate-400 bg-slate-950 p-2"
                             name="startHour-change"
                         >
-                            {hourArrayRef.current.map((hour) => (
+                            {hourArray.map((hour) => (
                                 <option key={hour} value={hour}>
                                     {hour}:00
                                 </option>
@@ -170,7 +195,7 @@ export function ModalChangeEvent({
                             className="border border-slate-400 bg-slate-950 p-2"
                             name="endHour-change"
                         >
-                            {hourArrayRef.current.map((hour) => (
+                            {hourArray.map((hour) => (
                                 <option key={hour} value={hour}>
                                     {hour}:00
                                 </option>
@@ -223,67 +248,12 @@ export function ModalChangeEvent({
                     }
                 />
             </dialog>
-            <ModalDelete
+            <ModalDeleteEvent
                 modalChangeRef={modalChangeRef}
                 modalDeleteRef={modalDeleteRef}
                 id={id}
                 title={title}
             />
         </>
-    );
-}
-
-type ModalDeleteProps = {
-    id: number;
-    title: string;
-    modalDeleteRef: React.RefObject<HTMLDialogElement>;
-    modalChangeRef: React.RefObject<HTMLDialogElement>;
-};
-
-export function ModalDelete({
-    id,
-    title,
-    modalDeleteRef,
-    modalChangeRef,
-}: ModalDeleteProps) {
-    const { mutate: deleteEvent } = clientAPI.events.delete.useMutation({
-        onMutate() {
-            toast.loading("Deleting");
-        },
-        onSuccess() {
-            toast.dismiss();
-            toast.success("Deleted");
-            modalChangeRef.current?.close();
-            modalDeleteRef.current?.close();
-        },
-        onError(error) {
-            toast.dismiss();
-            toast.error(`Error: ${error.message}`);
-        },
-    });
-
-    return (
-        <dialog
-            ref={modalDeleteRef}
-            className="border border-slate-500 bg-slate-900 text-slate-50"
-        >
-            <section className="grid grid-cols-2 gap-1 ">
-                <h2 className="col-start-1 col-end-3">
-                    Are you sure you want to delete {title}?
-                </h2>
-                <button
-                    className={buttonStyles}
-                    onClick={() => deleteEvent(id)}
-                >
-                    Yes!
-                </button>
-                <button
-                    className="rounded border-2 border-transparent bg-slate-600 p-1 hover:border-slate-300"
-                    onClick={() => modalDeleteRef.current?.close()}
-                >
-                    No!✋
-                </button>
-            </section>
-        </dialog>
     );
 }

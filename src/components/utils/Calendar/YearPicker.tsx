@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { getYearsRange } from "./utils";
+import { getYearsRange } from "~/utils/calendar";
 
 type YearPickerProps = {
     selectYear: (year: number) => void;

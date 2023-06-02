@@ -35,18 +35,18 @@ function setCalendarDates(
 ) {
     let selectedDateIndex = 0;
 
-    const selectedDate = date.getDate();
-    date.setDate(0);
-    const toMonday = date.getDay() - 1;
-    const lastDateOfPrevMonth = date.getDate();
+    const selectedDate = date.getUTCDate();
+    date.setUTCDate(0);
+    const toMonday = date.getUTCDay() - 1;
+    const lastDateOfPrevMonth = date.getUTCDate();
     if (toMonday >= 0) {
-        date.setDate(lastDateOfPrevMonth - toMonday);
+        date.setUTCDate(lastDateOfPrevMonth - toMonday);
         arrayOfDays[toMonday] = lastDateOfPrevMonth;
     } else {
         arrayOfDays[0] = 1;
         arrayOfMonths[0] = 0;
     }
-    const firstDay = date.getDate();
+    const firstDay = date.getUTCDate();
     let i = 0;
 
     while (arrayOfDays[i] === 0) {
@@ -54,11 +54,11 @@ function setCalendarDates(
         i++;
     }
 
-    date.setDate(1);
-    date.setMonth(date.getMonth() + 2);
-    date.setDate(0);
-    const lastDateOfCurMonth = date.getDate();
-    let daysToAdd = date.getDay();
+    date.setUTCDate(1);
+    date.setUTCMonth(date.getUTCMonth() + 2);
+    date.setUTCDate(0);
+    const lastDateOfCurMonth = date.getUTCDate();
+    let daysToAdd = date.getUTCDay();
     if (daysToAdd !== 0) {
         daysToAdd = 7 - daysToAdd;
     }
@@ -67,10 +67,10 @@ function setCalendarDates(
     let todayIndex = -1;
     let todayDate = -1;
     if (
-        today.getMonth() === date.getMonth() &&
-        today.getFullYear() === date.getFullYear()
+        today.getUTCMonth() === date.getUTCMonth() &&
+        today.getUTCFullYear() === date.getUTCFullYear()
     ) {
-        todayDate = today.getDate();
+        todayDate = today.getUTCDate();
     }
 
     let curDate = arrayOfDays[0] === 1 ? 2 : 1;
@@ -99,7 +99,7 @@ function setCalendarDates(
         curDate++;
         i++;
     }
-    date.setDate(selectedDate);
+    date.setUTCDate(selectedDate);
     return [selectedDateIndex, todayIndex] as const;
 }
 export function getYearsRange(selectedYear: number) {
