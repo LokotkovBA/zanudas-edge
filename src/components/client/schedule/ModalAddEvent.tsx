@@ -109,6 +109,14 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
                 </section>
                 <form
                     onSubmit={onSubmit}
+                    onKeyDown={(event) => {
+                        if (
+                            event.key === "Enter" &&
+                            (event.metaKey || event.ctrlKey)
+                        ) {
+                            onSubmit(event);
+                        }
+                    }}
                     className="grid-cols-songEdit grid items-center gap-2"
                 >
                     <label htmlFor="range-add">Range</label>
