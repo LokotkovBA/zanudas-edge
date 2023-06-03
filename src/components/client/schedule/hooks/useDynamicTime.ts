@@ -32,18 +32,16 @@ export function useDynamicTime(
                 weekEndTimestamp,
             ),
         );
-        const firstWait =
-            todayRef.current.getUTCMinutes() * 60000 +
-            todayRef.current.getUTCSeconds() * 1000;
+        const firstWait = (60 - todayRef.current.getMinutes()) * 60000;
 
         function syncTime() {
             const newTime = new Date();
-            setCurrentHour(newTime.getUTCHours);
+            setCurrentHour(newTime.getHours());
             setIsCurrentWeek(
                 getIsCurrentWeek(
+                    newTime.getTime(),
                     weekStartTimestamp,
                     weekEndTimestamp,
-                    newTime.getTime(),
                 ),
             );
             setCurrentWeekDay(getUTCWeekDay(newTime));
