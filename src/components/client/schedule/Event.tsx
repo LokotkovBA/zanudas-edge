@@ -63,11 +63,11 @@ export function Event({
                 <>
                     <Dot
                         size="1.5rem"
-                        className="animate- absolute right-0 fill-sky-400 stroke-sky-400"
+                        className="animate- absolute right-0 top-0 fill-sky-400 stroke-sky-400"
                     />
                     <Dot
                         size="1.5rem"
-                        className="absolute right-0 animate-ping fill-sky-400 stroke-sky-400"
+                        className="absolute right-0 top-0 animate-ping fill-sky-400 stroke-sky-400"
                     />
                 </>
             )}
