@@ -105,7 +105,9 @@ export function Schedule({
                     <ChevronLeft size="2rem" className="fill-slate-50" />
                 </button>
                 <h2>
-                    {weekStartDate.toUTCString().slice(4, 16)} -{" "}
+                    {weekStartDate.toUTCString().slice(4, 16)}
+                    <br className="sm:hidden" />
+                    <span className="hidden sm:inline"> - </span>
                     {weekEndDate.toUTCString().slice(4, 16)}
                 </h2>
                 <button
@@ -126,13 +128,13 @@ export function Schedule({
                     <ChevronRight size="2rem" className="fill-slate-50" />
                 </button>
             </header>
-            <section className="flex min-w-[110%] flex-col gap-2 rounded-xl border-x-8 border-b-8 border-t-8 border-sky-950 bg-sky-950 xl:grid xl:min-w-min xl:grid-cols-schedule xl:grid-rows-5 xl:gap-x-4 xl:gap-y-0 xl:border-t-0 xl:bg-transparent">
+            <section className="flex flex-col gap-2 rounded-xl border-8 border-sky-950 bg-sky-950 xl:grid xl:min-w-min xl:grid-cols-schedule xl:grid-rows-5 xl:gap-x-4 xl:gap-y-0 xl:border-y-0 xl:bg-transparent">
                 {generateDays(weekStartTimestamp).map(
                     ({ dayWeek, dayNumber }, index) => {
                         return (
                             <h3
                                 className={clsx(
-                                    `row-start-1 hidden justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
+                                    `row-start-1 hidden w-[15ch] justify-center xl:col-auto xl:flex xl:items-center xl:col-start-[${
                                         index + 2
                                     }]`,
                                     {
@@ -192,7 +194,7 @@ export function Schedule({
                     );
                 })}
                 {eventEntries.length === 0 && (
-                    <h2 className="self-center p-2 xl:hidden">
+                    <h2 className="w-60 p-2 text-center sm:w-80 xl:hidden">
                         Событий нет D:
                     </h2>
                 )}

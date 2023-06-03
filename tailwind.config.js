@@ -45,7 +45,7 @@ module.exports = {
                 comic: ["var(--font-comic)"],
             },
             gridTemplateColumns: {
-                schedule: ".2fr repeat(7, 1fr) .1fr",
+                schedule: ".2fr repeat(7, 1fr)",
                 desktopEdit: ".5fr 1fr",
                 mobileEdit: ".2fr 1fr",
                 queue: "3fr 1fr",

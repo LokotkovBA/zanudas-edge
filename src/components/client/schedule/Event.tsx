@@ -43,7 +43,7 @@ export function Event({
         <section
             onClick={onClick}
             className={clsx(
-                `relative col-start-1 rounded-md p-6 xl:py-0 row-span-[${
+                `relative col-start-1 rounded-md p-6 xl:w-[15ch] xl:py-0 row-span-[${
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
@@ -73,13 +73,14 @@ export function Event({
             )}
 
             <h2 className="flex h-full w-full items-center justify-between whitespace-pre-line xl:justify-center">
-                <span className="mr-10 justify-self-start xl:hidden">
+                <span className="justify-self-start xl:hidden">
                     {days[day - 1]}
-                    {`
-                    `}
-                    {startHour % 24}:00 - {endHour % 24}:00
+                    <br />
+                    {startHour % 24}:00 <br className="sm:hidden" />
+                    <span className="hidden sm:inline">-</span> {endHour % 24}
+                    :00
                 </span>
-                <span className="max-w-[15ch] text-right xl:text-left">
+                <span className="max-w-[20ch] text-right xl:text-left">
                     {title}
                 </span>
             </h2>
