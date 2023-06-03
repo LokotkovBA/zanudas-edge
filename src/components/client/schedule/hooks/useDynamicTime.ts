@@ -32,7 +32,9 @@ export function useDynamicTime(
                 weekEndTimestamp,
             ),
         );
-        const firstWait = (60 - todayRef.current.getMinutes()) * 60000;
+        const firstWait =
+            (60 - todayRef.current.getMinutes()) * 60000 -
+            todayRef.current.getSeconds() * 1000;
 
         function syncTime() {
             const newTime = new Date();
