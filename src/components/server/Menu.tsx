@@ -14,9 +14,12 @@ export async function Menu() {
     return (
         <nav className="w-full">
             <menu className="grid grid-cols-2 grid-rows-2 items-center justify-items-center gap-4 text-lg md:flex md:gap-6">
-                <li className="">
-                    <h1 className="font-bold text-amber-400 md:text-3xl">
-                        <Link href="/">{`>3`}</Link>
+                <li>
+                    <h1>
+                        <Link
+                            className="text-2xl font-bold leading-none text-amber-400 md:text-3xl"
+                            href="/"
+                        >{`>3`}</Link>
                     </h1>
                 </li>
                 <PublicLinks />
@@ -36,7 +39,7 @@ export async function Menu() {
                         <ProfileBlock image={user.image} name={user.name} />
                     </li>
                 )}
-                <li>
+                <li className="col-start-2">
                     {!user && <SignInButton />}
                     {user && <SignOutButton />}
                 </li>
@@ -47,7 +50,7 @@ export async function Menu() {
 
 function ProfileBlock({ image, name }: { image: string; name: string }) {
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
             <Image
                 priority={true}
                 className="rounded-full"
