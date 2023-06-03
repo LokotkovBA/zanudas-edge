@@ -51,8 +51,8 @@ export function Event({
                     endHour - firstScheduleHour + 2
                 }] cursor-pointer transition-all hover:scale-110`,
                 {
-                    "bg-green-800": modifier === "Variety",
-                    "bg-sky-800": modifier === "VKPlay",
+                    "bg-purple-800": modifier === "Variety",
+                    "bg-blue-800": modifier === "VKPlay",
                     "bg-fuchsia-800": modifier === "Music",
                     "bg-pink-800": modifier === "Moroshka",
                     "bg-gray-800": modifier === "Free",
