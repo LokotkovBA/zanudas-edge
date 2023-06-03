@@ -19,7 +19,7 @@ export default async function Home({
 
     const [weekStartDate, weekEndDate, weekStartTimestamp, weekEndTimestamp] =
         parseWeekRange(searchParams.weekRange);
-    console.log(weekStartTimestamp, weekEndTimestamp);
+
     return (
         <>
             {isAdmin(userData?.privileges) && <AddEventButton />}{" "}
@@ -68,7 +68,6 @@ async function InitialSchedule({
 
 function parseWeekRange(input: string | string[] | undefined) {
     if (typeof input !== "string") {
-        console.log(input);
         return getTimeRange();
     }
     const [weekStartTimestamp, weekEndTimestamp] = input
