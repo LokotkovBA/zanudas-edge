@@ -40,7 +40,7 @@ export function SearchableUsersList() {
             >
                 {onlyMods ? "Not" : "Show"} only mods
             </button>
-            <ul className="flex items-center gap-2 px-20 py-2">
+            <ul className="flex flex-wrap items-center gap-2 px-20 py-2">
                 {usersData
                     ?.filter(({ name, privileges }) => {
                         let add =
