@@ -88,6 +88,7 @@ export function Schedule({
                 })}
             >
                 <button
+                    title="Prev week"
                     onClick={() =>
                         switchWeek(
                             weekStartTimestamp,
@@ -108,6 +109,7 @@ export function Schedule({
                     {weekEndDate.toUTCString().slice(4, 16)}
                 </h2>
                 <button
+                    title="Next week"
                     onClick={() =>
                         switchWeek(
                             weekStartTimestamp,
