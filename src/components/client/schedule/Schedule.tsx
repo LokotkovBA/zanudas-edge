@@ -82,7 +82,7 @@ export function Schedule({
     return (
         <section className="flex flex-col items-center">
             <header
-                className={clsx("flex items-center gap-2 rounded-t-xl", {
+                className={clsx("flex gap-2 rounded-t-xl", {
                     "bg-slate-800": !isCurrentWeek,
                     "bg-sky-950": isCurrentWeek,
                 })}
@@ -104,7 +104,7 @@ export function Schedule({
                 >
                     <ChevronLeft size="2rem" className="fill-slate-50" />
                 </button>
-                <h2>
+                <h2 className="self-center">
                     {weekStartDate.toUTCString().slice(4, 16)}
                     <br className="sm:hidden" />
                     <span className="hidden sm:inline"> - </span>
