@@ -81,7 +81,7 @@ export function Event({
                 </>
             )}
 
-            <h2 className="flex h-full w-full items-center justify-between sm:min-w-[30ch] xl:justify-center">
+            <h2 className="flex h-full w-full items-center justify-between sm:min-w-[30ch] xl:min-w-0 xl:justify-center">
                 <span className="mr-4 justify-self-start xl:hidden">
                     {days[day - 1]}
                     <br />
