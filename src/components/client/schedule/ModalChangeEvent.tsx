@@ -217,21 +217,21 @@ export function ModalChangeEvent({
                         ))}
                     </select>
                     <label htmlFor="title-change">Title</label>
-                    <textarea
+                    <input
                         onChange={onChange}
                         value={title}
                         name="title"
                         id="title-change"
                         className={inputStyles}
+                        type="text"
                     />
                     <label htmlFor="description-change">Description</label>
-                    <input
+                    <textarea
                         onChange={onChange}
                         value={description}
                         name="description"
                         id="description-change"
                         className={searchBarStyles}
-                        type="text"
                     />
                     <button
                         type="submit"

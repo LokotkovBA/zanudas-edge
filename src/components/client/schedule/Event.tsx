@@ -1,4 +1,6 @@
 import clsx from "clsx";
+import { popUpStyles } from "~/components/styles/popUp";
+import { trianglePopUpStyles } from "~/components/styles/trianglePopUpStyles";
 import { Dot } from "~/svg/Dot";
 import { days } from "~/utils/schedule";
 import { type EventModifier } from "~/utils/types/schedule";
@@ -10,6 +12,7 @@ type EventProps = {
     startHour: number;
     endHour: number;
     title: string;
+    description: string;
     modifier: EventModifier;
     currentHour: number;
     isToday: boolean;
@@ -22,6 +25,7 @@ export function Event({
     startHour,
     endHour,
     title,
+    description,
     modifier,
     currentHour,
     isToday,
@@ -41,21 +45,26 @@ export function Event({
 
     return (
         <section
+            data-before={description}
             onClick={onClick}
             className={clsx(
-                `relative col-start-1 rounded-md p-6 xl:w-[15ch] xl:py-0 row-span-[${
+                popUpStyles,
+                trianglePopUpStyles,
+                `relative col-start-1 rounded-md p-6   
+                xl:w-[15ch] xl:py-0 row-span-[${
                     endHour - startHour + 1
                 }] xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
                 }] xl:row-end-[${
                     endHour - firstScheduleHour + 2
-                }] cursor-pointer transition-all hover:scale-110`,
+                }] cursor-pointer  transition-colors duration-75 ease-in-out`,
                 {
-                    "bg-purple-800": modifier === "Variety",
-                    "bg-blue-800": modifier === "VKPlay",
-                    "bg-fuchsia-800": modifier === "Music",
-                    "bg-pink-800": modifier === "Moroshka",
-                    "bg-gray-800": modifier === "Free",
+                    "bg-purple-800 hover:bg-purple-700": modifier === "Variety",
+                    "bg-blue-800 hover:bg-blue-700": modifier === "VKPlay",
+                    "bg-fuchsia-800 hover:bg-fuchsia-700": modifier === "Music",
+                    "bg-pink-800 hover:bg-pink-700": modifier === "Moroshka",
+                    "bg-gray-800 hover:bg-gray-700": modifier === "Free",
+                    "before:hover:block after:hover:block": description !== "",
                 },
             )}
         >
@@ -72,7 +81,7 @@ export function Event({
                 </>
             )}
 
-            <h2 className="flex h-full w-full items-center justify-between whitespace-pre-line xl:justify-center">
+            <h2 className="flex h-full w-full items-center justify-between xl:justify-center">
                 <span className="justify-self-start xl:hidden">
                     {days[day - 1]}
                     <br />

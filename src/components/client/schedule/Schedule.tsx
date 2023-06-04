@@ -216,6 +216,7 @@ export function Schedule({
                         }
                         endHour={(event.endDate.getUTCHours() - utcOffset) % 24}
                         title={event.title}
+                        description={event.description}
                         modifier={event.modifier}
                         currentHour={currentHour}
                         isToday={
