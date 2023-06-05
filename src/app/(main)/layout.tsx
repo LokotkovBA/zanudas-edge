@@ -12,7 +12,7 @@ export default function MainLayout({ children }: PropsWithChildren) {
                 {/* @ts-expect-error Async Server Component */}
                 <Menu />
             </header>
-            <main className="flex h-full flex-col items-center gap-2 py-2 sm:px-20">
+            <main className="flex h-full flex-col items-center gap-2 pt-2">
                 {children}
             </main>
             <Toaster

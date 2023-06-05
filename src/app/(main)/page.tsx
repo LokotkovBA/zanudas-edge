@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { AddEventButton } from "~/components/client/schedule/AddEventButton";
 import { Schedule } from "~/components/client/schedule/Schedule";
+import { Links } from "~/components/server/Links";
 import { Spinner } from "~/components/utils/Spinner";
 import { drizzleClient } from "~/drizzle/db";
 import { serverAPI } from "~/server/api";
@@ -31,6 +32,7 @@ export default async function Home({
                     weekStartDate={weekStartDate}
                     weekEndDate={weekEndDate}
                 />
+                <Links />
             </Suspense>
         </>
     );
