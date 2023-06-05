@@ -51,9 +51,7 @@ export function Event({
                 popUpStyles,
                 trianglePopUpStyles,
                 `relative col-start-1 rounded-md p-6   
-                xl:w-[15ch] xl:py-0 row-span-[${
-                    endHour - startHour + 1
-                }] xl:col-start-[${day + 1}] xl:row-start-[${
+                xl:w-[15ch] xl:py-0 xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
                 }] xl:row-end-[${
                     endHour - firstScheduleHour + 2
