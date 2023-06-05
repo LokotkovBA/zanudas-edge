@@ -49,16 +49,12 @@ export default async function Home({
 function Links() {
     return (
         <aside
-            className={`z-10 rounded border border-slate-500 bg-slate-950 p-2
-            sm:absolute sm:bottom-0 sm:right-0 sm:rounded-none sm:rounded-tl sm:border-b-0 sm:border-r-0
-            2xl:bottom-auto 2xl:top-1/2 2xl:-translate-y-1/2 2xl:rounded-bl 2xl:border-b`}
+            className={`z-10 h-fit w-full border-t border-slate-500 bg-slate-950 p-2 xl:absolute xl:bottom-0
+        2xl:absolute 2xl:right-0 2xl:top-1/2 2xl:w-fit 2xl:-translate-y-1/2 2xl:rounded-none 2xl:rounded-l 2xl:border-b 2xl:border-l 2xl:border-r-0`}
         >
-            <h2 className="col-span-5 row-start-1 p-2 text-center text-xl font-semibold">
-                Links
-            </h2>
-            <ul className="flex flex-col gap-1">
+            <ul className="flex flex-col gap-1 sm:grid sm:grid-cols-4 2xl:flex 2xl:flex-col">
                 {linksArray.map(({ icon, link, title }) => (
-                    <li className="row-start-2" key={link}>
+                    <li key={link}>
                         <Link
                             className="box-content flex h-10 items-center gap-2 rounded p-2 hover:bg-slate-900"
                             target="_blank"
@@ -77,29 +73,29 @@ function Links() {
 const linksArray = [
     {
         icon: <TwitchColorIcon size="2rem" />,
-        title: "zanuda",
+        title: "Twitch",
         link: "https://www.twitch.tv/zanuda",
     },
     {
         icon: <VKPlayIcon size="2rem" />,
-        title: "zanuda",
+        title: "VKPlay",
         link: "https://vkplay.live/zanuda",
     },
     {
         icon: <TelegramIcon size="2rem" />,
-        title: "Al>3rts",
+        title: "Telegram",
         link: "https://t.me/etzalert",
     },
     {
         icon: (
             <BoostyLogo className="mr-[.35rem]" height="2rem" width="1.65rem" />
         ),
-        title: "zanuda",
+        title: "Boosty",
         link: "https://boosty.to/zanuda",
     },
     {
         icon: <InstagramIcon size="2rem" />,
-        title: "zanudas",
+        title: "Instagram",
         link: "https://www.instagram.com/zanudas",
     },
     {
@@ -109,12 +105,12 @@ const linksArray = [
     },
     {
         icon: <GoodGameLogo width="2rem" height=".88rem" />,
-        title: "morethanthree",
+        title: "GoodGame",
         link: "https://goodgame.ru/channel/morethanthree",
     },
     {
         icon: <VKIcon size="2rem" />,
-        title: ">3",
+        title: "VK",
         link: "https://vk.com/morethanthree",
     },
 ];

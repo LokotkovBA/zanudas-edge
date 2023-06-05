@@ -80,7 +80,7 @@ export function Schedule({
     );
 
     return (
-        <section className="flex flex-col items-center">
+        <section className="mb-4 flex flex-col items-center">
             <header
                 className={clsx("flex gap-2 rounded-t-xl", {
                     "bg-slate-800": !isCurrentWeek,
