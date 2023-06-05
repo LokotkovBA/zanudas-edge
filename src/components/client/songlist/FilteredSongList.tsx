@@ -12,17 +12,17 @@ import { ModalDelete, ModalEdit } from "./SongListModals";
 import { LetterButtons } from "./LetterButtons";
 import { isAdmin } from "~/utils/privileges";
 
-type FilteredListProps = {
+type FilteredSongListProps = {
     privileges: number;
     defferedSearchValue: string;
     selectedCategoryIndex: number;
 };
 
-export const FilteredList = memo(function FilteredList({
+export const FilteredSongList = memo(function FilteredSongList({
     defferedSearchValue,
     selectedCategoryIndex,
     privileges,
-}: FilteredListProps) {
+}: FilteredSongListProps) {
     const { data: songListData } = clientAPI.songlist.getAll.useQuery(
         undefined,
         {
@@ -124,8 +124,8 @@ export const FilteredList = memo(function FilteredList({
             <ul className="w-full sm:w-2/3 xl:w-1/3">
                 {artistBlocks.map((block) => (
                     <ArtistBlock
-                        key={block[0]?.artist ?? "no"}
-                        artist={block[0]?.artist ?? "no"}
+                        key={block.songs[0]?.artist ?? "no"}
+                        artist={block.songs[0]?.artist ?? "no"}
                         setModalData={setModalData}
                         modalDeleteRef={modalDeleteRef}
                         modalEditRef={modalEditRef}

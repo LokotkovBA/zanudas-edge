@@ -1,4 +1,4 @@
-import { type Song } from "~/drizzle/types";
+import type { Block, Song } from "~/drizzle/types";
 
 export function exportJSON(songListData: Song[]) {
     const jsonStringData = `data:text/json;chatset=utf8,${encodeURIComponent(
@@ -14,44 +14,39 @@ export function exportJSON(songListData: Song[]) {
 export function splitByArtist(
     artistFirstLetters: string[],
     list?: Song[],
-): Song[][] {
+): Block[] {
     artistFirstLetters.length = 0;
-    const result: Song[][] = [];
+    const result: Block[] = [];
     if (list === undefined || list.length === 0) return result;
 
     let curArtist = list[0]?.artist;
     let curArtistArray: Song[] = [];
     for (const song of list) {
         if (song.artist !== curArtist) {
-            result.push(curArtistArray);
+            result.push({
+                songs: curArtistArray,
+                letter: curArtist?.[0] ?? "",
+            });
             curArtistArray = [];
             curArtist = song.artist;
         }
         curArtistArray.push(song);
     }
-    result.push(curArtistArray);
+    result.push({
+        songs: curArtistArray,
+        letter: curArtist?.[0] ?? "",
+    });
 
-    const firstBlock = result[0];
-    if (!firstBlock) {
-        return result;
-    }
+    let prevLetter = "";
 
-    const firstArtistFirstLetter = firstBlock[0]?.artist[0];
-    if (!firstArtistFirstLetter) {
-        return result;
-    }
-
-    artistFirstLetters.push(firstArtistFirstLetter);
-    let letterIndex = 0;
     for (const block of result) {
-        const curArtistFirstLetter = block[0]?.artist[0];
-        if (
-            curArtistFirstLetter &&
-            artistFirstLetters[letterIndex] !== curArtistFirstLetter
-        ) {
-            artistFirstLetters.push(curArtistFirstLetter);
-            letterIndex++;
+        if (prevLetter === block.letter) {
+            continue;
         }
+
+        prevLetter = block.letter;
+        artistFirstLetters.push(prevLetter);
+        block.letter += "/first";
     }
 
     return result;

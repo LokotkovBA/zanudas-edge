@@ -13,7 +13,7 @@ import { isAdmin } from "~/utils/privileges";
 import { buttonStyles } from "~/components/styles/button";
 import { exportJSON } from "~/utils/songlist";
 import { ModalAdd } from "./SongListModals";
-import { FilteredList } from "./FilteredSongList";
+import { FilteredSongList } from "./FilteredSongList";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -90,7 +90,7 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                     ))}
                 </div>
             </header>
-            <FilteredList
+            <FilteredSongList
                 defferedSearchValue={defferedSearchValue}
                 selectedCategoryIndex={selectedCategoryIndex}
                 privileges={privileges}
