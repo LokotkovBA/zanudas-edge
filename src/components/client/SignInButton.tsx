@@ -2,9 +2,9 @@
 import clsx from "clsx";
 import { signIn } from "~/auth/client";
 import { buttonStyles } from "../styles/button";
-import TwitchIcon from "~/svg/TwitchIcon";
 import { LoaderIcon } from "~/svg/LoaderIcon";
 import { useState } from "react";
+import { TwitchIcon } from "~/svg/TwitchIcon";
 
 type SignInButtonProps = {
     className?: string;

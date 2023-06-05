@@ -1,8 +1,12 @@
 type TwitchIconProps = {
     size: string;
+    className?: string;
 };
 
-const TwitchIcon: React.FC<TwitchIconProps> = ({ size }) => {
+export function TwitchIcon({
+    size,
+    className = "fill-slate-50",
+}: TwitchIconProps) {
     return (
         <svg
             width={size}
@@ -10,7 +14,7 @@ const TwitchIcon: React.FC<TwitchIconProps> = ({ size }) => {
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="fill-slate-50"
+            className={className}
         >
             <path
                 fillRule="evenodd"
@@ -19,6 +23,4 @@ const TwitchIcon: React.FC<TwitchIconProps> = ({ size }) => {
             />
         </svg>
     );
-};
-
-export default TwitchIcon;
+}
