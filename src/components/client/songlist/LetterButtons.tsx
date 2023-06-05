@@ -1,5 +1,4 @@
 import clsx from "clsx";
-import Link from "next/link";
 
 type LetterButtonsProps = {
     letters: string[];
@@ -12,16 +11,22 @@ export function LetterButtons({ letters, className }: LetterButtonsProps) {
             {letters.map((firstLetter) => {
                 return (
                     <li key={firstLetter}>
-                        <Link
+                        <button
                             className="flex w-6 justify-center border border-sky-800 bg-sky-800 px-1 hover:border-slate-50"
-                            scroll={false}
-                            href={`/songlist#${firstLetter}`}
+                            onClick={() => scrollToLetter(firstLetter)}
                         >
                             {firstLetter}
-                        </Link>
+                        </button>
                     </li>
                 );
             })}
         </menu>
     );
+}
+
+function scrollToLetter(letter: string) {
+    document.getElementById(letter)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+    });
 }
