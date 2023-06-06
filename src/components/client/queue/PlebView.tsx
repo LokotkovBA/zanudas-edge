@@ -1,68 +1,29 @@
 "use client";
 
 import { clientAPI } from "~/client/ClientProvider";
-import { LikeBlock } from "./LikeBlock";
-import { EntryNumber } from "~/components/server/queue/EntryNumber";
+import { PlebEntry } from "./PlebEntry";
 
 export function PlebView() {
     const { data: filteredQueueData } = clientAPI.queue.getFiltered.useQuery();
 
     return (
         <>
-            {filteredQueueData?.map(
-                (
-                    {
-                        queue: {
-                            artist,
-                            id,
-                            songName,
-                            donorName,
-                            current,
-                            played,
-                            likeCount,
-                        },
-                        userLikes,
-                    },
-                    index,
-                ) => {
-                    if (current) {
-                        document.title = `${artist} - ${songName}`;
-                    }
-                    return (
-                        <li
-                            key={id}
-                            className="grid items-center gap-2 border-b border-b-sky-600 px-1 py-3 last:border-transparent sm:grid-cols-2 sm:grid-rows-2"
-                        >
-                            <h2 className="col-span-2 grid items-center gap-2 sm:flex sm:flex-wrap">
-                                <EntryNumber
-                                    number={index + 1}
-                                    current={!!current}
-                                    played={!!played}
-                                />
-                                <span className="font-bold text-sky-400">
-                                    {artist}
-                                </span>{" "}
-                                <span className="hidden sm:block">-</span>{" "}
-                                {songName}
-                            </h2>
-                            {donorName && (
-                                <p className="justify-self-end">
-                                    from{" "}
-                                    <span className="font-bold text-amber-400">
-                                        {donorName}
-                                    </span>
-                                </p>
-                            )}
-                            <LikeBlock
-                                songId={id}
-                                className="col-start-2 justify-self-end"
-                                count={likeCount}
-                                value={userLikes ? userLikes.value : 0}
-                            />
-                        </li>
-                    );
-                },
-            )}
+            {filteredQueueData?.map(({ queue, userLikes }, index) => {
+                return (
+                    <PlebEntry
+                        id={queue.id}
+                        index={index}
+                        key={queue.id}
+                        artist={queue.artist}
+                        songName={queue.songName}
+                        donorName={queue.donorName}
+                        current={queue.current}
+                        played={queue.played}
+                        likeCount={queue.likeCount}
+                        userLikes={userLikes}
+                    />
+                );
+            })}
         </>
     );
 }
