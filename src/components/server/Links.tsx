@@ -11,8 +11,9 @@ import { YoutubeIcon } from "~/svg/YoutubeIcon";
 export function Links() {
     return (
         <aside
-            className={`z-10 h-fit w-full border-t border-slate-500 bg-slate-950 p-2 xl:absolute xl:bottom-0
-        2xl:absolute 2xl:right-0 2xl:top-1/2 2xl:w-fit 2xl:-translate-y-1/2 2xl:rounded-none 2xl:rounded-l 2xl:border-b 2xl:border-l 2xl:border-r-0`}
+            className={`z-10 mt-auto h-fit w-full border-t border-slate-500 bg-slate-950 p-2 
+            2xl:absolute 2xl:bottom-0 2xl:right-0 2xl:top-1/2 2xl:w-fit 2xl:-translate-y-1/2 2xl:rounded-none 
+            2xl:rounded-l 2xl:border-b 2xl:border-l 2xl:border-r-0`}
         >
             <ul className="flex flex-col gap-1 sm:grid sm:grid-cols-4 2xl:flex 2xl:flex-col">
                 {linksArray.map(({ icon, link, title }) => (
