@@ -252,6 +252,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                 </form>
                 <button
                     onClick={() => {
+                        console.log(entry);
                         setSelectedEntry?.(entry);
                         modalChangeRef?.current?.showModal();
                     }}
