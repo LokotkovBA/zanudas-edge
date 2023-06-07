@@ -93,12 +93,23 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                         />
                     </button>
                     <EntryNumber
+                        className=""
                         number={index}
                         current={!!entry.current}
                         visible={!!entry.visible}
                         played={!!entry.played}
                     />
-                    {entry.artist} - {entry.songName}
+                    <div>
+                        {entry.artist} - {entry.songName}
+                        {entry.donorName && (
+                            <p>
+                                from{" "}
+                                <span className="font-bold text-amber-400">
+                                    {entry.donorName}
+                                </span>
+                            </p>
+                        )}
+                    </div>
                 </h2>
                 <button
                     onClick={() => {
