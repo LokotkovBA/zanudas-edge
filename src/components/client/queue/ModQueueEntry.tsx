@@ -116,7 +116,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                         setSelectedEntry?.(entry);
                         modalDeleteRef?.current?.showModal();
                     }}
-                    className="self-start justify-self-end rounded-full border border-transparent bg-sky-800 p-2 hover:border-sky-400"
+                    className="self-start justify-self-end rounded-full border border-transparent bg-red-800 p-2 hover:border-slate-50"
                 >
                     <Cross
                         id={`${index}-close`}
