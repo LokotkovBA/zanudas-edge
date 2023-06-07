@@ -259,7 +259,7 @@ export const queueRouter = createTRPCRouter({
             song.playCount++;
             song.likeCount += deletedEntry.likeCount;
             song.lastPlayed = new Date().toISOString();
-            song.tag = deletedEntry.tag;
+            song.tag = deletedEntry.tag === "" ? song.tag : deletedEntry.tag;
 
             return ctx.drizzle
                 .update(songs)
