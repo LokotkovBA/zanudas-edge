@@ -11,6 +11,10 @@ import { getTimeRange } from "~/utils/schedule";
 
 export const runtime = "edge";
 
+export const metadata = {
+    title: "Zanuda's schedule",
+};
+
 export default async function Home({
     searchParams,
 }: {
