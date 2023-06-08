@@ -3,8 +3,8 @@
 import clsx from "clsx";
 import { RepeatedSymbol } from "./RepeatedSymbol";
 import { Progress } from "./Progress";
-import { useIntro } from "~/utils/intro";
 import { type IntroEntry } from "~/utils/types/intro";
+import { useIntro } from "./hooks/useIntro";
 
 type IntroOverlayProps = {
     introData: IntroEntry[];

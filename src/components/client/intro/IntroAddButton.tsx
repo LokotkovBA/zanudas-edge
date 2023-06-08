@@ -71,7 +71,7 @@ export function IntroAddButton() {
                     </label>
                     <input
                         id="preMessage"
-                        placeholder="Будет показано 7.5 секунд"
+                        placeholder="Будет показано 10 секунд"
                         value={preMessageValue}
                         onChange={(event) => {
                             setPreMessageValue(event.target.value);
