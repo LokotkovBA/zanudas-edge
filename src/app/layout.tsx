@@ -11,7 +11,7 @@ const inter = Inter({
 export const metadata = {
     title: "Kalny app",
     description: "Automated queue and song list for Zanuda's kalny streams",
-    icons: "/logo.png",
+    icons: "/favicon.ico",
     themeColor: "#020617",
     other: {
         google: "notranslate",
