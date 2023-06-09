@@ -25,7 +25,7 @@ export function useIntro(introData: IntroEntry[]) {
     );
 
     useEffect(() => {
-        const mainLoop = setInterval(async () => {
+        async function mainLoop() {
             setPosition(-1);
             await sleep(500);
             setPosition(1);
@@ -59,10 +59,13 @@ export function useIntro(introData: IntroEntry[]) {
             }
 
             setSplitMessage(currEntry.mainMessage);
-        }, 20000);
+        }
+
+        mainLoop();
+        const mainLoopInterval = setInterval(mainLoop, 20000);
 
         return () => {
-            clearInterval(mainLoop);
+            clearInterval(mainLoopInterval);
         };
     }, [introData, setSymbol]);
 
