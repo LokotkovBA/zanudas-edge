@@ -14,6 +14,7 @@ import { searchBarStyles } from "~/components/styles/searchBar";
 import { buttonStyles } from "~/components/styles/button";
 import { Cross } from "~/svg/Cross";
 import { deleteButtonStyles } from "~/components/styles/deleteButton";
+import { createMultipleQueryString } from "~/utils/routing";
 
 export function SearchableIntroList() {
     const [filterMessage, setFilterMessage] = useState("");
@@ -232,6 +233,23 @@ function IntroEntry({
                 />
                 <button className={`${buttonStyles} col-span-4`} type="submit">
                     Change
+                </button>
+                <button
+                    onClick={() => {
+                        window.open(
+                            `/intro/preview?${createMultipleQueryString({
+                                mainMessage:
+                                    mainMessageRef.current?.value ?? "",
+                                preMessage: preMessageValue,
+                                symbol: symbolRef.current?.value ?? "",
+                                progress: progressValue,
+                            })}`,
+                        );
+                    }}
+                    className={`${buttonStyles} col-span-4`}
+                    type="button"
+                >
+                    Preview
                 </button>
             </form>
         </li>

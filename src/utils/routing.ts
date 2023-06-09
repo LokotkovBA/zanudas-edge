@@ -14,3 +14,15 @@ export function createQueryString(
 
     return params.toString();
 }
+
+export function createMultipleQueryString(searchParams: {
+    [key: string]: string;
+}) {
+    const params = new URLSearchParams();
+
+    for (const [param, value] of Object.entries(searchParams)) {
+        params.set(param, value);
+    }
+
+    return params.toString();
+}
