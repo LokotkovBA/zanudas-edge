@@ -50,12 +50,11 @@ export function Event({
             className={clsx(
                 popUpStyles,
                 trianglePopUpStyles,
-                `relative col-start-1 rounded-md p-6   
-                xl:w-[15ch] xl:py-0 xl:col-start-[${day + 1}] xl:row-start-[${
+                "relative col-start-1 cursor-pointer rounded-md p-6  transition-colors duration-75 ease-in-out",
+                "xl:w-[15ch] xl:py-0",
+                `xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
-                }] xl:row-end-[${
-                    endHour - firstScheduleHour + 2
-                }] cursor-pointer  transition-colors duration-75 ease-in-out`,
+                }] xl:row-end-[${endHour - firstScheduleHour + 2}]`,
                 {
                     "bg-purple-800 hover:bg-purple-700": modifier === "Variety",
                     "bg-blue-800 hover:bg-blue-700": modifier === "VKPlay",
