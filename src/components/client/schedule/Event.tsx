@@ -50,7 +50,7 @@ export function Event({
             className={clsx(
                 popUpStyles,
                 trianglePopUpStyles,
-                "relative col-start-1 cursor-pointer rounded-md p-6  transition-colors duration-75 ease-in-out",
+                "relative col-start-1 cursor-pointer rounded-md p-6 transition-colors duration-75 ease-in-out",
                 "xl:w-[15ch] xl:py-0",
                 `xl:col-start-[${day + 1}] xl:row-start-[${
                     startHour - firstScheduleHour + 2
