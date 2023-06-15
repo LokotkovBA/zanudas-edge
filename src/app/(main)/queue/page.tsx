@@ -54,14 +54,12 @@ export default async function Queue() {
                         </li>
                     </menu>
                     <Suspense fallback={<Spinner />}>
-                        {/* @ts-expect-error Async Server Component */}
                         <ModPart />
                     </Suspense>
                 </>
             )}
             {!isMod(userData?.privileges) && (
                 <Suspense fallback={<Spinner />}>
-                    {/* @ts-expect-error Async Server Component */}
                     <PlebPart />
                 </Suspense>
             )}

@@ -29,7 +29,6 @@ export default async function Home({
         <>
             {isAdmin(userData?.privileges) && <AddEventButton />}{" "}
             <Suspense fallback={<Spinner />}>
-                {/* @ts-expect-error Async Server Component */}
                 <InitialSchedule
                     weekStartTimestamp={weekStartTimestamp}
                     weekEndTimestamp={weekEndTimestamp}

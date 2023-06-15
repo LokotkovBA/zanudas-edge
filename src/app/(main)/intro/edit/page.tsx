@@ -20,7 +20,6 @@ export default async function Intro() {
 
     return (
         <Suspense fallback={<Spinner />}>
-            {/* @ts-expect-error Async Server Component */}
             <IntroList />
         </Suspense>
     );

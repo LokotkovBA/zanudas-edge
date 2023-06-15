@@ -9,7 +9,6 @@ export default function MainLayout({ children }: PropsWithChildren) {
                 id="top"
                 className="border-b border-b-slate-500 bg-slate-950 px-2 py-4 xl:px-40"
             >
-                {/* @ts-expect-error Async Server Component */}
                 <Menu />
             </header>
             <main className="flex flex-1 flex-col items-center gap-2 pt-2">

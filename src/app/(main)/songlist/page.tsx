@@ -19,7 +19,6 @@ export default async function SongList() {
         <>
             {isAdmin(userData?.privileges) && <FileUploader />}
             <Suspense fallback={<Spinner />}>
-                {/* @ts-expect-error Async Server Component */}
                 <List privileges={userData?.privileges} />
             </Suspense>
         </>

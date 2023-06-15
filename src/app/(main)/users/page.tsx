@@ -21,7 +21,6 @@ export default async function Users() {
     return (
         <>
             <Suspense fallback={<Spinner />}>
-                {/* @ts-expect-error Async Server Component */}
                 <UsersList />
             </Suspense>
         </>
