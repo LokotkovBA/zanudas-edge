@@ -211,6 +211,7 @@ export function Schedule({
                         key={event.id}
                         firstScheduleHour={firstScheduleHour}
                         day={event.weekDay}
+                        date={event.startDate}
                         startHour={
                             (event.startDate.getUTCHours() - utcOffset) % 24
                         }

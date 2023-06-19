@@ -20,12 +20,12 @@ export const eventsRouter = createTRPCRouter({
         ),
     add: privateProcedure
         .input(insertEventsSchema)
-        .mutation(({ ctx, input }) => {
+        .mutation(async ({ ctx, input }) => {
             if (!isAdmin(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
 
-            return ctx.drizzle.insert(events).values(input).run();
+            await ctx.drizzle.insert(events).values(input).run();
         }),
 
     change: privateProcedure

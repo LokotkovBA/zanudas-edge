@@ -9,6 +9,7 @@ type EventProps = {
     onClick: () => void;
     firstScheduleHour: number;
     day: number;
+    date: Date;
     startHour: number;
     endHour: number;
     title: string;
@@ -22,6 +23,7 @@ export function Event({
     onClick,
     firstScheduleHour,
     day,
+    date,
     startHour,
     endHour,
     title,
@@ -81,6 +83,8 @@ export function Event({
             <h2 className="flex h-full w-full items-center justify-between sm:min-w-[30ch] xl:min-w-0 xl:justify-center">
                 <span className="mr-4 justify-self-start xl:hidden">
                     {days[day - 1]}
+                    <span className="hidden sm:inline">,</span>
+                    <br className="sm:hidden" /> {date.getUTCDate()}
                     <br />
                     {startHour % 24}:00 <br className="sm:hidden" />
                     <span className="hidden sm:inline">-</span> {endHour % 24}
