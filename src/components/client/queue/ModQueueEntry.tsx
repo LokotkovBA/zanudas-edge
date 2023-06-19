@@ -18,7 +18,7 @@ type ModQueueEntryProps = {
     className?: string;
     listeners?: SyntheticListenerMap;
     attributes?: DraggableAttributes;
-    id: string;
+    id: number;
     changeEntry?: (entry: ChangedQueueEntry) => void;
     setSelectedEntry?: (entry: QueueEntry) => void;
     setCurrent?: (value: { id: number; value: boolean; index: number }) => void;
@@ -43,7 +43,9 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
         ref,
     ) {
         const { data: queueData } = clientAPI.queue.getAll.useQuery();
-        const queueEntry = queueData?.map.get(id);
+        const queueEntry = queueData?.data.find(
+            (entry) => entry.queue.id === id,
+        );
         useEffect(() => {
             if (
                 queueEntry?.queue.current &&

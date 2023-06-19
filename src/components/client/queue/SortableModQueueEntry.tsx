@@ -5,7 +5,7 @@ import { ModQueueEntry } from "./ModQueueEntry";
 import { useEffect, useState } from "react";
 
 type SortableModQueueEntryProps = {
-    id: string;
+    id: number;
     changeEntry: (entry: ChangedQueueEntry) => void;
     setSelectedEntry: (entry: QueueEntry) => void;
     setCurrent: (value: { id: number; value: boolean; index: number }) => void;

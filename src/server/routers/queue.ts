@@ -30,28 +30,23 @@ export const queueRouter = createTRPCRouter({
             .leftJoin(userLikes, eq(queue.id, userLikes.songId))
             .all();
 
-        const map = new Map<
-            string,
-            { queue: QueueEntry; userLikes: LikeEntry | null }
-        >();
-        const order: string[] = new Array(data.length);
+        const order: number[] = new Array(data.length);
 
         let index = 0;
         for (const entry of data) {
-            const id = entry.queue.id.toString();
-            map.set(id, entry);
+            const id = entry.queue.id;
             order[index] = id;
             index++;
         }
 
         return {
-            map,
+            data,
             order,
         };
     }),
 
     changeOrder: privateProcedure
-        .input(z.array(z.string()))
+        .input(z.array(z.number()))
         .mutation(async ({ ctx, input: newOrder }) => {
             if (!isMod(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
@@ -62,7 +57,7 @@ export const queueRouter = createTRPCRouter({
                 promises[index] = ctx.drizzle
                     .update(queue)
                     .set({ queueNumber: index })
-                    .where(eq(queue.id, parseInt(id)))
+                    .where(eq(queue.id, id))
                     .run();
                 index++;
             }

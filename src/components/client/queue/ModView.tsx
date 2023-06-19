@@ -79,7 +79,7 @@ export function ModView() {
         }),
     );
 
-    const [activeId, setActiveId] = useState<string | null>(null);
+    const [activeId, setActiveId] = useState<number | null>(null);
     const [order, setOrder] = useState(queueData?.order);
 
     useLayoutEffect(() => {
@@ -134,7 +134,7 @@ export function ModView() {
                 <DndContext
                     onDragStart={(event) => {
                         const { active } = event;
-                        setActiveId(active.id.toString());
+                        setActiveId(parseInt(active.id.toString()));
                     }}
                     onDragEnd={onDragEnd}
                     sensors={sensors}
