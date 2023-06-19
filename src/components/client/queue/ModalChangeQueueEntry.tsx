@@ -4,12 +4,10 @@ import { inputStyles } from "~/components/styles/input";
 import { type ChangedQueueEntry, type QueueEntry } from "~/drizzle/types";
 
 type ModalChangeQueueEntryProps = {
-    entry: QueueEntry | null;
+    entry: QueueEntry;
     modalRef: React.RefObject<HTMLDialogElement>;
     changeEntry: (entry: ChangedQueueEntry) => void;
-    modifyEntry: (
-        changeFunction: (oldEntry: QueueEntry | null) => QueueEntry | null,
-    ) => void;
+    modifyEntry: (changeFunction: (oldEntry: QueueEntry) => QueueEntry) => void;
 };
 
 export function ModalChangeQueueEntry({
@@ -26,12 +24,10 @@ export function ModalChangeQueueEntry({
                 event.target.id === "donateAmount"
                     ? parseInt(event.target.value)
                     : event.target.value;
-            return prev !== null
-                ? {
-                      ...prev,
-                      [event.target.id]: value,
-                  }
-                : null;
+            return {
+                ...prev,
+                [event.target.id]: value,
+            };
         });
     }
 

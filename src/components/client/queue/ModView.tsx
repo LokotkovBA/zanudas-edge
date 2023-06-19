@@ -25,6 +25,7 @@ import {
 import { SortableModQueueEntry } from "./SortableModQueueEntry";
 import { ModalChangeQueueEntry } from "./ModalChangeQueueEntry";
 import { ModalDeleteQueueEntry } from "./ModalDeleteQueueEntry";
+import { emptyEntry } from "~/utils/queue";
 
 export function ModView() {
     const { data: queueData } = clientAPI.queue.getAll.useQuery();
@@ -68,7 +69,7 @@ export function ModView() {
         },
     });
 
-    const [selectedEntry, setSelectedEntry] = useState<QueueEntry | null>(null);
+    const [selectedEntry, setSelectedEntry] = useState<QueueEntry>(emptyEntry);
     const modalChangeRef = useRef<HTMLDialogElement>(null);
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
 
