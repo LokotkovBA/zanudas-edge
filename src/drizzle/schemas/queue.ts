@@ -21,6 +21,15 @@ export const queue = sqliteTable("queue", {
 
 export const insertQueueSchema = createInsertSchema(queue);
 export const selectQueueSchema = createSelectSchema(queue);
+export const filteredQueueSelect = {
+    id: queue.id,
+    artist: queue.artist,
+    songName: queue.songName,
+    donorName: queue.donorName,
+    current: queue.current,
+    played: queue.played,
+    likeCount: queue.likeCount,
+};
 
 export const likes = sqliteTable(
     "likes",

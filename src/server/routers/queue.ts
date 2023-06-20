@@ -1,14 +1,10 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
-import { likes, queue } from "~/drizzle/schemas/queue";
+import { filteredQueueSelect, likes, queue } from "~/drizzle/schemas/queue";
 import { isMod } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import {
-    type QueueEntry,
-    type LikeEntry,
-    changedQueueEntrySchema,
-} from "~/drizzle/types";
+import { changedQueueEntrySchema } from "~/drizzle/types";
 import { type RouterOutput } from "./root";
 import { type ResultSet } from "@libsql/client";
 import { songs } from "~/drizzle/schemas/songlist";
@@ -75,8 +71,16 @@ export const queueRouter = createTRPCRouter({
 
     getFiltered: publicProcedure.query(async ({ ctx }) => {
         let out: {
-            queue: QueueEntry;
-            userLikes: LikeEntry | null;
+            queue: {
+                id: number;
+                artist: string;
+                songName: string;
+                donorName: string;
+                current: number;
+                played: number;
+                likeCount: number;
+            };
+            userLikes: { value: number } | null;
         }[];
 
         if (ctx.user) {
@@ -86,7 +90,12 @@ export const queueRouter = createTRPCRouter({
                 .where(eq(likes.userId, ctx.user.id))
                 .as("userLikes");
             out = await ctx.drizzle
-                .select()
+                .select({
+                    queue: filteredQueueSelect,
+                    userLikes: {
+                        value: userLikes.value,
+                    },
+                })
                 .from(queue)
                 .where(eq(queue.visible, 1))
                 .orderBy(asc(queue.queueNumber))
@@ -94,7 +103,7 @@ export const queueRouter = createTRPCRouter({
                 .all();
         } else {
             const data = await ctx.drizzle
-                .select()
+                .select(filteredQueueSelect)
                 .from(queue)
                 .where(eq(queue.visible, 1))
                 .orderBy(asc(queue.queueNumber))

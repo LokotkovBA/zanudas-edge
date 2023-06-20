@@ -12,10 +12,7 @@ type PlebEntryProps = {
     played: number;
     likeCount: number;
     userLikes: {
-        id: number;
         value: number;
-        songId: number | null;
-        userId: string | null;
     } | null;
 };
 
