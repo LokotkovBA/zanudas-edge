@@ -5,6 +5,7 @@ import { HydrateClient } from "~/client/HydrateClient";
 import { AddButton } from "~/components/client/queue/AddButton";
 import { AdminButton } from "~/components/client/queue/AdminButton";
 import { DAControl } from "~/components/client/queue/DAControl";
+import { EmptyQueueReloader } from "~/components/client/queue/EmptyQueueReloader";
 import { ModView } from "~/components/client/queue/ModView";
 import { PlebView } from "~/components/client/queue/PlebView";
 import { QueueSocketsSub } from "~/components/client/queue/QueueSocketsSub";
@@ -112,6 +113,7 @@ function EmptyQueue() {
                 <DonationAlertsIcon size={"1.2em"} />
                 Request
             </Link>
+            <EmptyQueueReloader />
         </h2>
     );
 }
