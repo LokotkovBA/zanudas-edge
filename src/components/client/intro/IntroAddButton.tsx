@@ -55,7 +55,7 @@ export function IntroAddButton() {
                 Add new message
             </button>
             <dialog
-                className="rounded border border-slate-400 bg-slate-900 text-slate-50"
+                className="rounded p-4 border border-slate-400 bg-slate-900 text-slate-50"
                 ref={modalRef}
             >
                 <button

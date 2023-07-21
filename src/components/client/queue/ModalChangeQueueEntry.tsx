@@ -33,7 +33,7 @@ export function ModalChangeQueueEntry({
 
     return (
         <dialog
-            className="border border-slate-500 bg-slate-900 text-slate-50"
+            className="border p-4 border-slate-500 bg-slate-900 text-slate-50"
             onSubmit={(event) => {
                 event.preventDefault();
                 if (!entry) {

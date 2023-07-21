@@ -85,7 +85,7 @@ export function ModalAddEvent({ modalRef }: ModalAddEventProps) {
         <>
             <dialog
                 ref={modalRef}
-                className="border border-slate-500 bg-slate-900 text-slate-50"
+                className="border p-4 border-slate-500 bg-slate-900 text-slate-50"
             >
                 <section className="mb-2 flex items-center">
                     <button

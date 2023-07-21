@@ -282,7 +282,7 @@ function ModalDelete({
     return (
         <dialog
             ref={modalRef}
-            className="border border-slate-500 bg-slate-900 text-slate-50"
+            className="border p-4 border-slate-500 bg-slate-900 text-slate-50"
         >
             <section className="grid grid-cols-2 gap-7 ">
                 <h2 className="col-start-1 col-end-3 text-center">

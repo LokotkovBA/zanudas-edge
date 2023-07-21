@@ -38,7 +38,7 @@ export function ModalAdd({ modalRef }: ModalAddProps) {
     return (
         <dialog
             ref={modalRef}
-            className="border border-slate-500 bg-slate-900 text-slate-50"
+            className="border p-4 border-slate-500 bg-slate-900 text-slate-50"
             onSubmit={(event) => {
                 event.preventDefault();
                 let artistCapitalFirst = artistValue[0]?.toUpperCase();
@@ -124,7 +124,7 @@ export function ModalDelete({
     return (
         <dialog
             ref={modalRef}
-            className="border border-slate-500 bg-slate-900 text-slate-50"
+            className="border p-4 border-slate-500 bg-slate-900 text-slate-50"
         >
             <section className="grid grid-cols-2 gap-1 ">
                 <h2 className="col-start-1 col-end-3">
@@ -190,7 +190,7 @@ export function ModalEdit({ song, modalRef }: ModalEditProps) {
     });
     return (
         <dialog
-            className="border border-slate-500 bg-slate-900 text-slate-50"
+            className="border p-4 border-slate-500 bg-slate-900 text-slate-50"
             onSubmit={(event) => {
                 event.preventDefault();
                 if (!song) {

@@ -69,7 +69,7 @@ export function AdminPanel({ modalRef }: AdminPanelProps) {
 
     return (
         <dialog
-            className="rounded border border-slate-400 bg-slate-950"
+            className="rounded p-4 border border-slate-400 bg-slate-950"
             ref={modalRef}
         >
             <form
