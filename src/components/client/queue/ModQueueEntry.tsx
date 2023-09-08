@@ -237,7 +237,7 @@ export const ModQueueEntry = forwardRef<HTMLLIElement, ModQueueEntryProps>(
                             className="cursor-pointer"
                             htmlFor={`${entry.id}-willAdd`}
                         >
-                            Will add
+                            Song list
                         </label>
                     </div>
                     <CheckBox
