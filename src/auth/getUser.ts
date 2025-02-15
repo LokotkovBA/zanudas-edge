@@ -17,10 +17,13 @@ export function createGetUser(
     cookies: RequestCookies | ReadonlyRequestCookies,
 ) {
     return async () => {
-        const newCookies = cookies.getAll().reduce((cookiesObj, cookie) => {
-            cookiesObj[cookie.name] = cookie.value;
-            return cookiesObj;
-        }, {} as Record<string, string>);
+        const newCookies = cookies.getAll().reduce(
+            (cookiesObj, cookie) => {
+                cookiesObj[cookie.name] = cookie.value;
+                return cookiesObj;
+            },
+            {} as Record<string, string>,
+        );
 
         const sessionToken =
             newCookies["next-auth.session-token"] ??

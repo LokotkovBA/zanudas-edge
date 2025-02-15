@@ -96,8 +96,6 @@ export const songsRouter = createTRPCRouter({
                 .orderBy(asc(songs.artist), asc(songs.songName))
                 .all();
 
-            console.log(songList);
-
             return {
                 songList,
                 ...getListData(songList),
