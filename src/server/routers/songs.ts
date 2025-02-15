@@ -3,7 +3,7 @@ import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { insertSongsSchema, songs } from "~/drizzle/schemas/songlist";
 import { TRPCError } from "@trpc/server";
 import { isAdmin } from "~/utils/privileges";
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, like, not } from "drizzle-orm";
 
 export const songsRouter = createTRPCRouter({
     uploadMany: privateProcedure
@@ -82,6 +82,28 @@ export const songsRouter = createTRPCRouter({
             return ctx.drizzle.insert(songs).values(input).returning().get();
         }),
 
+    getList: publicProcedure
+        .input(z.union([z.literal("kalny"), z.literal("karaoke")]))
+        .query(async ({ ctx, input }) => {
+            const condition =
+                input === "karaoke"
+                    ? like(songs.tag, "%karaoke%")
+                    : not(like(songs.tag, "%karaoke%"));
+            const songList = await ctx.drizzle
+                .select()
+                .from(songs)
+                .where(condition)
+                .orderBy(asc(songs.artist), asc(songs.songName))
+                .all();
+
+            console.log(songList);
+
+            return {
+                songList,
+                ...getListData(songList),
+            };
+        }),
+
     getAll: publicProcedure.query(async ({ ctx }) => {
         const songList = await ctx.drizzle
             .select()
@@ -89,39 +111,63 @@ export const songsRouter = createTRPCRouter({
             .orderBy(asc(songs.artist), asc(songs.songName))
             .all();
 
-        const firstArtistFirstLetter = songList[0]?.artist[0];
-        if (!firstArtistFirstLetter) {
-            throw new TRPCError({
-                code: "INTERNAL_SERVER_ERROR",
-                message: "First artist first letter doesn't exist",
-            });
-        }
-
-        const categories = ["Foreign", "Russian", "OST", "Original"];
-        const categoriesCounts: number[] = [];
-        const artistFirstLetters: string[] = [firstArtistFirstLetter];
-        let lettersIndex = 0;
-        for (const { tag, artist } of songList) {
-            if (artist[0] && artist[0] !== artistFirstLetters[lettersIndex]) {
-                artistFirstLetters.push(artist[0]);
-                lettersIndex++;
-            }
-
-            let index = 0;
-            for (const category of categories) {
-                if (tag.includes(category.toLowerCase())) {
-                    const currentCount = categoriesCounts[index];
-                    categoriesCounts[index] =
-                        currentCount === undefined ? 1 : currentCount + 1;
-                }
-                index++;
-            }
-        }
         return {
             songList,
-            categories,
-            categoriesCounts,
-            artistFirstLetters,
+            ...getListData(songList),
         };
     }),
 });
+
+function getListData(
+    list: {
+        id: number;
+        artist: string;
+        songName: string;
+        tag: string;
+        likeCount: number;
+        playCount: number;
+        lastPlayed: string | null;
+    }[],
+) {
+    if (!list.length)
+        return {
+            categories: [],
+            categoriesCounts: [],
+            artistFirstLetters: [],
+        };
+
+    const firstArtistFirstLetter = list[0]?.artist[0];
+    if (!firstArtistFirstLetter) {
+        throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "First artist first letter doesn't exist",
+        });
+    }
+
+    const categories = ["Foreign", "Russian", "OST", "Original"];
+    const categoriesCounts: number[] = [];
+    const artistFirstLetters: string[] = [firstArtistFirstLetter];
+    let lettersIndex = 0;
+    for (const { tag, artist } of list) {
+        if (artist[0] && artist[0] !== artistFirstLetters[lettersIndex]) {
+            artistFirstLetters.push(artist[0]);
+            lettersIndex++;
+        }
+
+        let index = 0;
+        for (const category of categories) {
+            if (tag.includes(category.toLowerCase())) {
+                const currentCount = categoriesCounts[index];
+                categoriesCounts[index] =
+                    currentCount === undefined ? 1 : currentCount + 1;
+            }
+            index++;
+        }
+    }
+
+    return {
+        categories,
+        categoriesCounts,
+        artistFirstLetters,
+    };
+}

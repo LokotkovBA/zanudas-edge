@@ -14,6 +14,8 @@ import { buttonStyles } from "~/components/styles/button";
 import { exportJSON } from "~/utils/songlist";
 import { ModalAdd } from "./SongListModals";
 import { FilteredSongList } from "./FilteredSongList";
+import type { SongListType } from "~/utils/types";
+import { Spinner } from "~/components/utils/Spinner";
 
 function categoryStyles(isSelected: boolean) {
     const className =
@@ -24,8 +26,14 @@ function categoryStyles(isSelected: boolean) {
     });
 }
 
-export function SearchableSongList({ privileges }: { privileges: number }) {
-    const { data: songListData } = clientAPI.songlist.getAll.useQuery();
+export function SearchableSongList({
+    privileges,
+    type,
+}: {
+    privileges: number;
+    type: SongListType;
+}) {
+    const { data: songListData } = clientAPI.songlist.getList.useQuery(type);
 
     const [selectedCategoryIndex, setSelectedCategoryIndex] = useState(-1);
     const modalAddRef = useRef<HTMLDialogElement>(null);
@@ -37,6 +45,10 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
     }
 
     if (!songListData) {
+        return <Spinner />;
+    }
+
+    if (!songListData.songList.length) {
         return <>The list is empty</>;
     }
 
@@ -94,8 +106,11 @@ export function SearchableSongList({ privileges }: { privileges: number }) {
                 defferedSearchValue={defferedSearchValue}
                 selectedCategoryIndex={selectedCategoryIndex}
                 privileges={privileges}
+                type={type}
             />
-            {isAdmin(privileges) && <ModalAdd modalRef={modalAddRef} />}
+            {isAdmin(privileges) && (
+                <ModalAdd type={type} modalRef={modalAddRef} />
+            )}
         </>
     );
 }

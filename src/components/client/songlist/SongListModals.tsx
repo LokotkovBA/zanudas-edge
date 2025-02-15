@@ -1,4 +1,4 @@
-"use state";
+"use client";
 
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -7,15 +7,17 @@ import { buttonStyles } from "~/components/styles/button";
 import { inputStyles } from "~/components/styles/input";
 import { searchBarStyles } from "~/components/styles/searchBar";
 import { type Song } from "~/drizzle/types";
+import type { SongListType } from "~/utils/types";
 
 type ModalAddProps = {
     modalRef: React.RefObject<HTMLDialogElement>;
+    type: SongListType;
 };
 
-export function ModalAdd({ modalRef }: ModalAddProps) {
+export function ModalAdd({ modalRef, type }: ModalAddProps) {
     const [artistValue, setArtistValue] = useState("");
     const [songNameValue, setSongNameValue] = useState("");
-    const [tagValue, setTagValue] = useState("");
+    const [tagValue, setTagValue] = useState(type === "karaoke" ? type : "");
 
     const { mutate: addSong } = clientAPI.songlist.addSong.useMutation({
         onMutate() {
@@ -24,7 +26,7 @@ export function ModalAdd({ modalRef }: ModalAddProps) {
         onSuccess() {
             setArtistValue("");
             setSongNameValue("");
-            setTagValue("");
+            setTagValue(type === "karaoke" ? type : "");
             toast.dismiss();
             toast.success("Added");
             modalRef.current?.close();

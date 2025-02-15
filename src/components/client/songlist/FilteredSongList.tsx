@@ -11,38 +11,40 @@ import { ArtistBlock } from "./ArtistBlock";
 import { ModalDelete, ModalEdit } from "./SongListModals";
 import { LetterButtons } from "./LetterButtons";
 import { isAdmin } from "~/utils/privileges";
+import type { SongListType } from "~/utils/types";
+import { usePathname } from "next/navigation";
 
 type FilteredSongListProps = {
     privileges: number;
     defferedSearchValue: string;
     selectedCategoryIndex: number;
+    type: SongListType;
 };
 
 export const FilteredSongList = memo(function FilteredSongList({
     defferedSearchValue,
     selectedCategoryIndex,
     privileges,
+    type,
 }: FilteredSongListProps) {
-    const { data: songListData } = clientAPI.songlist.getAll.useQuery(
-        undefined,
-        {
-            onSuccess(songList) {
-                setArtistBlocks(
-                    splitByArtist(
-                        artistFirstLettersRef.current,
-                        filterBySearch(
-                            defferedSearchValue,
-                            filterByCategorySonglist(
-                                selectedCategoryIndex,
-                                songList.categories,
-                                songList.songList,
-                            ),
+    const pathname = usePathname();
+    const { data: songListData } = clientAPI.songlist.getList.useQuery(type, {
+        onSuccess(songList) {
+            setArtistBlocks(
+                splitByArtist(
+                    artistFirstLettersRef.current,
+                    filterBySearch(
+                        defferedSearchValue,
+                        filterByCategorySonglist(
+                            selectedCategoryIndex,
+                            songList.categories,
+                            songList.songList,
                         ),
                     ),
-                );
-            },
+                ),
+            );
         },
-    );
+    });
 
     const modalEditRef = useRef<HTMLDialogElement>(null);
     const modalDeleteRef = useRef<HTMLDialogElement>(null);
@@ -105,7 +107,7 @@ export const FilteredSongList = memo(function FilteredSongList({
                     </button>
                     <Link
                         className="flex h-full items-center justify-center border border-sky-800 bg-sky-800 px-1 hover:border-slate-50"
-                        href="/songlist#top"
+                        href={`${pathname}#top`}
                     >
                         Top
                     </Link>

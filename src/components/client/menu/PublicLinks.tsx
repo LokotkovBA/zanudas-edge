@@ -29,6 +29,16 @@ export default function PublicLinks() {
                     Song list
                 </Link>
             </li>
+            <li>
+                <Link
+                    className={clsx(linkStyles, {
+                        "text-sky-400": pathname === "/karaokelist",
+                    })}
+                    href="/karaokelist"
+                >
+                    Karaoke list
+                </Link>
+            </li>
         </>
     );
 }
