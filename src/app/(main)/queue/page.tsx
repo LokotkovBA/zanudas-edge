@@ -5,6 +5,7 @@ import { HydrateClient } from "~/client/HydrateClient";
 import { AddButton } from "~/components/client/queue/AddButton";
 import { AdminButton } from "~/components/client/queue/AdminButton";
 import { DAControl } from "~/components/client/queue/DAControl";
+import { DeleteAllButton } from "~/components/client/queue/DeleteAllButton";
 import { EmptyQueueReloader } from "~/components/client/queue/EmptyQueueReloader";
 import { ModView } from "~/components/client/queue/ModView";
 import { PlebView } from "~/components/client/queue/PlebView";
@@ -52,6 +53,9 @@ export default async function Queue() {
                         </li>
                         <li>
                             <DAControl encUser={userData.encUser} />
+                        </li>
+                        <li>
+                            <DeleteAllButton />
                         </li>
                     </menu>
                     <Suspense fallback={<Spinner />}>

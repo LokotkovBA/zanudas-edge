@@ -4,7 +4,7 @@ import { filteredQueueSelect, likes, queue } from "~/drizzle/schemas/queue";
 import { isMod } from "~/utils/privileges";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { changedQueueEntrySchema } from "~/drizzle/types";
+import { changedQueueEntrySchema, type Song } from "~/drizzle/types";
 import { type RouterOutput } from "./root";
 import { type ResultSet } from "@libsql/client";
 import { songs } from "~/drizzle/schemas/songlist";
@@ -196,6 +196,92 @@ export const queueRouter = createTRPCRouter({
 
             return index;
         }),
+
+    deleteAll: privateProcedure.mutation(async ({ ctx }) => {
+        if (!isMod(ctx.user.privileges)) {
+            throw new TRPCError({ code: "FORBIDDEN" });
+        }
+
+        const deletedEntries = await ctx.drizzle
+            .delete(queue)
+            .where(eq(queue.played, 1))
+            .returning()
+            .all();
+
+        const getSongPromises: Promise<Song | undefined>[] = [];
+        let kek = -1;
+        for (const deletedEntry of deletedEntries) {
+            kek++;
+            if (deletedEntry.played === 0) {
+                continue;
+            }
+
+            console.log(kek, deletedEntry);
+            getSongPromises.push(
+                ctx.drizzle
+                    .select()
+                    .from(songs)
+                    .where(
+                        and(
+                            eq(songs.artist, deletedEntry.artist),
+                            eq(songs.songName, deletedEntry.songName),
+                        ),
+                    )
+                    .limit(1)
+                    .get(),
+            );
+        }
+
+        const songsToAdd: Song[] = [];
+        const updateSongPromises: Promise<ResultSet>[] = [];
+        let idx = -1;
+        for (const result of await Promise.allSettled(getSongPromises)) {
+            idx++;
+            if (result.status === "rejected") continue;
+
+            const { value: song } = result;
+            const deletedEntry = deletedEntries[idx];
+            console.log(idx, deletedEntry);
+            if (!deletedEntry || (!song && deletedEntry.willAdd === 0)) {
+                continue;
+            }
+
+            if (!song || !song.id) {
+                songsToAdd.push({
+                    artist: deletedEntry.artist,
+                    songName: deletedEntry.songName,
+                    likeCount: deletedEntry.likeCount,
+                    tag: deletedEntry.tag,
+                    playCount: 1,
+                    lastPlayed: new Date().toISOString(),
+                });
+                continue;
+            }
+
+            song.playCount = (song.playCount ?? 0) + 1;
+            song.likeCount = (song.likeCount ?? 0) + deletedEntry.likeCount;
+            song.lastPlayed = new Date().toISOString();
+            song.tag = deletedEntry.tag === "" ? song.tag : deletedEntry.tag;
+
+            updateSongPromises.push(
+                ctx.drizzle
+                    .update(songs)
+                    .set(song)
+                    .where(eq(songs.id, song.id))
+                    .run(),
+            );
+        }
+
+        console.log("song to add", songsToAdd);
+        if (songsToAdd.length) {
+            await Promise.allSettled([
+                ...updateSongPromises,
+                ctx.drizzle.insert(songs).values(songsToAdd).run(),
+            ]);
+        } else {
+            await Promise.allSettled(updateSongPromises);
+        }
+    }),
 
     delete: privateProcedure
         .input(z.object({ id: z.number() }))
