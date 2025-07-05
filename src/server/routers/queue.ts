@@ -1,4 +1,4 @@
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, not } from "drizzle-orm";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
 import { filteredQueueSelect, likes, queue } from "~/drizzle/schemas/queue";
 import { isMod } from "~/utils/privileges";
@@ -7,7 +7,8 @@ import { z } from "zod";
 import { changedQueueEntrySchema, type Song } from "~/drizzle/types";
 import { type RouterOutput } from "./root";
 import { type ResultSet } from "@libsql/client";
-import { songs } from "~/drizzle/schemas/songlist";
+import { karaokeFilter, songs } from "~/drizzle/schemas/songlist";
+import { KARAOKE_TAG } from "~/utils/consts";
 
 export type QueueGetAllOutput = RouterOutput["queue"]["getAll"];
 
@@ -209,14 +210,11 @@ export const queueRouter = createTRPCRouter({
             .all();
 
         const getSongPromises: Promise<Song | undefined>[] = [];
-        let kek = -1;
         for (const deletedEntry of deletedEntries) {
-            kek++;
             if (deletedEntry.played === 0) {
                 continue;
             }
 
-            console.log(kek, deletedEntry);
             getSongPromises.push(
                 ctx.drizzle
                     .select()
@@ -225,6 +223,9 @@ export const queueRouter = createTRPCRouter({
                         and(
                             eq(songs.artist, deletedEntry.artist),
                             eq(songs.songName, deletedEntry.songName),
+                            deletedEntry.tag.includes(KARAOKE_TAG)
+                                ? karaokeFilter
+                                : not(karaokeFilter),
                         ),
                     )
                     .limit(1)
@@ -241,7 +242,6 @@ export const queueRouter = createTRPCRouter({
 
             const { value: song } = result;
             const deletedEntry = deletedEntries[idx];
-            console.log(idx, deletedEntry);
             if (!deletedEntry || (!song && deletedEntry.willAdd === 0)) {
                 continue;
             }
@@ -272,7 +272,6 @@ export const queueRouter = createTRPCRouter({
             );
         }
 
-        console.log("song to add", songsToAdd);
         if (songsToAdd.length) {
             await Promise.allSettled([
                 ...updateSongPromises,
@@ -324,6 +323,9 @@ export const queueRouter = createTRPCRouter({
                     and(
                         eq(songs.artist, deletedEntry.artist),
                         eq(songs.songName, deletedEntry.songName),
+                        deletedEntry.tag.includes(KARAOKE_TAG)
+                            ? karaokeFilter
+                            : not(karaokeFilter),
                     ),
                 )
                 .limit(1)

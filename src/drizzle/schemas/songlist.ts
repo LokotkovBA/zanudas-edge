@@ -1,5 +1,7 @@
+import { like } from "drizzle-orm";
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { KARAOKE_TAG } from "~/utils/consts";
 
 export const songs = sqliteTable("songs", {
     id: integer("id").primaryKey(),
@@ -13,3 +15,5 @@ export const songs = sqliteTable("songs", {
 
 export const insertSongsSchema = createInsertSchema(songs);
 export const selectSongsSchema = createSelectSchema(songs);
+
+export const karaokeFilter = like(songs.tag, `%${KARAOKE_TAG}%`);

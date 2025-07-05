@@ -1,9 +1,14 @@
 import { z } from "zod";
 import { createTRPCRouter, privateProcedure, publicProcedure } from "../trpc";
-import { insertSongsSchema, songs } from "~/drizzle/schemas/songlist";
+import {
+    insertSongsSchema,
+    karaokeFilter,
+    songs,
+} from "~/drizzle/schemas/songlist";
 import { TRPCError } from "@trpc/server";
 import { isAdmin } from "~/utils/privileges";
-import { asc, eq, like, not } from "drizzle-orm";
+import { asc, eq, not } from "drizzle-orm";
+import { KARAOKE_TAG } from "~/utils/consts";
 
 export const songsRouter = createTRPCRouter({
     uploadMany: privateProcedure
@@ -86,9 +91,7 @@ export const songsRouter = createTRPCRouter({
         .input(z.union([z.literal("kalny"), z.literal("karaoke")]))
         .query(async ({ ctx, input }) => {
             const condition =
-                input === "karaoke"
-                    ? like(songs.tag, "%karaoke%")
-                    : not(like(songs.tag, "%karaoke%"));
+                input === KARAOKE_TAG ? karaokeFilter : not(karaokeFilter);
             const songList = await ctx.drizzle
                 .select()
                 .from(songs)
