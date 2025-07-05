@@ -7,6 +7,7 @@ import { type Song } from "~/drizzle/types";
 import { Cross } from "~/svg/Cross";
 import { ThumbsDown } from "~/svg/ThumbsDown";
 import { ThumbsUp } from "~/svg/ThumbsUp";
+import { KARAOKE_TAG } from "~/utils/consts";
 import { isAdmin, isMod } from "~/utils/privileges";
 
 type SongListEntryProps = {
@@ -71,7 +72,8 @@ export function SongListEntry({
                     )}
                     {!!song.playCount && song.playCount > 1 && (
                         <p className="ml-1 whitespace-nowrap">
-                            x{song.playCount}🎹
+                            x{song.playCount}
+                            {song.tag?.includes(KARAOKE_TAG) ? "🗣️" : "🎹"}
                         </p>
                     )}
                 </section>
