@@ -83,6 +83,9 @@ export const songsRouter = createTRPCRouter({
             if (!isAdmin(ctx.user.privileges)) {
                 throw new TRPCError({ code: "FORBIDDEN" });
             }
+            input.artist = input.artist.trim();
+            input.songName = input.songName.trim();
+            input.tag = input.tag.trim();
 
             return ctx.drizzle.insert(songs).values(input).returning().get();
         }),
