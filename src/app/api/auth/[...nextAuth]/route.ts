@@ -19,7 +19,17 @@ async function handler(request: NextRequest) {
     // If we pass the request we get from next to SolidAuthHandler, it will access the headers
     // in a way that next.js does not like and we'll end up with a requestAsyncStorage error
     // https://github.com/vercel/next.js/issues/46356
-    const req = new Request(request.url, {
+    const url = new URL(request.url);
+    if (env.STANDALONE) {
+        url.host =
+            (request.headers.get("x-forwarded-host") ||
+                request.headers.get("host")) ??
+            "localhost:3000";
+        url.port = "";
+        url.protocol = "https";
+    }
+
+    const req = new Request(url.toString(), {
         headers: request.headers,
         cache: request.cache,
         credentials: request.credentials,
