@@ -3,6 +3,8 @@ import { drizzleClient } from "~/drizzle/db";
 import { createDrizzleAdapter } from "./adapters/drizzle-orm";
 import { type SolidAuthConfig } from "./server";
 import { env } from "~/env.mjs";
+import { users } from "~/drizzle/schemas/auth";
+import { eq } from "drizzle-orm";
 
 export const authConfig: SolidAuthConfig = {
     // Configure one or more authentication providers
@@ -16,6 +18,23 @@ export const authConfig: SolidAuthConfig = {
         }),
     ],
     callbacks: {
+        async signIn({ user, profile }) {
+            try {
+                await drizzleClient
+                    .update(users)
+                    .set({
+                        name: profile?.preferred_username ?? undefined,
+                        image: profile?.picture ?? undefined,
+                        email: profile?.email ?? undefined,
+                    })
+                    .where(eq(users.id, user.id))
+                    .run();
+            } catch (e) {
+                console.error(`Error when updating user ${user.name}\n`, e);
+            } finally {
+                return true;
+            }
+        },
         session({ session, user }) {
             if (session.user) {
                 session.user.id = user.id;
